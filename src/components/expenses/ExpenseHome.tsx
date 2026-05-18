@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Target, ArrowUpRight, Search, Lightbulb, Save } from 'lucide-react';
+import { Sparkles, Target, ArrowUpRight, Search, Lightbulb, Save, Edit2, Trash2 } from 'lucide-react';
 import type { Expense, ExpenseSettings, QuickAddTemplate } from '../../types';
 import { getTodayTotal, getMonthTotal, getWeekTotal, getYearTotal, getNoSpendDays, getTodayString, getCurrentTimeString } from '../../utils/expenseUtils';
 
@@ -9,6 +9,8 @@ interface ExpenseHomeProps {
   onAddExpense: (expense: Partial<Expense>) => Promise<void>;
   onSettingsChange: (settings: ExpenseSettings) => void;
   onNavigate: (tab: 'home' | 'add' | 'reports' | 'settings') => void;
+  onEdit?: (expense: Expense) => void;
+  onDelete?: (id: string) => void;
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -22,7 +24,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   'Miscellaneous': '📦',
 };
 
-const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpense, onSettingsChange, onNavigate }) => {
+const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpense, onSettingsChange, onNavigate, onEdit, onDelete }) => {
   const [dayNote, setDayNote] = useState('');
   const [editingNote, setEditingNote] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -201,6 +203,14 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                 <div className="tx-meta">
                   <p className="tx-date">{new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</p>
                   <p className="tx-payment">{exp.payment_method}</p>
+                </div>
+                <div className="flex items-center gap-1 ml-2">
+                  <button onClick={() => onEdit?.(exp)} className="btn-action">
+                    <Edit2 size={16} />
+                  </button>
+                  <button onClick={() => { if (window.confirm('Are you sure you want to delete this expense?')) onDelete?.(exp.id); }} className="btn-action danger">
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
             ))}

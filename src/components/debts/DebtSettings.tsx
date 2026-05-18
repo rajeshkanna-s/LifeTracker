@@ -75,7 +75,7 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
 
       {/* Income & Reminders */}
       <Section id="income" title="Income & Reminders" Icon={Settings} open={openSection} setOpen={setOpenSection}>
-        <div className="grid grid-cols-2 gap-3 pt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-1">Monthly Income ({settings.currencySymbol})</label>
             <input type="number" min={0} value={settings.monthlyIncome || ''} onChange={e => update({ monthlyIncome: parseFloat(e.target.value) || 0 })} className={inputClass} placeholder="e.g., 50000" />
@@ -111,7 +111,7 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
       <Section id="calculator" title="EMI Calculator" Icon={Calculator} open={openSection} setOpen={setOpenSection}>
         <div className="bg-red-50 rounded-xl p-4 mt-4 space-y-3 border border-red-100">
           <h4 className="text-xs font-bold text-red-800">EMI Calculator (Reducing Balance)</h4>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
               <label className="text-[10px] font-bold uppercase text-red-700 mb-1 block">Loan Amount</label>
               <input type="number" placeholder="1000000" value={calcPrincipal} onChange={e => setCalcPrincipal(e.target.value)} className={inputClass} />
@@ -126,7 +126,7 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
             </div>
           </div>
           {emiResult && (
-            <div className="grid grid-cols-3 gap-2 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
               <div className="bg-white rounded-xl p-3 text-center shadow-sm">
                 <p className="text-[10px] text-slate-500 font-semibold mb-1">Monthly EMI</p>
                 <p className="text-sm font-bold text-red-600">{settings.currencySymbol}{emiResult.emi.toLocaleString()}</p>

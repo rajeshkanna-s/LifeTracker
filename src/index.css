@@ -82,11 +82,11 @@ body { font-family: var(--font-family); background: var(--bg-body); color: var(-
 }
 .bottom-nav-inner::-webkit-scrollbar { display: none; }
 .bottom-nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 6px 10px; border-radius: 12px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 12px; border-radius: 12px; cursor: pointer;
   transition: all 0.2s; border: none; background: none;
   color: var(--text-muted); font-size: 10px; font-weight: 600;
-  min-width: 52px; flex-shrink: 0;
+  min-width: 60px; flex-shrink: 0;
 }
 .bottom-nav-item.active { color: var(--accent); }
 .bottom-nav-item.active .bottom-nav-icon { background: rgba(124,58,237,0.12); }
@@ -202,7 +202,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
 
 /* ── Action Buttons ── */
 .btn-action {
-  width: 32px; height: 32px; border-radius: 8px;
+  width: 36px; height: 36px; border-radius: 8px;
   border: 1px solid var(--border-color); background: var(--bg-card);
   display: inline-flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all 0.15s ease; color: var(--text-secondary);
@@ -349,7 +349,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
 @media (max-width: 640px) {
   .app-navbar { display: none; }
   .bottom-nav { display: block; }
-  main { padding: 1rem 0.75rem; padding-bottom: 100px; }
+  main { padding: 1rem 0.75rem; padding-bottom: 120px; }
   .summary-cards.cols-3, .summary-cards.cols-4 { grid-template-columns: repeat(2, 1fr); }
   .summary-card .card-value { font-size: 1.2rem; }
   .data-card { border-radius: var(--radius-sm); }
@@ -359,9 +359,9 @@ main { max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
   .filter-select { min-width: 100%; }
   .search-wrapper { min-width: 100%; }
   .form-grid { grid-template-columns: 1fr; }
-  .module-subtabs { border-radius: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .module-subtabs { border-radius: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 6px; gap: 6px; }
   .module-subtabs::-webkit-scrollbar { display: none; }
-  .module-subtab { padding: 8px 6px; font-size: 0.75rem; flex-shrink: 0; white-space: nowrap; }
+  .module-subtab { padding: 12px 10px; font-size: 0.8rem; flex-shrink: 0; white-space: nowrap; }
   .module-subtab span.label-text { display: none; }
   .habit-week-header, .habit-row { grid-template-columns: 100px repeat(7, 1fr); gap: 2px; }
   .habit-check { width: 28px; height: 28px; border-radius: 6px; }
@@ -371,6 +371,10 @@ main { max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
   .modal-body { padding: 1rem; }
   .modal-header { padding: 1rem 1.25rem; }
   .modal-footer { padding: 0.75rem 1rem; }
+  .btn-action { width: 40px; height: 40px; }
+  .tx-item { flex-wrap: wrap; gap: 8px; }
+  .tx-details { min-width: 45%; flex: 1 1 auto; }
+  .tx-meta { text-align: left; min-width: 40%; flex: 1 1 auto; }
 }
 
 @media (max-width: 400px) {

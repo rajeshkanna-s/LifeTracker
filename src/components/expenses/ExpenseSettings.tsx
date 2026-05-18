@@ -132,7 +132,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
         <div className="pt-4 space-y-4">
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 space-y-3">
             <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wider">Add New Template</h4>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <input placeholder="Name (e.g. Tea)" value={newQuickAdd.name} onChange={e => setNewQuickAdd({ ...newQuickAdd, name: e.target.value })} className={inputClass} />
               <input type="number" placeholder="Amount" value={newQuickAdd.amount} onChange={e => setNewQuickAdd({ ...newQuickAdd, amount: e.target.value })} className={inputClass} />
               <select value={newQuickAdd.category} onChange={e => setNewQuickAdd({ ...newQuickAdd, category: e.target.value })} className={`${inputClass} cursor-pointer`}>
@@ -261,7 +261,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
         <div className="pt-4 space-y-4">
           <div className="bg-gradient-to-br from-rose-50 to-pink-50 p-4 rounded-xl border border-rose-200 space-y-3">
             <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wider">Set Budget per Category</h4>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <select value={newCatBudget.category} onChange={e => setNewCatBudget({ ...newCatBudget, category: e.target.value })} className={`${inputClass} cursor-pointer`}>
                 <option value="">Select Category</option>
                 {[...DEFAULT_CATEGORIES, ...settings.customCategories]

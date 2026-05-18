@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { FileSpreadsheet, Filter, PieChart, TrendingUp, Store } from 'lucide-react';
+import { FileSpreadsheet, Filter, PieChart, TrendingUp, Store, Edit2, Trash2 } from 'lucide-react';
 import type { Expense, ExpenseSettings } from '../../types';
 import { format, parseISO } from 'date-fns';
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line, CartesianGrid } from 'recharts';
@@ -9,11 +9,13 @@ import { DEFAULT_CATEGORIES, ALL_PLATFORMS, PAYMENT_METHODS } from '../../data/c
 interface ExpenseReportsProps {
   expenses: Expense[];
   settings: ExpenseSettings;
+  onEdit?: (expense: Expense) => void;
+  onDelete?: (id: string) => void;
 }
 
 const COLORS = ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"];
 
-const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings }) => {
+const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onEdit, onDelete }) => {
   const [filters, setFilters] = useState({
     fromDate: getMonthStartString(),
     toDate: getTodayString(),
@@ -64,7 +66,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings }) =
         <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2 mb-3">
           <Filter size={14} className="text-emerald-500" /> Filters
         </h3>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <div>
             <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">From</label>
             <input type="date" value={filters.fromDate} onChange={e => setFilters({...filters, fromDate: e.target.value})} className={selectClass} />
@@ -136,6 +138,40 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings }) =
                 </div>
               ))}
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Expense History List */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 mt-4">
+        <h3 className="text-sm font-bold flex items-center gap-2 mb-4">
+          <Store size={16} className="text-blue-500" /> Expense History
+        </h3>
+        
+        {filteredExpenses.length === 0 ? (
+          <div className="text-center py-8 text-gray-400 text-sm">No expenses found for these filters.</div>
+        ) : (
+          <div className="space-y-1">
+            {filteredExpenses.map(exp => (
+              <div key={exp.id} className="tx-item">
+                <div className="tx-details">
+                  <p className="tx-amount">{settings.currencySymbol}{Number(exp.amount).toLocaleString()}</p>
+                  <p className="tx-category">{exp.description || exp.category}</p>
+                </div>
+                <div className="tx-meta">
+                  <p className="tx-date">{new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                  <p className="tx-payment">{exp.payment_method}</p>
+                </div>
+                <div className="flex items-center gap-1 ml-2">
+                  <button onClick={() => onEdit?.(exp)} className="btn-action">
+                    <Edit2 size={16} />
+                  </button>
+                  <button onClick={() => { if (window.confirm('Are you sure you want to delete this expense?')) onDelete?.(exp.id); }} className="btn-action danger">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

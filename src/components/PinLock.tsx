@@ -75,11 +75,12 @@ const PinLock: React.FC<PinLockProps> = ({ onUnlock }) => {
       }} />
 
       <div style={{
-        position: 'relative', textAlign: 'center' as const, padding: '2.5rem 2rem',
-        width: '90%', maxWidth: '380px', background: 'rgba(255,255,255,0.7)',
+        position: 'relative', textAlign: 'center' as const, padding: '2.5rem 1.25rem',
+        width: '92%', maxWidth: '380px', background: 'rgba(255,255,255,0.7)',
         borderRadius: '24px', backdropFilter: 'blur(20px)',
         border: '1px solid rgba(255,255,255,0.8)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.06), 0 4px 20px rgba(124,58,237,0.05)',
+        boxSizing: 'border-box' as const,
       }} className={error ? 'animate-shake' : ''}>
         {/* Icon */}
         <div style={{
@@ -96,7 +97,7 @@ const PinLock: React.FC<PinLockProps> = ({ onUnlock }) => {
         <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '2rem' }}>Enter your 6-digit PIN</p>
 
         {/* PIN Inputs */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '1.5rem' }} onPaste={handlePaste}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '1.5rem', width: '100%', maxWidth: '320px', marginLeft: 'auto', marginRight: 'auto' }} onPaste={handlePaste}>
           {pin.map((digit, i) => (
             <input
               key={i}
@@ -107,13 +108,15 @@ const PinLock: React.FC<PinLockProps> = ({ onUnlock }) => {
               onKeyDown={e => handleKeyDown(i, e)}
               disabled={checking || success}
               style={{
-                width: '48px', height: '56px', textAlign: 'center' as const,
-                fontSize: '1.5rem', fontWeight: 700, borderRadius: '14px',
+                flex: '1 1 0', minWidth: 0, maxWidth: '48px', aspectRatio: '1 / 1.15',
+                textAlign: 'center' as const,
+                fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 700, borderRadius: '14px',
                 border: `2px solid ${success ? '#10b981' : error ? '#ef4444' : digit ? '#7c3aed' : '#e5e7eb'}`,
                 background: success ? '#ecfdf5' : error ? '#fef2f2' : digit ? '#f5f3ff' : '#fff',
                 color: success ? '#059669' : error ? '#dc2626' : '#1e1b4b',
                 outline: 'none', transition: 'all 0.2s', fontFamily: 'Inter, sans-serif',
                 boxShadow: digit ? '0 2px 8px rgba(124,58,237,0.08)' : 'none',
+                boxSizing: 'border-box' as const,
               }}
             />
           ))}

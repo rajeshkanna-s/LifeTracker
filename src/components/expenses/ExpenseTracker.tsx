@@ -59,6 +59,11 @@ const ExpenseTracker: React.FC = () => {
     if (activeTab === 'add') setActiveTab('home');
   };
 
+  const handleDeleteExpense = async (id: string) => {
+    await supabase.from('expenses').delete().eq('id', id);
+    fetchData();
+  };
+
   const openForm = (exp?: Partial<Expense>) => {
     setEditExpense(exp);
     setShowAddModal(true);
@@ -100,10 +105,17 @@ const ExpenseTracker: React.FC = () => {
             onAddExpense={handleAddExpense}
             onSettingsChange={handleSettingsChange}
             onNavigate={setActiveTab}
+            onEdit={openForm}
+            onDelete={handleDeleteExpense}
           />
         )}
         {activeTab === 'reports' && (
-          <ExpenseReports expenses={expenses} settings={settings} />
+          <ExpenseReports 
+            expenses={expenses} 
+            settings={settings} 
+            onEdit={openForm}
+            onDelete={handleDeleteExpense}
+          />
         )}
         {activeTab === 'settings' && (
           <ExpenseSettingsTab settings={settings} onSettingsChange={handleSettingsChange} />
