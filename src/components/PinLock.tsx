@@ -102,7 +102,7 @@ const PinLock: React.FC<PinLockProps> = ({ onUnlock }) => {
             <input
               key={i}
               ref={el => { inputRefs.current[i] = el; }}
-              type="text" inputMode="numeric" maxLength={1}
+              type="password" inputMode="numeric" maxLength={1} autoComplete="off"
               value={digit}
               onChange={e => handleChange(i, e.target.value)}
               onKeyDown={e => handleKeyDown(i, e)}

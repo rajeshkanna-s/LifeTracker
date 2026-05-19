@@ -43,12 +43,12 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
     onSubmit(payload);
   };
 
-  const inputClass = "w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-white transition-all";
+  const inputClass = "w-full border border-slate-300 rounded-lg px-3 py-2 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-white transition-all";
   const labelClass = "block text-xs font-semibold text-slate-700 mb-1.5";
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
           <h3 className="font-bold text-slate-800">{initialData?.id ? 'Edit Debt' : 'Add New Debt'}</h3>
           <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
@@ -68,7 +68,7 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Original Amount ({settings.currencySymbol}) *</label>
               <input 
@@ -95,7 +95,7 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Monthly EMI ({settings.currencySymbol})</label>
               <input 
@@ -144,7 +144,7 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
             />
           </div>
           
-          <div className="pt-2 flex gap-3">
+          <div className="sticky bottom-0 -mx-4 -mb-4 mt-2 p-4 bg-white border-t border-slate-100 flex gap-3">
             <button 
               type="button" 
               onClick={onClose} 

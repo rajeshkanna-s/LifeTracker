@@ -130,7 +130,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
       )}
 
       {/* Stats Row */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {[
           { label: 'Today', value: todayTotal, icon: '📅' },
           { label: 'Week', value: weekTotal, icon: '📊' },
@@ -173,14 +173,14 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
           <h3 className="font-bold text-sm text-gray-900">Recent Transactions</h3>
           <button onClick={() => onNavigate('reports')} className="text-xs text-violet-600 hover:text-violet-700 font-semibold transition">See all</button>
         </div>
-        <div className="flex items-center gap-2 px-3 py-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 px-3 py-2">
           <div className="flex-1 relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 outline-none focus:border-violet-400 placeholder:text-gray-400" />
           </div>
           <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-lg px-2 py-2 text-xs text-gray-700 outline-none cursor-pointer">
+            className="w-full sm:w-auto bg-gray-50 border border-gray-200 rounded-lg px-2 py-2 text-xs text-gray-700 outline-none cursor-pointer">
             <option value="">All</option>
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>

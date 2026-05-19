@@ -203,7 +203,7 @@ const NotesTracker: React.FC = () => {
               onChange={(e) => setQuickNote(e.target.value)}
             />
             <button type="submit" disabled={!quickNote.trim()} className="notes-quick-btn">
-              <Plus size={16} /> Add
+              <Plus size={16} /> <span>Add</span>
             </button>
           </form>
         </div>

@@ -100,12 +100,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Summary Row */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-3 flex items-center justify-between">
           <span className="text-xs font-semibold text-slate-600">Total Filtered</span>
           <span className="text-xl font-bold text-emerald-700">{settings.currencySymbol}{totalAmount.toLocaleString()}</span>
         </div>
-        <button onClick={exportCSV} className="px-4 border border-slate-200 rounded-xl flex items-center gap-2 text-sm font-semibold hover:bg-slate-50 transition bg-white">
+        <button onClick={exportCSV} className="w-full sm:w-auto justify-center px-4 py-3 border border-slate-200 rounded-xl flex items-center gap-2 text-sm font-semibold hover:bg-slate-50 transition bg-white">
           <FileSpreadsheet size={16} className="text-emerald-600" /> Export CSV
         </button>
       </div>

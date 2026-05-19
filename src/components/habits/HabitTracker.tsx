@@ -145,15 +145,15 @@ const HabitTracker: React.FC = () => {
 
             {/* Week Navigation */}
             <div className="card-dark">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div className="flex items-center justify-between sm:justify-start gap-2">
                   <button className="btn-action" onClick={prevWeek}><ChevronLeft size={16} /></button>
-                  <span className="text-sm font-bold text-gray-800">
+                  <span className="text-sm font-bold text-gray-800 text-center flex-1 sm:flex-none">
                     {new Date(weekDates[0]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} — {new Date(weekDates[6]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </span>
                   <button className="btn-action" onClick={nextWeek}><ChevronRight size={16} /></button>
                 </div>
-                <button onClick={goToday} className="text-xs text-emerald-600 font-bold hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 transition">Today</button>
+                <button onClick={goToday} className="w-full sm:w-auto text-xs text-emerald-600 font-bold hover:text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200 transition">Today</button>
               </div>
             </div>
 
