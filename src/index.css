@@ -668,3 +668,363 @@ main { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
   .grid.grid-cols-2.gap-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grid.grid-cols-2.gap-3 label { min-width: 0; }
 }
+
+
+
+/* ═══════════════════════════════════════════
+   Fitness Plan – Personalized Plan & Diet Chart
+   (Dark navy theme – matches printable handout)
+   ═══════════════════════════════════════════ */
+
+.fitness-plan-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  font-family: var(--font-family);
+}
+
+.fp-card {
+  background: linear-gradient(180deg, #0d1b2a 0%, #0a1628 100%);
+  border: 1px solid #1e3a5f;
+  border-radius: 18px;
+  padding: 1.75rem 1.5rem;
+  color: #cbd5e1;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Title block */
+.fp-title {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #2dd4bf;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.fp-subtitle {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #cbd5e1;
+  margin-top: 6px;
+}
+.fp-date {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-top: 6px;
+}
+.fp-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #2dd4bf, transparent);
+  margin: 1rem 0 1.25rem;
+}
+
+/* Section */
+.fp-section {
+  margin-bottom: 1.25rem;
+}
+.fp-section-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #2dd4bf;
+  letter-spacing: 0.06em;
+  padding-left: 10px;
+  border-left: 3px solid #2dd4bf;
+  margin-bottom: 0.85rem;
+}
+.fp-section-sub {
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+/* Body Profile stats */
+.fp-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+.fp-stat {
+  border: 1px solid #2dd4bf66;
+  background: rgba(45, 212, 191, 0.04);
+  border-radius: 10px;
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fp-stat-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+}
+.fp-stat-value {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #2dd4bf;
+}
+
+/* Goal */
+.fp-goal-box {
+  border: 1.5px solid #fbbf24;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  text-align: center;
+  background: rgba(251, 191, 36, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.fp-goal-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.04em;
+}
+.fp-goal-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+/* Day list */
+.fp-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0.85rem;
+}
+.fp-day-row {
+  display: grid;
+  grid-template-columns: 110px 18px 1fr;
+  align-items: center;
+  gap: 10px;
+  background: rgba(30, 58, 95, 0.35);
+  border-radius: 6px;
+  padding: 4px 10px 4px 4px;
+}
+.fp-day-pill {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1.5px solid;
+  background: rgba(13, 27, 42, 0.6);
+}
+.fp-pill-green { color: #34d399; border-color: #34d399; }
+.fp-pill-yellow { color: #fbbf24; border-color: #fbbf24; }
+.fp-pill-red { color: #f87171; border-color: #f87171; }
+.fp-day-arrow {
+  color: #64748b;
+  font-weight: 700;
+  text-align: center;
+}
+.fp-day-content {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+/* Target time */
+.fp-target-time {
+  border: 1.5px solid #fbbf24;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  background: rgba(251, 191, 36, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+.fp-target-label {
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.04em;
+}
+.fp-target-text {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+.fp-target-sep {
+  color: #475569;
+}
+
+/* Diet Chart – Meal grid */
+.fp-meal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+.fp-meal-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.fp-meal-card {
+  border: 1px solid #1e3a5f;
+  border-radius: 10px;
+  background: rgba(30, 58, 95, 0.2);
+  overflow: hidden;
+}
+.fp-meal-label {
+  background: rgba(251, 146, 60, 0.06);
+  border-bottom: 1px solid #1e3a5f;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fb923c;
+  letter-spacing: 0.05em;
+}
+.fp-meal-list {
+  list-style: none;
+  padding: 0.6rem 0.85rem;
+  margin: 0;
+}
+.fp-meal-list li {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  padding: 3px 0;
+  position: relative;
+  padding-left: 14px;
+  font-weight: 500;
+}
+.fp-meal-list li::before {
+  content: '•';
+  color: #fb923c;
+  position: absolute;
+  left: 2px;
+  font-weight: 800;
+}
+
+/* Daily Nuts */
+.fp-nuts-card {
+  border: 1px solid #2dd4bf66;
+  border-radius: 10px;
+  background: rgba(45, 212, 191, 0.05);
+  margin-bottom: 0.85rem;
+  overflow: hidden;
+}
+.fp-nuts-label {
+  background: rgba(45, 212, 191, 0.1);
+  padding: 0.5rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #2dd4bf;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #2dd4bf33;
+}
+.fp-nuts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 0.7rem 0.85rem;
+}
+.fp-nut-item {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+/* Bottom grid: avoid + supplements */
+.fp-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+.fp-avoid-card,
+.fp-supplements-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+.fp-avoid-card {
+  border: 1.5px solid #f87171;
+  background: rgba(248, 113, 113, 0.04);
+}
+.fp-supplements-card {
+  border: 1.5px solid #34d399;
+  background: rgba(52, 211, 153, 0.04);
+}
+.fp-avoid-label {
+  background: rgba(248, 113, 113, 0.1);
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #f87171;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid #f8717133;
+}
+.fp-supplements-label {
+  background: rgba(52, 211, 153, 0.1);
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #34d399;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid #34d39933;
+}
+.fp-avoid-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  padding: 0.7rem 0.85rem;
+}
+.fp-avoid-item {
+  font-size: 0.78rem;
+  color: #fecaca;
+  font-weight: 500;
+  min-height: 18px;
+}
+.fp-supplements-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fp-supplements-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+}
+.fp-supp-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #34d399;
+}
+.fp-supp-sub {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .fp-card { padding: 1.25rem 1rem; border-radius: 14px; }
+  .fp-title { font-size: 1.2rem; }
+  .fp-subtitle { font-size: 0.78rem; }
+  .fp-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .fp-stat-value { font-size: 0.92rem; }
+  .fp-day-row { grid-template-columns: 90px 14px 1fr; gap: 6px; padding: 4px 8px 4px 3px; }
+  .fp-day-pill { font-size: 0.62rem; padding: 5px 4px; }
+  .fp-day-content { font-size: 0.78rem; }
+  .fp-target-time { font-size: 0.74rem; gap: 8px; padding: 0.6rem 0.75rem; }
+  .fp-meal-grid { grid-template-columns: 1fr; }
+  .fp-bottom-grid { grid-template-columns: 1fr; }
+  .fp-nuts-row { gap: 10px; }
+  .fp-nut-item { font-size: 0.75rem; }
+}
