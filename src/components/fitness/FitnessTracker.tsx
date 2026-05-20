@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, Plus, Trash2, Pencil, Flame, Clock, Scale, Settings } from 'lucide-react';
+import { Dumbbell, Plus, Trash2, Pencil, Flame, Clock, Scale, Settings, ClipboardList } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Workout, FitnessSettings } from '../../types';
 import { getDefaultFitnessSettings } from '../../data/constants';
 import FitnessSettingsTab from './FitnessSettings';
+import FitnessPlan from './FitnessPlan';
 
 const TYPES = ['Strength', 'Cardio', 'Yoga', 'HIIT', 'Walking', 'Running', 'Cycling', 'Swimming', 'Stretching', 'Other'];
 const MOODS = ['💪 Great', '😊 Good', '😐 Okay', '😓 Tired', '😩 Exhausted'];
 const TYPE_EMOJI: Record<string, string> = { Strength: '💪', Cardio: '🏃', Yoga: '🧘', HIIT: '🔥', Walking: '🚶', Running: '🏃', Cycling: '🚴', Swimming: '🏊', Stretching: '🤸', Other: '⚡' };
 
 const FitnessTracker: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'home' | 'settings'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'plan' | 'settings'>('home');
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [settings, setSettings] = useState<FitnessSettings>(getDefaultFitnessSettings());
   const [settingsId, setSettingsId] = useState<string | null>(null);
@@ -96,6 +97,9 @@ const FitnessTracker: React.FC = () => {
         <button onClick={() => { resetForm(); setShowModal(true); }} className="module-subtab" style={{ color: '#f97316' }}>
           <Plus size={16} /> <span className="label-text">Log Workout</span>
         </button>
+        <button onClick={() => setActiveTab('plan')} className={`module-subtab ${activeTab === 'plan' ? 'active-fitness' : ''}`}>
+          <ClipboardList size={16} /> <span className="label-text">My Plan</span>
+        </button>
         <button onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-fitness' : ''}`}>
           <Settings size={16} /> <span className="label-text">Settings</span>
         </button>
@@ -159,6 +163,7 @@ const FitnessTracker: React.FC = () => {
             </div>
           </div>
         )}
+        {activeTab === 'plan' && <FitnessPlan />}
         {activeTab === 'settings' && (
           <FitnessSettingsTab settings={settings} workouts={workouts} onSettingsChange={handleSettingsChange} />
         )}
