@@ -113,9 +113,9 @@ const DebtHome: React.FC<DebtHomeProps> = ({ debts, settings, onEdit, onDelete, 
                         </td>
                         <td className="py-3">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => onMarkPaid(d)} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Mark EMI Paid"><CheckCircle size={14} /></button>
-                            <button onClick={() => onEdit(d)} className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition" title="Edit"><Pencil size={14} /></button>
-                            <button onClick={() => onDelete(d.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition" title="Delete"><Trash2 size={14} /></button>
+                            <button onClick={() => onMarkPaid(d)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Mark EMI Paid"><CheckCircle size={14} /></button>
+                            <button onClick={() => onEdit(d)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition" title="Edit"><Pencil size={14} /></button>
+                            <button onClick={() => onDelete(d.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Delete"><Trash2 size={14} /></button>
                           </div>
                         </td>
                       </tr>

@@ -39,7 +39,7 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
 
   const update = (partial: Partial<DebtSettings>) => onSettingsChange({ ...settings, ...partial });
 
-  const inputClass = "w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 bg-white";
+
 
   const calculateEMI = (principal: number, ratePerAnnum: number, months: number): number => {
     if (ratePerAnnum === 0) return Math.round(principal / months);
@@ -67,7 +67,7 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
           <select value={settings.currency} onChange={e => {
             const curr = CURRENCIES.find(c => c.code === e.target.value);
             if (curr) update({ currency: curr.code, currencySymbol: curr.symbol });
-          }} className={inputClass}>
+          }} className="input-unified">
             {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.symbol} — {c.name} ({c.code})</option>)}
           </select>
         </div>
@@ -78,12 +78,12 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-1">Monthly Income ({settings.currencySymbol})</label>
-            <input type="number" min={0} value={settings.monthlyIncome || ''} onChange={e => update({ monthlyIncome: parseFloat(e.target.value) || 0 })} className={inputClass} placeholder="e.g., 50000" />
+            <input type="number" min={0} value={settings.monthlyIncome || ''} onChange={e => update({ monthlyIncome: parseFloat(e.target.value) || 0 })} className="input-unified" placeholder="e.g., 50000" />
             <p className="text-[10px] text-slate-400 mt-1">Used for Debt-to-Income ratio</p>
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-1">EMI Reminder Days</label>
-            <input type="number" min={1} max={30} value={settings.reminderDays || 7} onChange={e => update({ reminderDays: parseInt(e.target.value) || 7 })} className={inputClass} />
+            <input type="number" min={1} max={30} value={settings.reminderDays || 7} onChange={e => update({ reminderDays: parseInt(e.target.value) || 7 })} className="input-unified" />
             <p className="text-[10px] text-slate-400 mt-1">Alert when EMI is due</p>
           </div>
         </div>
@@ -93,7 +93,7 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
       <Section id="categories" title="Debt Categories" Icon={Settings} badge={DEBT_CATEGORIES.length + settings.customCategories.length} open={openSection} setOpen={setOpenSection}>
         <div className="space-y-3 pt-4">
           <div className="flex gap-2">
-            <input placeholder="New Category" value={newCategory} onChange={e => setNewCategory(e.target.value)} className={inputClass} />
+            <input placeholder="New Category" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="input-unified" />
             <button onClick={() => { if (newCategory.trim()) { update({ customCategories: [...settings.customCategories, newCategory.trim()] }); setNewCategory(""); } }} className="h-[38px] px-4 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition">Add</button>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -114,15 +114,15 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
               <label className="text-[10px] font-bold uppercase text-red-700 mb-1 block">Loan Amount</label>
-              <input type="number" placeholder="1000000" value={calcPrincipal} onChange={e => setCalcPrincipal(e.target.value)} className={inputClass} />
+              <input type="number" placeholder="1000000" value={calcPrincipal} onChange={e => setCalcPrincipal(e.target.value)} className="input-unified" />
             </div>
             <div>
               <label className="text-[10px] font-bold uppercase text-red-700 mb-1 block">Rate (% p.a.)</label>
-              <input type="number" step="0.1" placeholder="8.5" value={calcRate} onChange={e => setCalcRate(e.target.value)} className={inputClass} />
+              <input type="number" step="0.1" placeholder="8.5" value={calcRate} onChange={e => setCalcRate(e.target.value)} className="input-unified" />
             </div>
             <div>
               <label className="text-[10px] font-bold uppercase text-red-700 mb-1 block">Tenure (months)</label>
-              <input type="number" placeholder="60" value={calcTenure} onChange={e => setCalcTenure(e.target.value)} className={inputClass} />
+              <input type="number" placeholder="60" value={calcTenure} onChange={e => setCalcTenure(e.target.value)} className="input-unified" />
             </div>
           </div>
           {emiResult && (

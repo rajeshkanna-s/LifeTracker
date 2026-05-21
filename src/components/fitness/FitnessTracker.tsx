@@ -129,14 +129,14 @@ const FitnessTracker: React.FC = () => {
             {/* Workout List */}
             <div className="card-dark !p-0">
               <div className="flex items-center justify-between p-3">
-                <h3 className="font-bold text-sm text-gray-900">Workout Log</h3>
-                <span className="text-xs text-gray-400">{workouts.length} workouts</span>
+                <h3 className="font-bold text-sm text-slate-900">Workout Log</h3>
+                <span className="text-xs text-slate-400">{workouts.length} workouts</span>
               </div>
               {workouts.length === 0 ? (
                 <div className="text-center py-10 px-4">
                   <div className="text-4xl mb-3 opacity-40">🏋️</div>
-                  <h4 className="text-sm font-bold text-gray-800">No workouts logged</h4>
-                  <p className="text-xs text-gray-400 mt-1">Start logging your fitness journey</p>
+                  <h4 className="text-sm font-bold text-slate-800">No workouts logged</h4>
+                  <p className="text-xs text-slate-400 mt-1">Start logging your fitness journey</p>
                 </div>
               ) : (
                 <div className="px-1">
@@ -152,7 +152,7 @@ const FitnessTracker: React.FC = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-gray-400 font-medium">{new Date(w.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
+                        <span className="text-[10px] text-slate-400 font-medium">{new Date(w.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
                         <button className="btn-action" onClick={() => handleEdit(w)}><Pencil size={13} /></button>
                         <button className="btn-action danger" onClick={() => handleDelete(w.id)}><Trash2 size={13} /></button>
                       </div>

@@ -42,7 +42,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
   const allPlatforms = [...ALL_PLATFORMS, ...settings.customPlatforms];
   const allPayments = [...PAYMENT_METHODS, ...settings.customPaymentMethods];
 
-  const selectClass = "w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-400 bg-white";
+
 
   // Quick CSV Export
   const exportCSV = () => {
@@ -68,30 +68,30 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">From</label>
-            <input type="date" value={filters.fromDate} onChange={e => setFilters({...filters, fromDate: e.target.value})} className={selectClass} />
+            <label className="label-unified">From</label>
+            <input type="date" value={filters.fromDate} onChange={e => setFilters({...filters, fromDate: e.target.value})} className="input-unified" />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">To</label>
-            <input type="date" value={filters.toDate} onChange={e => setFilters({...filters, toDate: e.target.value})} className={selectClass} />
+            <label className="label-unified">To</label>
+            <input type="date" value={filters.toDate} onChange={e => setFilters({...filters, toDate: e.target.value})} className="input-unified" />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Category</label>
-            <select value={filters.category} onChange={e => setFilters({...filters, category: e.target.value})} className={selectClass}>
+            <label className="label-unified">Category</label>
+            <select value={filters.category} onChange={e => setFilters({...filters, category: e.target.value})} className="input-unified">
               <option value="all">All Categories</option>
               {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Platform</label>
-            <select value={filters.platform} onChange={e => setFilters({...filters, platform: e.target.value})} className={selectClass}>
+            <label className="label-unified">Platform</label>
+            <select value={filters.platform} onChange={e => setFilters({...filters, platform: e.target.value})} className="input-unified">
               <option value="all">All Platforms</option>
               {allPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Payment</label>
-            <select value={filters.paymentMethod} onChange={e => setFilters({...filters, paymentMethod: e.target.value})} className={selectClass}>
+            <label className="label-unified">Payment</label>
+            <select value={filters.paymentMethod} onChange={e => setFilters({...filters, paymentMethod: e.target.value})} className="input-unified">
               <option value="all">All Methods</option>
               {allPayments.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
@@ -149,7 +149,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </h3>
         
         {filteredExpenses.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 text-sm">No expenses found for these filters.</div>
+          <div className="text-center py-8 text-slate-400 text-sm">No expenses found for these filters.</div>
         ) : (
           <div className="space-y-1">
             {filteredExpenses.map(exp => (

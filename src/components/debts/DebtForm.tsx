@@ -31,7 +31,6 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
     e.preventDefault();
     if (!form.source) return;
     
-    // Ensure numeric values
     const payload = {
       ...form,
       original_amount: Number(form.original_amount) || 0,
@@ -43,34 +42,31 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
     onSubmit(payload);
   };
 
-  const inputClass = "w-full border border-slate-300 rounded-lg px-3 py-2 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-white transition-all";
-  const labelClass = "block text-xs font-semibold text-slate-700 mb-1.5";
-
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
-          <h3 className="font-bold text-slate-800">{initialData?.id ? 'Edit Debt' : 'Add New Debt'}</h3>
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
+    <div className="modal-overlay" style={{ '--module-accent': '#ef4444', '--module-accent-light': 'rgba(239,68,68,0.1)' } as React.CSSProperties}>
+      <div className="modal-box">
+        <div className="modal-header">
+          <h3>{initialData?.id ? 'Edit Debt' : 'Add New Debt'}</h3>
+          <button onClick={onClose} className="modal-close">
             <X size={18} />
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="modal-body space-y-4">
           <div>
-            <label className={labelClass}>Source / Lender *</label>
+            <label className="label-unified">Source / Lender *</label>
             <input 
               required
               placeholder="e.g. HDFC, Personal Loan" 
               value={form.source || ''} 
               onChange={e => setForm({ ...form, source: e.target.value })} 
-              className={inputClass} 
+              className="input-unified" 
             />
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Original Amount ({settings.currencySymbol}) *</label>
+              <label className="label-unified">Original Amount ({settings.currencySymbol}) *</label>
               <input 
                 required
                 type="number" 
@@ -78,11 +74,11 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
                 placeholder="0" 
                 value={form.original_amount || ''} 
                 onChange={e => setForm({ ...form, original_amount: Number(e.target.value) })} 
-                className={inputClass} 
+                className="input-unified" 
               />
             </div>
             <div>
-              <label className={labelClass}>Current Balance ({settings.currencySymbol}) *</label>
+              <label className="label-unified">Current Balance ({settings.currencySymbol}) *</label>
               <input 
                 required
                 type="number" 
@@ -90,40 +86,40 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
                 placeholder="0" 
                 value={form.current_balance || ''} 
                 onChange={e => setForm({ ...form, current_balance: Number(e.target.value) })} 
-                className={inputClass} 
+                className="input-unified" 
               />
             </div>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Monthly EMI ({settings.currencySymbol})</label>
+              <label className="label-unified">Monthly EMI ({settings.currencySymbol})</label>
               <input 
                 type="number" 
                 min="0"
                 placeholder="0" 
                 value={form.emi_amount || ''} 
                 onChange={e => setForm({ ...form, emi_amount: Number(e.target.value) })} 
-                className={inputClass} 
+                className="input-unified" 
               />
             </div>
             <div>
-              <label className={labelClass}>Closing Month</label>
+              <label className="label-unified">Closing Month</label>
               <input 
                 placeholder="e.g. Dec-2027" 
                 value={form.closing_month || ''} 
                 onChange={e => setForm({ ...form, closing_month: e.target.value })} 
-                className={inputClass} 
+                className="input-unified" 
               />
             </div>
           </div>
           
           <div>
-            <label className={labelClass}>Type</label>
+            <label className="label-unified">Type</label>
             <select 
               value={form.type || 'loan'} 
               onChange={e => setForm({ ...form, type: e.target.value })} 
-              className={inputClass}
+              className="input-unified"
             >
               <option value="loan">Loan</option>
               <option value="credit_card">Credit Card</option>
@@ -135,26 +131,26 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
           </div>
           
           <div>
-            <label className={labelClass}>Notes</label>
+            <label className="label-unified">Notes</label>
             <textarea 
               rows={2} 
               value={form.notes || ''} 
               onChange={e => setForm({ ...form, notes: e.target.value })} 
-              className={inputClass} 
+              className="input-unified" 
             />
           </div>
           
-          <div className="sticky bottom-0 -mx-4 -mb-4 mt-2 p-4 bg-white border-t border-slate-100 flex gap-3">
+          <div className="modal-footer">
             <button 
               type="button" 
               onClick={onClose} 
-              className="flex-1 py-2.5 px-4 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
+              className="btn-cancel flex-1"
             >
               Cancel
             </button>
             <button 
               type="submit" 
-              className="flex-1 py-2.5 px-4 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 shadow-sm shadow-red-200 transition-colors"
+              className="btn-submit red flex-1"
             >
               {initialData?.id ? 'Update Debt' : 'Add Debt'}
             </button>

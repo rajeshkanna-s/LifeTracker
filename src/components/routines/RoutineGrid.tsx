@@ -98,9 +98,9 @@ const RoutineGrid: React.FC<RoutineGridProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {dailyRoutines.length > 0 && dailyRoutines.map(r => renderRow(r, 'bg-[#a3c9a8]', 'text-emerald-950'))}
-            {weeklyRoutines.length > 0 && weeklyRoutines.map(r => renderRow(r, 'bg-[#f4d399]', 'text-amber-950'))}
-            {monthlyRoutines.length > 0 && monthlyRoutines.map(r => renderRow(r, 'bg-[#9fb8d0]', 'text-blue-950'))}
+            {dailyRoutines.length > 0 && dailyRoutines.map(r => renderRow(r, 'bg-emerald-100', 'text-emerald-950'))}
+            {weeklyRoutines.length > 0 && weeklyRoutines.map(r => renderRow(r, 'bg-amber-100', 'text-amber-950'))}
+            {monthlyRoutines.length > 0 && monthlyRoutines.map(r => renderRow(r, 'bg-sky-100', 'text-blue-950'))}
           </tbody>
         </table>
       </div>

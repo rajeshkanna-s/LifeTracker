@@ -148,7 +148,7 @@ const HabitTracker: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                 <div className="flex items-center justify-between sm:justify-start gap-2">
                   <button className="btn-action" onClick={prevWeek}><ChevronLeft size={16} /></button>
-                  <span className="text-sm font-bold text-gray-800 text-center flex-1 sm:flex-none">
+                  <span className="text-sm font-bold text-slate-800 text-center flex-1 sm:flex-none">
                     {new Date(weekDates[0]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} — {new Date(weekDates[6]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </span>
                   <button className="btn-action" onClick={nextWeek}><ChevronRight size={16} /></button>
@@ -162,36 +162,36 @@ const HabitTracker: React.FC = () => {
               <div className="min-w-[600px]">
                 {/* Week Header */}
                 <div className="grid gap-1 p-3 pb-0" style={{ gridTemplateColumns: '1fr repeat(7, 44px) 44px' }}>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider self-end pb-1">Habit</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider self-end pb-1">Habit</span>
                   {weekDates.map((d, i) => {
                     const isToday = d === today;
                     return (
                       <div key={d} className={`text-center rounded-lg py-1 ${isToday ? 'bg-emerald-50 border border-emerald-200' : ''}`}>
-                        <p className={`text-[10px] font-bold ${isToday ? 'text-emerald-600' : 'text-gray-400'}`}>{DAYS[i]}</p>
-                        <p className={`text-xs font-bold ${isToday ? 'text-emerald-700' : 'text-gray-600'}`}>{new Date(d).getDate()}</p>
+                        <p className={`text-[10px] font-bold ${isToday ? 'text-emerald-600' : 'text-slate-400'}`}>{DAYS[i]}</p>
+                        <p className={`text-xs font-bold ${isToday ? 'text-emerald-700' : 'text-slate-600'}`}>{new Date(d).getDate()}</p>
                       </div>
                     );
                   })}
-                  <span className="text-[10px] font-bold text-gray-400 text-center self-end pb-1">🗑</span>
+                  <span className="text-[10px] font-bold text-slate-400 text-center self-end pb-1">🗑</span>
                 </div>
 
                 {habits.length === 0 ? (
                   <div className="text-center py-10 px-4">
                     <div className="text-4xl mb-3 opacity-40">✅</div>
-                    <h4 className="text-sm font-bold text-gray-800">No habits yet</h4>
-                    <p className="text-xs text-gray-400 mt-1">Create your first habit to start tracking</p>
+                    <h4 className="text-sm font-bold text-slate-800">No habits yet</h4>
+                    <p className="text-xs text-slate-400 mt-1">Create your first habit to start tracking</p>
                   </div>
                 ) : (
                   <div className="px-3 pb-3">
                     {habits.map(habit => {
                       const progress = getWeekProgress(habit.id);
                       return (
-                        <div key={habit.id} className="grid gap-1 py-2 border-t border-gray-100 items-center" style={{ gridTemplateColumns: '1fr repeat(7, 44px) 44px' }}>
+                        <div key={habit.id} className="grid gap-1 py-2 border-t border-slate-100 items-center" style={{ gridTemplateColumns: '1fr repeat(7, 44px) 44px' }}>
                           <div className="flex items-center gap-2 min-w-0">
                             <span className="text-sm">{CATEGORY_EMOJI[habit.category] || '✨'}</span>
                             <div className="min-w-0">
-                              <p className="text-xs font-bold text-gray-800 truncate">{habit.name}</p>
-                              <p className="text-[10px] text-gray-400">{progress}/7</p>
+                              <p className="text-xs font-bold text-slate-800 truncate">{habit.name}</p>
+                              <p className="text-[10px] text-slate-400">{progress}/7</p>
                             </div>
                           </div>
                           {weekDates.map(date => {
@@ -203,7 +203,7 @@ const HabitTracker: React.FC = () => {
                                   className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center transition-all active:scale-90 ${
                                     checked
                                       ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-200'
-                                      : 'border-gray-200 hover:border-emerald-300 text-gray-300'
+                                      : 'border-slate-200 hover:border-emerald-300 text-slate-300'
                                   }`}
                                 >
                                   {checked && <Check size={16} strokeWidth={3} />}

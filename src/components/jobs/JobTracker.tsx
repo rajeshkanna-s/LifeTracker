@@ -138,11 +138,11 @@ const JobTracker: React.FC = () => {
             <div className="card-dark !p-0">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3">
                 <div className="flex-1 relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 outline-none focus:border-indigo-400 placeholder:text-gray-400"
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-indigo-400 placeholder:text-slate-400"
                     placeholder="Search company or role..." value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
-                <select className="w-full sm:w-auto bg-gray-50 border border-gray-200 rounded-lg px-2 py-2 text-xs text-gray-700 outline-none cursor-pointer"
+                <select className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-xs text-slate-700 outline-none cursor-pointer"
                   value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
                   <option>All Status</option>{allStatuses.map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -151,8 +151,8 @@ const JobTracker: React.FC = () => {
               {filtered.length === 0 ? (
                 <div className="text-center py-10 px-4">
                   <div className="text-4xl mb-3 opacity-40">🏢</div>
-                  <h4 className="text-sm font-bold text-gray-800">No applications found</h4>
-                  <p className="text-xs text-gray-400 mt-1">Start tracking your job applications</p>
+                  <h4 className="text-sm font-bold text-slate-800">No applications found</h4>
+                  <p className="text-xs text-slate-400 mt-1">Start tracking your job applications</p>
                 </div>
               ) : (
                 <div className="px-1">

@@ -33,7 +33,7 @@ const FitnessSettingsTab: React.FC<FitnessSettingsProps> = ({ settings, workouts
 
   const update = (partial: Partial<FitnessSettings>) => onSettingsChange({ ...settings, ...partial });
 
-  const inputClass = "w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white";
+
 
 
   return (
@@ -44,7 +44,7 @@ const FitnessSettingsTab: React.FC<FitnessSettingsProps> = ({ settings, workouts
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-2">Workout Types</label>
             <div className="flex gap-2 mb-2">
-              <input placeholder="New Workout Type" value={newType} onChange={e => setNewType(e.target.value)} className={inputClass} />
+              <input placeholder="New Workout Type" value={newType} onChange={e => setNewType(e.target.value)} className="input-unified" />
               <button onClick={() => { if (newType.trim()) { update({ customTypes: [...(settings.customTypes || []), newType.trim()] }); setNewType(""); } }} className="h-[38px] px-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition">Add</button>
             </div>
             <div className="flex flex-wrap gap-2">

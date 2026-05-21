@@ -34,7 +34,7 @@ const JobSettingsTab: React.FC<JobSettingsProps> = ({ settings, jobs, onSettings
 
   const update = (partial: Partial<JobSettings>) => onSettingsChange({ ...settings, ...partial });
 
-  const inputClass = "w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white";
+
 
   const downloadJSON = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jobs));
@@ -54,7 +54,7 @@ const JobSettingsTab: React.FC<JobSettingsProps> = ({ settings, jobs, onSettings
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-2">Custom Application Sources</label>
             <div className="flex gap-2 mb-2">
-              <input placeholder="New Source" value={newSource} onChange={e => setNewSource(e.target.value)} className={inputClass} />
+              <input placeholder="New Source" value={newSource} onChange={e => setNewSource(e.target.value)} className="input-unified" />
               <button onClick={() => { if (newSource.trim()) { update({ customSources: [...(settings.customSources || []), newSource.trim()] }); setNewSource(""); } }} className="h-[38px] px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition">Add</button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -72,7 +72,7 @@ const JobSettingsTab: React.FC<JobSettingsProps> = ({ settings, jobs, onSettings
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-2">Custom Job Statuses</label>
             <div className="flex gap-2 mb-2">
-              <input placeholder="New Status" value={newStatus} onChange={e => setNewStatus(e.target.value)} className={inputClass} />
+              <input placeholder="New Status" value={newStatus} onChange={e => setNewStatus(e.target.value)} className="input-unified" />
               <button onClick={() => { if (newStatus.trim()) { update({ customStatuses: [...(settings.customStatuses || []), newStatus.trim()] }); setNewStatus(""); } }} className="h-[38px] px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition">Add</button>
             </div>
             <div className="flex flex-wrap gap-2">

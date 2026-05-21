@@ -577,7 +577,7 @@ const VaultTracker: React.FC = () => {
           
           <button
             onClick={generateDedicatedPassword}
-            className="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
+            className="btn-submit vault-blue w-full flex items-center justify-center gap-2"
           >
             <RefreshCw size={14} /> Refresh generated key
           </button>

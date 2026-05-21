@@ -33,7 +33,7 @@ const HabitSettingsTab: React.FC<HabitSettingsProps> = ({ settings, habits, onSe
 
   const update = (partial: Partial<HabitSettings>) => onSettingsChange({ ...settings, ...partial });
 
-  const inputClass = "w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white";
+
 
 
   return (
@@ -44,7 +44,7 @@ const HabitSettingsTab: React.FC<HabitSettingsProps> = ({ settings, habits, onSe
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-2">Categories</label>
             <div className="flex gap-2 mb-2">
-              <input placeholder="New Category" value={newCategory} onChange={e => setNewCategory(e.target.value)} className={inputClass} />
+              <input placeholder="New Category" value={newCategory} onChange={e => setNewCategory(e.target.value)} className="input-unified" />
               <button onClick={() => { if (newCategory.trim()) { update({ customCategories: [...(settings.customCategories || []), newCategory.trim()] }); setNewCategory(""); } }} className="h-[38px] px-4 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm font-medium transition">Add</button>
             </div>
             <div className="flex flex-wrap gap-2">
