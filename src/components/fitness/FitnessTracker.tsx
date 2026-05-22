@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, Plus, Trash2, Pencil, Flame, Clock, Scale, Settings, ClipboardList } from 'lucide-react';
+import { Dumbbell, Plus, Trash2, Pencil, Flame, Clock, Scale, Settings, ClipboardList, ExternalLink } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Workout, FitnessSettings } from '../../types';
 import { getDefaultFitnessSettings } from '../../data/constants';
@@ -100,6 +100,9 @@ const FitnessTracker: React.FC = () => {
         <button onClick={() => setActiveTab('plan')} className={`module-subtab ${activeTab === 'plan' ? 'active-fitness' : ''}`}>
           <ClipboardList size={16} /> <span className="label-text">My Plan</span>
         </button>
+        <a href="https://dfits.netlify.app/" target="_blank" rel="noopener noreferrer" className="module-subtab" style={{ color: '#f97316', textDecoration: 'none' }}>
+          <ExternalLink size={16} /> <span className="label-text">Workout</span>
+        </a>
         <button onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-fitness' : ''}`}>
           <Settings size={16} /> <span className="label-text">Settings</span>
         </button>
