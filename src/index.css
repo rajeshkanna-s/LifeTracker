@@ -329,9 +329,11 @@ main { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
 }
 .btn-cancel:hover { background: var(--bg-surface); }
 .btn-submit {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 10px 24px; border-radius: var(--radius-sm);
   border: none; color: #fff; font-size: 0.9rem;
   font-weight: 600; cursor: pointer; font-family: var(--font-family);
+  white-space: nowrap; line-height: 1;
   transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }

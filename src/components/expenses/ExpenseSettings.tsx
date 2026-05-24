@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Wallet, Users, Zap, CreditCard, Tag, Store, Target, PiggyBank, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Wallet, Users, Zap, CreditCard, Tag, Store, Target, PiggyBank, ChevronDown, ChevronRight, Pencil, X, Check } from 'lucide-react';
 import type { ExpenseSettings, QuickAddTemplate, CategoryBudget, SavingsGoal } from '../../types';
 import { CURRENCIES, DEFAULT_CATEGORIES, PAYMENT_METHODS, ALL_PLATFORMS, DEFAULT_QUICK_ADD } from '../../data/constants';
 
@@ -51,6 +51,7 @@ const Section: React.FC<{
 const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettingsChange }) => {
   const [open, setOpen] = useState('currency');
   const [newQuickAdd, setNewQuickAdd] = useState({ name: '', amount: '', category: '', platform: '', icon: '☕' });
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [newCategory, setNewCategory] = useState('');
   const [newPlatform, setNewPlatform] = useState('');
   const [newPayment, setNewPayment] = useState('');
@@ -127,7 +128,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
       <Section id="quickadd" title="Quick Add Templates" Icon={Zap} badge={settings.quickAddTemplates?.length} open={open} setOpen={setOpen} color="amber">
         <div className="pt-4 space-y-4">
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 space-y-3">
-            <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">Add New Template</h4>
+            <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">{editingTemplateId ? 'Edit Template' : 'Add New Template'}</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <input placeholder="Name (e.g. Tea)" value={newQuickAdd.name} onChange={e => setNewQuickAdd({ ...newQuickAdd, name: e.target.value })} className="input-unified" />
               <input type="number" placeholder="Amount" value={newQuickAdd.amount} onChange={e => setNewQuickAdd({ ...newQuickAdd, amount: e.target.value })} className="input-unified" />
@@ -137,27 +138,82 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
               </select>
               <input placeholder="Emoji Icon (e.g. ☕)" value={newQuickAdd.icon} onChange={e => setNewQuickAdd({ ...newQuickAdd, icon: e.target.value })} className="input-unified" />
             </div>
-            <button onClick={() => {
-              if (newQuickAdd.name && newQuickAdd.amount && newQuickAdd.category) {
-                updateSettings({ quickAddTemplates: [...(settings.quickAddTemplates || []), { ...newQuickAdd, id: Date.now().toString(), amount: Number(newQuickAdd.amount) }] });
+            <div className="flex gap-2">
+              {editingTemplateId && (
+                <button onClick={() => {
+                  setEditingTemplateId(null);
+                  setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
+                }} className="btn-cancel h-10 px-4 gap-2"><X size={16} /> Cancel</button>
+              )}
+              <button onClick={() => {
+                if (!newQuickAdd.name || !newQuickAdd.amount || !newQuickAdd.category) return;
+                if (editingTemplateId) {
+                  updateSettings({
+                    quickAddTemplates: (settings.quickAddTemplates || []).map(x =>
+                      x.id === editingTemplateId
+                        ? { ...x, name: newQuickAdd.name, amount: Number(newQuickAdd.amount), category: newQuickAdd.category, platform: newQuickAdd.platform, icon: newQuickAdd.icon }
+                        : x
+                    ),
+                  });
+                  setEditingTemplateId(null);
+                } else {
+                  updateSettings({ quickAddTemplates: [...(settings.quickAddTemplates || []), { ...newQuickAdd, id: Date.now().toString(), amount: Number(newQuickAdd.amount) }] });
+                }
                 setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
-              }
-            }} className="btn-submit purple w-full h-10 gap-2"><Plus size={16} /> Add Template</button>
+              }} className="btn-submit purple flex-1 h-10 gap-2">
+                {editingTemplateId ? <><Check size={16} /> Update Template</> : <><Plus size={16} /> Add Template</>}
+              </button>
+            </div>
           </div>
           
           <div className="space-y-2">
-            {(settings.quickAddTemplates || []).map(t => (
-              <div key={t.id} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-50/80 transition-all group">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-lg shadow-sm">{t.icon}</div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-800">{t.name}</p>
-                    <p className="text-xs text-slate-500">{settings.currencySymbol}{t.amount} · {t.category}</p>
+            {(settings.quickAddTemplates || []).map(t => {
+              const isEditing = editingTemplateId === t.id;
+              return (
+                <div key={t.id} className={`flex items-center justify-between p-3 border rounded-xl transition-all group ${isEditing ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-200' : 'bg-gray-50 border-gray-200 hover:bg-gray-50/80'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-lg shadow-sm">{t.icon}</div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{t.name}</p>
+                      <p className="text-xs text-slate-500">{settings.currencySymbol}{t.amount} · {t.category}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        setEditingTemplateId(t.id);
+                        setNewQuickAdd({
+                          name: t.name,
+                          amount: String(t.amount),
+                          category: t.category,
+                          platform: t.platform || '',
+                          icon: t.icon || '☕',
+                        });
+                      }}
+                      className="text-slate-400 hover:text-amber-600 hover:bg-amber-50 p-2 rounded-lg transition-all"
+                      title="Edit template"
+                      aria-label="Edit template"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateSettings({ quickAddTemplates: settings.quickAddTemplates.filter(x => x.id !== t.id) });
+                        if (editingTemplateId === t.id) {
+                          setEditingTemplateId(null);
+                          setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
+                        }
+                      }}
+                      className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all"
+                      title="Delete template"
+                      aria-label="Delete template"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
-                <button onClick={() => updateSettings({ quickAddTemplates: settings.quickAddTemplates.filter(x => x.id !== t.id) })} className="text-slate-400 hover:text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16} /></button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </Section>
