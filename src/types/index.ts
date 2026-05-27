@@ -51,6 +51,7 @@ export interface ExpenseSettings {
   customCategories: string[];
   customPaymentMethods: string[];
   customPlatforms: string[];
+  customCategoryEmojis: Record<string, string[]>;
   familyMembers: string[];
   savingsGoals: SavingsGoal[];
   dayNotes: DayNote[];

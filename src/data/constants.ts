@@ -39,6 +39,33 @@ export const PAYMENT_METHODS = [
   'Wallet (Paytm)', 'Wallet (GPay)', 'Wallet (PhonePe)', 'Wallet (Amazon Pay)',
 ];
 
+// ── Category Emojis ──
+export const CATEGORY_EMOJIS: Record<string, string[]> = {
+  'Food': ['🍕', '🍔', '🍜', '🍛', '🌮', '🍱', '🍲', '🥘'],
+  'Grocery': ['🛒', '🧺', '🥫', '🧴', '🫙', '🧈'],
+  'Vegetables': ['🥬', '🥕', '🍅', '🥦', '🌽', '🧅', '🥒'],
+  'Petrol / Fuel': ['⛽', '🛢️', '🚗', '🏍️', '🚙'],
+  'Travel / Transport': ['🚌', '🚇', '🛺', '✈️', '🚕', '🚂', '🚁'],
+  'Mobile Recharge': ['📱', '📶', '💳', '🔋', '📞'],
+  'Internet Bill': ['🌐', '📡', '💻', '🖥️', '📶'],
+  'Electricity Bill': ['💡', '⚡', '🔌', '🏠', '🔋'],
+  'Rent / Home Loan': ['🏠', '🏡', '🔑', '🏢', '🏘️'],
+  'EMIs / Loans': ['🏦', '💸', '📋', '🤝', '💰'],
+  'Education': ['📚', '🎓', '✏️', '🏫', '📖', '🧑‍🎓'],
+  'Health / Medical': ['🏥', '💊', '🩺', '🩹', '🧬', '💉'],
+  'Entertainment': ['🎮', '🎬', '🎵', '🎭', '🎪', '🎧'],
+  'Cinema / Movies': ['🎬', '🍿', '🎥', '📽️', '🎞️'],
+  'Dress / Clothing': ['👕', '👗', '👟', '🧥', '👔', '👒'],
+  'Shopping': ['🛍️', '🏪', '🛒', '💳', '📦', '🏬'],
+  'Office': ['☕', '💼', '🖊️', '📎', '🖨️', '🗂️'],
+  'Kids / Family': ['👶', '🧸', '🎒', '🍼', '👨‍👩‍👧', '🎠'],
+  'Gifts / Donations': ['🎁', '💝', '🤲', '🎀', '💐', '🙏'],
+  'Home Maintenance': ['🔧', '🪛', '🧹', '🪣', '🔨', '🪠'],
+  'Savings / Investments': ['💰', '📈', '🏦', '🪙', '💎', '📊'],
+  'Social / Events': ['🎉', '🥂', '🎊', '👥', '🍾', '🥳'],
+  'Miscellaneous': ['📌', '🔖', '📝', '🗂️', '🏷️', '🔗'],
+};
+
 // ── Quick Add Defaults ──
 export const DEFAULT_QUICK_ADD: QuickAddTemplate[] = [
   { id: '1', name: 'Tea', amount: 20, category: 'Office', platform: 'Tea', icon: '☕' },
@@ -68,6 +95,7 @@ export const getDefaultExpenseSettings = (): ExpenseSettings => ({
   customCategories: [],
   customPaymentMethods: [],
   customPlatforms: [],
+  customCategoryEmojis: {},
   familyMembers: ['Me'],
   savingsGoals: [],
   dayNotes: [],

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Wallet, Users, Zap, CreditCard, Tag, Store, Target, PiggyBank, ChevronDown, ChevronRight, Pencil, X, Check } from 'lucide-react';
 import type { ExpenseSettings, QuickAddTemplate, CategoryBudget, SavingsGoal } from '../../types';
-import { CURRENCIES, DEFAULT_CATEGORIES, PAYMENT_METHODS, ALL_PLATFORMS, DEFAULT_QUICK_ADD } from '../../data/constants';
+import { CURRENCIES, DEFAULT_CATEGORIES, PAYMENT_METHODS, ALL_PLATFORMS, DEFAULT_QUICK_ADD, CATEGORY_EMOJIS } from '../../data/constants';
 
 interface ExpenseSettingsProps {
   settings: ExpenseSettings;
@@ -52,6 +52,8 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
   const [open, setOpen] = useState('currency');
   const [newQuickAdd, setNewQuickAdd] = useState({ name: '', amount: '', category: '', platform: '', icon: '☕' });
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiFilter, setEmojiFilter] = useState<'all' | 'category'>('all');
   const [newCategory, setNewCategory] = useState('');
   const [newPlatform, setNewPlatform] = useState('');
   const [newPayment, setNewPayment] = useState('');
@@ -127,8 +129,21 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
       {/* Quick Add Templates */}
       <Section id="quickadd" title="Quick Add Templates" Icon={Zap} badge={settings.quickAddTemplates?.length} open={open} setOpen={setOpen} color="amber">
         <div className="pt-4 space-y-4">
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 space-y-3">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 space-y-4">
             <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">{editingTemplateId ? 'Edit Template' : 'Add New Template'}</h4>
+            
+            {/* Selected Icon Preview */}
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 bg-white border-2 border-violet-200 rounded-2xl flex items-center justify-center text-3xl shadow-sm">
+                {newQuickAdd.icon || '☕'}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-700">{newQuickAdd.icon ? 'Selected Icon' : 'Choose an icon'}</p>
+                <p className="text-[11px] text-slate-400">{newQuickAdd.category ? `Pick from "${newQuickAdd.category}" or browse all` : 'Select a category first for suggestions'}</p>
+              </div>
+            </div>
+
+            {/* Form Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <input placeholder="Name (e.g. Tea)" value={newQuickAdd.name} onChange={e => setNewQuickAdd({ ...newQuickAdd, name: e.target.value })} className="input-unified" />
               <input type="number" placeholder="Amount" value={newQuickAdd.amount} onChange={e => setNewQuickAdd({ ...newQuickAdd, amount: e.target.value })} className="input-unified" />
@@ -136,13 +151,88 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 <option value="">Select Category</option>
                 {[...DEFAULT_CATEGORIES, ...settings.customCategories].map(c => <option key={c} value={c}>{c}</option>)}
               </select>
-              <input placeholder="Emoji Icon (e.g. ☕)" value={newQuickAdd.icon} onChange={e => setNewQuickAdd({ ...newQuickAdd, icon: e.target.value })} className="input-unified" />
+              <select value={newQuickAdd.platform} onChange={e => setNewQuickAdd({ ...newQuickAdd, platform: e.target.value })} className="input-unified cursor-pointer">
+                <option value="">Platform (optional)</option>
+                {ALL_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
             </div>
+
+            {/* Emoji Picker - Collapsible */}
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="flex items-center gap-2 text-xs font-semibold text-violet-600 hover:text-violet-800 transition-colors"
+              >
+                {showEmojiPicker ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                {showEmojiPicker ? 'Hide Emoji Picker' : 'Choose Emoji Icon'}
+              </button>
+
+              {showEmojiPicker && (
+                <div className="border border-violet-200 rounded-xl bg-white overflow-hidden">
+                  {/* Category filter tabs */}
+                  <div className="flex items-center gap-1 p-2 border-b border-slate-100 overflow-x-auto">
+                    <button
+                      type="button"
+                      onClick={() => setEmojiFilter('all')}
+                      className={`shrink-0 px-3 py-1.5 text-[11px] font-medium rounded-lg transition-all ${
+                        emojiFilter === 'all' ? 'bg-violet-100 text-violet-700 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {newQuickAdd.category && CATEGORY_EMOJIS[newQuickAdd.category] && (
+                      <button
+                        type="button"
+                        onClick={() => setEmojiFilter('category')}
+                        className={`shrink-0 px-3 py-1.5 text-[11px] font-medium rounded-lg transition-all ${
+                          emojiFilter === 'category' ? 'bg-violet-100 text-violet-700 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
+                        }`}
+                      >
+                        {newQuickAdd.category}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Emoji Grid */}
+                  <div className="max-h-56 overflow-y-auto p-3 space-y-3">
+                    {(emojiFilter === 'category' && newQuickAdd.category && CATEGORY_EMOJIS[newQuickAdd.category]
+                      ? [{ category: newQuickAdd.category, emojis: CATEGORY_EMOJIS[newQuickAdd.category] }]
+                      : DEFAULT_CATEGORIES.filter(c => CATEGORY_EMOJIS[c]).map(c => ({ category: c, emojis: CATEGORY_EMOJIS[c] }))
+                    ).map(({ category, emojis }) => (
+                      <div key={category}>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{category}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {emojis.map(emoji => (
+                            <button
+                              key={`${category}-${emoji}`}
+                              type="button"
+                              onClick={() => setNewQuickAdd({ ...newQuickAdd, icon: emoji })}
+                              className={`w-10 h-10 flex items-center justify-center text-xl rounded-xl transition-all duration-150 ${
+                                newQuickAdd.icon === emoji
+                                  ? 'ring-2 ring-violet-400 bg-violet-50 scale-110 shadow-md'
+                                  : 'bg-slate-50 hover:bg-amber-50 hover:scale-105 hover:shadow-sm'
+                              }`}
+                              title={`${emoji} (${category})`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
             <div className="flex gap-2">
               {editingTemplateId && (
                 <button onClick={() => {
                   setEditingTemplateId(null);
                   setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
+                  setShowEmojiPicker(false);
                 }} className="btn-cancel h-10 px-4 gap-2"><X size={16} /> Cancel</button>
               )}
               <button onClick={() => {
@@ -160,6 +250,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                   updateSettings({ quickAddTemplates: [...(settings.quickAddTemplates || []), { ...newQuickAdd, id: Date.now().toString(), amount: Number(newQuickAdd.amount) }] });
                 }
                 setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
+                setShowEmojiPicker(false);
               }} className="btn-submit purple flex-1 h-10 gap-2">
                 {editingTemplateId ? <><Check size={16} /> Update Template</> : <><Plus size={16} /> Add Template</>}
               </button>
@@ -175,7 +266,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                     <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-lg shadow-sm">{t.icon}</div>
                     <div>
                       <p className="text-sm font-semibold text-slate-800">{t.name}</p>
-                      <p className="text-xs text-slate-500">{settings.currencySymbol}{t.amount} · {t.category}</p>
+                      <p className="text-xs text-slate-500">{settings.currencySymbol}{t.amount} · {t.category}{t.platform ? ` · ${t.platform}` : ''}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -189,6 +280,8 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                           platform: t.platform || '',
                           icon: t.icon || '☕',
                         });
+                        setShowEmojiPicker(true);
+                        setEmojiFilter(t.category && CATEGORY_EMOJIS[t.category] ? 'category' : 'all');
                       }}
                       className="text-slate-400 hover:text-amber-600 hover:bg-amber-50 p-2 rounded-lg transition-all"
                       title="Edit template"
@@ -202,6 +295,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                         if (editingTemplateId === t.id) {
                           setEditingTemplateId(null);
                           setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
+                          setShowEmojiPicker(false);
                         }
                       }}
                       className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all"
