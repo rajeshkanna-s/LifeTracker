@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Sparkles, Target, ArrowUpRight, Search, Lightbulb, Save, Edit2, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Sparkles, Target, ArrowUpRight, Search, Lightbulb, Save, Edit2, Trash2, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import type { Expense, ExpenseSettings, QuickAddTemplate } from '../../types';
+import { CATEGORY_EMOJIS } from '../../data/constants';
 import { getTodayTotal, getMonthTotal, getWeekTotal, getYearTotal, getNoSpendDays, getTodayString, getCurrentTimeString } from '../../utils/expenseUtils';
 
 interface ExpenseHomeProps {
@@ -29,6 +30,12 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
   const [editingNote, setEditingNote] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCat, setFilterCat] = useState('');
+  const [slide, setSlide] = useState(0);
+  const [justAdded, setJustAdded] = useState<string | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // Items per slide page (responsive: mobile shows fewer per row but more rows)
+  const PER_PAGE = 8;
 
   const todayTotal = getTodayTotal(expenses);
   const weekTotal = getWeekTotal(expenses);
@@ -49,7 +56,47 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
       payment_method: 'UPI', date: getTodayString(), time: getCurrentTimeString(),
       description: t.name, person: 'Me', tags: '', notes: ''
     });
+    setJustAdded(t.id);
+    setTimeout(() => setJustAdded(null), 1200);
   };
+
+  // Build Quick Add items: saved templates + auto-derived from every transaction.
+  // Deduplicated by name (case-insensitive), keeping the most recent occurrence.
+  const quickItems = useMemo<QuickAddTemplate[]>(() => {
+    const iconFor = (category: string) => CATEGORY_EMOJIS[category]?.[0] || '📦';
+    const map = new Map<string, QuickAddTemplate>();
+
+    // Seed with saved templates first (they take priority for icon/amount)
+    (settings.quickAddTemplates || []).forEach(t => {
+      const key = (t.name || '').trim().toLowerCase();
+      if (key) map.set(key, t);
+    });
+
+    // expenses are ordered newest-first; only fill names not already present
+    expenses.forEach(e => {
+      const name = (e.description || e.category || '').trim();
+      const key = name.toLowerCase();
+      if (!name || map.has(key)) return;
+      map.set(key, {
+        id: `tx-${e.id}`,
+        name,
+        amount: Number(e.amount) || 0,
+        category: e.category || 'Miscellaneous',
+        platform: e.platform || '',
+        icon: iconFor(e.category || 'Miscellaneous'),
+      });
+    });
+
+    return Array.from(map.values());
+  }, [settings.quickAddTemplates, expenses]);
+
+  const totalSlides = Math.max(1, Math.ceil(quickItems.length / PER_PAGE));
+
+  useEffect(() => {
+    if (slide > totalSlides - 1) setSlide(0);
+  }, [totalSlides, slide]);
+
+  const goTo = (i: number) => setSlide(Math.max(0, Math.min(totalSlides - 1, i)));
 
   const handleSaveDayNote = () => {
     const today = getTodayString();
@@ -147,24 +194,72 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
         ))}
       </div>
 
-      {/* Quick Add */}
+      {/* Quick Add — Slides */}
       <div className="card-dark">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-sm flex items-center gap-2 text-slate-900">
             <Sparkles size={16} className="text-amber-500" /> Quick Add
+            <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{quickItems.length}</span>
           </h3>
-          <button onClick={() => onNavigate('settings')} className="text-xs text-violet-600 hover:text-violet-700 font-semibold transition">Customize</button>
+          <div className="flex items-center gap-2">
+            {totalSlides > 1 && (
+              <div className="flex items-center gap-1">
+                <button onClick={() => goTo(slide - 1)} disabled={slide === 0}
+                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90">
+                  <ChevronLeft size={15} />
+                </button>
+                <button onClick={() => goTo(slide + 1)} disabled={slide === totalSlides - 1}
+                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90">
+                  <ChevronRight size={15} />
+                </button>
+              </div>
+            )}
+            <button onClick={() => onNavigate('settings')} className="text-xs text-violet-600 hover:text-violet-700 font-semibold transition">Customize</button>
+          </div>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {(settings.quickAddTemplates || []).slice(0, 6).map(t => (
-            <button key={t.id} onClick={() => handleQuickAdd(t)}
-              className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center hover:border-violet-400 hover:bg-violet-50 transition-all active:scale-95 group">
-              <div className="text-xl mb-1">{t.icon}</div>
-              <p className="text-[11px] font-semibold text-slate-800 truncate">{t.name}</p>
-              <p className="text-[9px] text-slate-400 font-medium">{settings.currencySymbol}{t.amount}</p>
-            </button>
-          ))}
-        </div>
+
+        {quickItems.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="text-2xl mb-1 opacity-40">⚡</div>
+            <p className="text-xs text-slate-400">No quick items yet. Add expenses or templates.</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-hidden">
+              <div ref={trackRef} className="flex transition-transform duration-300 ease-out"
+                style={{ transform: `translateX(-${slide * 100}%)` }}>
+                {Array.from({ length: totalSlides }).map((_, pageIdx) => (
+                  <div key={pageIdx} className="shrink-0 w-full grid grid-cols-4 sm:grid-cols-4 gap-2">
+                    {quickItems.slice(pageIdx * PER_PAGE, pageIdx * PER_PAGE + PER_PAGE).map(t => (
+                      <button key={t.id} onClick={() => handleQuickAdd(t)}
+                        className={`relative bg-slate-50 border rounded-xl p-2.5 text-center transition-all active:scale-95 group ${justAdded === t.id ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-violet-400 hover:bg-violet-50'}`}>
+                        {justAdded === t.id && (
+                          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                            <Check size={11} className="text-white" />
+                          </span>
+                        )}
+                        <div className="text-xl mb-1">{t.icon}</div>
+                        <p className="text-[11px] font-semibold text-slate-800 truncate">{t.name}</p>
+                        <p className="text-[9px] text-slate-400 font-medium">{settings.currencySymbol}{t.amount.toLocaleString()}</p>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Slide dots */}
+            {totalSlides > 1 && (
+              <div className="flex items-center justify-center gap-1.5 mt-3">
+                {Array.from({ length: totalSlides }).map((_, i) => (
+                  <button key={i} onClick={() => goTo(i)}
+                    className={`h-1.5 rounded-full transition-all ${i === slide ? 'w-5 bg-violet-500' : 'w-1.5 bg-slate-300 hover:bg-slate-400'}`}
+                    aria-label={`Go to slide ${i + 1}`} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Recent Transactions */}

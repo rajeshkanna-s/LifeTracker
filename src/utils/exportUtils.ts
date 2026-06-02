@@ -2,11 +2,135 @@ import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import type { Debt, DebtSettings, JobApplication } from '../types';
+import type { Debt, DebtSettings, JobApplication, Expense, ExpenseSettings } from '../types';
 
 const getPDFCurrencySymbol = (symbol: string): string => {
   const map: Record<string, string> = { "₹": "Rs.", "€": "EUR", "£": "GBP", "¥": "JPY", "$": "USD" };
   return map[symbol] || symbol;
+};
+
+// ── Expense Report Exports ──
+export interface ExpenseReportSummary {
+  total: number;
+  count: number;
+  avgPerTxn: number;
+  avgPerDay: number;
+  largest: number;
+  smallest: number;
+  activeDays: number;
+}
+
+export interface CategoryBreakdownRow {
+  category: string;
+  amount: number;
+  percentage: number;
+}
+
+export const exportExpensesToExcel = (
+  expenses: Expense[],
+  breakdown: CategoryBreakdownRow[],
+  settings: ExpenseSettings,
+  fromDate: string,
+  toDate: string,
+) => {
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Expense detail
+  const detail = expenses.map((e, i) => ({
+    "S.No": i + 1,
+    "Date": e.date,
+    "Time": e.time || "-",
+    "Category": e.category,
+    "Platform": e.platform || "-",
+    "Payment Method": e.payment_method || "-",
+    [`Amount (${settings.currencySymbol})`]: Number(e.amount),
+    "Person": e.person || "-",
+    "Tags": e.tags || "-",
+    "Description": e.description || "-",
+  }));
+  const ws1 = XLSX.utils.json_to_sheet(detail);
+  ws1["!cols"] = [{ wch: 6 }, { wch: 12 }, { wch: 8 }, { wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 24 }];
+  XLSX.utils.book_append_sheet(wb, ws1, "Expenses");
+
+  // Sheet 2: Category breakdown
+  const cat = breakdown.map((b, i) => ({
+    "S.No": i + 1,
+    "Category": b.category,
+    [`Amount (${settings.currencySymbol})`]: b.amount,
+    "Percentage (%)": b.percentage,
+  }));
+  const ws2 = XLSX.utils.json_to_sheet(cat);
+  ws2["!cols"] = [{ wch: 6 }, { wch: 22 }, { wch: 16 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ws2, "By Category");
+
+  XLSX.writeFile(wb, `expense-report-${fromDate}-to-${toDate}.xlsx`);
+};
+
+export const exportExpensesToPDF = (
+  expenses: Expense[],
+  summary: ExpenseReportSummary,
+  breakdown: CategoryBreakdownRow[],
+  settings: ExpenseSettings,
+  fromDate: string,
+  toDate: string,
+) => {
+  const doc = new jsPDF();
+  const cur = getPDFCurrencySymbol(settings.currencySymbol);
+  const money = (n: number) => `${cur} ${Number(n).toLocaleString()}`;
+
+  // Header
+  doc.setFillColor(16, 185, 129); doc.rect(0, 0, 210, 35, "F");
+  doc.setTextColor(255, 255, 255); doc.setFontSize(20); doc.setFont("helvetica", "bold");
+  doc.text("EXPENSE REPORT", 105, 18, { align: "center" });
+  doc.setFontSize(10); doc.setFont("helvetica", "normal");
+  doc.text(`Period: ${fromDate} to ${toDate}  |  Generated: ${format(new Date(), "yyyy-MM-dd")}`, 105, 27, { align: "center" });
+  doc.setTextColor(0, 0, 0);
+
+  // Summary
+  doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text("Summary", 15, 48);
+  autoTable(doc, {
+    startY: 52,
+    theme: "grid",
+    styles: { fontSize: 9, cellPadding: 2.5 },
+    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: "bold" },
+    head: [["Total", "Transactions", "Avg / Txn", "Avg / Day", "Largest", "Smallest", "Active Days"]],
+    body: [[
+      money(summary.total), summary.count.toString(), money(summary.avgPerTxn),
+      money(summary.avgPerDay), money(summary.largest), money(summary.smallest), summary.activeDays.toString(),
+    ]],
+  });
+
+  // Category breakdown
+  const afterSummary = (doc as any).lastAutoTable?.finalY ?? 70;
+  doc.setFont("helvetica", "bold"); doc.text("By Category", 15, afterSummary + 10);
+  autoTable(doc, {
+    startY: afterSummary + 14,
+    theme: "striped",
+    styles: { fontSize: 9, cellPadding: 2.5 },
+    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: "bold" },
+    head: [["#", "Category", "Amount", "%"]],
+    body: breakdown.map((b, i) => [(i + 1).toString(), b.category, money(b.amount), `${b.percentage}%`]),
+  });
+
+  // Expense detail
+  const afterCat = (doc as any).lastAutoTable?.finalY ?? afterSummary + 30;
+  doc.setFont("helvetica", "bold"); doc.text("Expense Details", 15, afterCat + 10);
+  autoTable(doc, {
+    startY: afterCat + 14,
+    theme: "striped",
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: "bold" },
+    head: [["Date", "Category", "Platform", "Payment", "Amount"]],
+    body: expenses.map((e) => [
+      e.date,
+      (e.category || "-").substring(0, 18),
+      (e.platform || "-").substring(0, 14),
+      (e.payment_method || "-").substring(0, 14),
+      money(e.amount),
+    ]),
+  });
+
+  doc.save(`expense-report-${fromDate}-to-${toDate}.pdf`);
 };
 
 // ── Debt Exports ──
