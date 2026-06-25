@@ -1,6 +1,7 @@
 import React from 'react';
-import { Receipt, CreditCard, Building2, CheckSquare, Dumbbell, StickyNote, ListChecks, Lock } from 'lucide-react';
+import { Receipt, CreditCard, Building2, CheckSquare, Dumbbell, StickyNote, ListChecks, Lock, Download } from 'lucide-react';
 import type { TabId } from '../types';
+import { usePWA } from '../utils/usePWA';
 
 interface NavbarProps {
   activeTab: TabId;
@@ -19,6 +20,8 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
 ];
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
+  const { isInstallable, install } = usePWA();
+
   return (
     <>
       {/* Desktop Top Navbar */}
@@ -26,6 +29,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
         <div className="app-brand">
           <div className="brand-icon">M</div>
           <span>MyLife Tracker</span>
+          {isInstallable && (
+            <button className="btn-install-desktop" onClick={install}>
+              <Download size={14} />
+              <span>Install App</span>
+            </button>
+          )}
         </div>
         <div className="nav-tabs-custom">
           {tabs.map(tab => (

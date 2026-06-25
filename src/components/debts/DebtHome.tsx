@@ -48,7 +48,7 @@ const DebtHome: React.FC<DebtHomeProps> = ({ debts, settings, onEdit, onDelete, 
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {chartData.length > 0 && (
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm lg:col-span-1">
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm lg:col-span-1 min-w-0">
             <h3 className="text-sm font-bold text-slate-800 mb-4">Balance Breakdown</h3>
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">

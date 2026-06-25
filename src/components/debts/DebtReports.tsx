@@ -24,7 +24,7 @@ const DebtReports: React.FC<DebtReportsProps> = ({ debts, settings }) => {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Outstanding Balance Breakdown */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm min-w-0">
           <h3 className="text-sm font-bold text-slate-800 mb-4">Balance Breakdown</h3>
           {chartData.length === 0 ? (
             <div className="h-[250px] flex items-center justify-center text-slate-500 text-sm">No active debts to display</div>
@@ -59,7 +59,7 @@ const DebtReports: React.FC<DebtReportsProps> = ({ debts, settings }) => {
         </div>
 
         {/* Repayment Progress */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm min-w-0">
           <h3 className="text-sm font-bold text-slate-800 mb-4">Repayment Progress</h3>
           {progressData.length === 0 ? (
             <div className="h-[250px] flex items-center justify-center text-slate-500 text-sm">No data to display</div>

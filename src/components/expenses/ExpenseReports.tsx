@@ -219,7 +219,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Spending Trend */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h3 className="text-sm font-bold flex items-center gap-2">
             <TrendingUp size={16} className="text-emerald-500" /> Spending Trend
@@ -259,7 +259,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       {/* Charts row: Category Pie + Dimension Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {catBreakdown.length > 0 && (
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
+          <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
             <h3 className="text-sm font-bold flex items-center gap-2 mb-4">
               <PieChart size={16} className="text-purple-500" /> By Category
             </h3>
@@ -288,7 +288,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         )}
 
         {/* Breakdown by Dimension */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
             <h3 className="text-sm font-bold flex items-center gap-2">
               <Layers size={16} className="text-blue-500" /> Breakdown
