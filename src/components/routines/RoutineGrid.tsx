@@ -33,6 +33,7 @@ const RoutineGrid: React.FC<RoutineGridProps> = ({
   const dailyRoutines = routines.filter(r => r.frequency === 'daily');
   const weeklyRoutines = routines.filter(r => r.frequency === 'weekly');
   const monthlyRoutines = routines.filter(r => r.frequency === 'monthly');
+  const yearlyRoutines = routines.filter(r => r.frequency === 'yearly');
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -101,6 +102,7 @@ const RoutineGrid: React.FC<RoutineGridProps> = ({
             {dailyRoutines.length > 0 && dailyRoutines.map(r => renderRow(r, 'bg-emerald-100', 'text-emerald-950'))}
             {weeklyRoutines.length > 0 && weeklyRoutines.map(r => renderRow(r, 'bg-amber-100', 'text-amber-950'))}
             {monthlyRoutines.length > 0 && monthlyRoutines.map(r => renderRow(r, 'bg-sky-100', 'text-blue-950'))}
+            {yearlyRoutines.length > 0 && yearlyRoutines.map(r => renderRow(r, 'bg-purple-100', 'text-purple-950'))}
           </tbody>
         </table>
       </div>

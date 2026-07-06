@@ -29,6 +29,10 @@ const RoutineReports: React.FC<RoutineReportsProps> = ({ routines, entries, base
         const match = r.name.match(/(\d+)\s+[Tt]imes/);
         const weeklyTarget = match ? parseInt(match[1], 10) : 1;
         target = weeklyTarget * 4; 
+      } else if (r.frequency === 'monthly') {
+        target = 1;
+      } else if (r.frequency === 'yearly') {
+        target = 1;
       } else {
         target = 1;
       }
@@ -44,8 +48,10 @@ const RoutineReports: React.FC<RoutineReportsProps> = ({ routines, entries, base
 
     const dailyCompletions = performance.filter(p => p.frequency === 'daily').reduce((sum, p) => sum + p.completions, 0);
     const weeklyCompletions = performance.filter(p => p.frequency === 'weekly').reduce((sum, p) => sum + p.completions, 0);
+    const monthlyCompletions = performance.filter(p => p.frequency === 'monthly').reduce((sum, p) => sum + p.completions, 0);
+    const yearlyCompletions = performance.filter(p => p.frequency === 'yearly').reduce((sum, p) => sum + p.completions, 0);
 
-    return { totalCompletions, topPerformers, needsWork, dailyCompletions, weeklyCompletions };
+    return { totalCompletions, topPerformers, needsWork, dailyCompletions, weeklyCompletions, monthlyCompletions, yearlyCompletions };
   }, [routines, entries, daysInMonth]);
 
   return (
@@ -54,34 +60,54 @@ const RoutineReports: React.FC<RoutineReportsProps> = ({ routines, entries, base
         <h2 className="text-xl font-bold text-slate-800">Monthly Report: {monthName}</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-            <Target size={24} />
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Target size={20} />
           </div>
-          <div>
-            <p className="text-sm text-slate-500 font-medium">Total Actions Completed</p>
-            <p className="text-2xl font-bold text-slate-800">{stats.totalCompletions}</p>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 font-medium truncate">Total Hit</p>
+            <p className="text-xl font-bold text-slate-800">{stats.totalCompletions}</p>
           </div>
         </div>
         
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
-            <Trophy size={24} />
+        <div className="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Trophy size={20} />
           </div>
-          <div>
-            <p className="text-sm text-slate-500 font-medium">Daily Routines Hit</p>
-            <p className="text-2xl font-bold text-slate-800">{stats.dailyCompletions}</p>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 font-medium truncate">Daily Hit</p>
+            <p className="text-xl font-bold text-slate-800">{stats.dailyCompletions}</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
-            <Trophy size={24} />
+        <div className="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Trophy size={20} />
           </div>
-          <div>
-            <p className="text-sm text-slate-500 font-medium">Weekly Routines Hit</p>
-            <p className="text-2xl font-bold text-slate-800">{stats.weeklyCompletions}</p>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 font-medium truncate">Weekly Hit</p>
+            <p className="text-xl font-bold text-slate-800">{stats.weeklyCompletions}</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Trophy size={20} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 font-medium truncate">Monthly Hit</p>
+            <p className="text-xl font-bold text-slate-800">{stats.monthlyCompletions}</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Trophy size={20} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 font-medium truncate">Yearly Hit</p>
+            <p className="text-xl font-bold text-slate-800">{stats.yearlyCompletions}</p>
           </div>
         </div>
       </div>
