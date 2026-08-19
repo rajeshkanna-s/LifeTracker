@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, PieChart as ChartIcon, Settings as SettingsIcon, Calendar } from 'lucide-react';
+import { Home, Plus, PieChart as ChartIcon, Settings as SettingsIcon, Calendar, Shield } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import type { Debt, DebtSettings, DebtPayment } from '../../types';
+import type { Debt, DebtSettings, DebtPayment, Insurance } from '../../types';
 import { getDefaultDebtSettings } from '../../data/constants';
 
 import DebtHome from './DebtHome';
@@ -9,8 +9,9 @@ import DebtForm from './DebtForm';
 import DebtReports from './DebtReports';
 import DebtSettingsTab from './DebtSettings';
 import DebtEmiTracker from './DebtEmiTracker';
+import DebtInsurance from './DebtInsurance';
 
-type Tab = 'home' | 'track' | 'add' | 'reports' | 'settings';
+type Tab = 'home' | 'track' | 'insurance' | 'add' | 'reports' | 'settings';
 
 const DebtTracker: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('home');
@@ -32,7 +33,7 @@ const DebtTracker: React.FC = () => {
     const { data: pData } = await supabase.from('debt_payments').select('*');
     if (pData) setPayments(pData);
 
-    const { data: setObj, error } = await supabase.from('debt_settings').select('*').limit(1).single();
+    const { data: setObj, error } = await supabase.from('debt_settings').select('*').order('id', { ascending: true }).limit(1).single();
     if (setObj) {
       setSettingsId(setObj.id);
       setSettings({ ...getDefaultDebtSettings(), ...(setObj.settings_json || {}) });
@@ -95,6 +96,27 @@ const DebtTracker: React.FC = () => {
     }
   };
 
+  const handleSaveInsurance = async (policy: Insurance) => {
+    const list = settings.insurances || [];
+    let updated: Insurance[];
+    if (list.some(ins => ins.id === policy.id)) {
+      updated = list.map(ins => ins.id === policy.id ? policy : ins);
+    } else {
+      updated = [...list, policy];
+    }
+    const newSettings = { ...settings, insurances: updated };
+    await handleSettingsChange(newSettings);
+  };
+
+  const handleDeleteInsurance = async (id: string) => {
+    if (confirm('Are you sure you want to delete this insurance policy?')) {
+      const list = settings.insurances || [];
+      const updated = list.filter(ins => ins.id !== id);
+      const newSettings = { ...settings, insurances: updated };
+      await handleSettingsChange(newSettings);
+    }
+  };
+
   const openForm = (d?: Partial<Debt>) => { setEditDebt(d); setShowAddModal(true); };
 
   if (loading) return (
@@ -111,6 +133,9 @@ const DebtTracker: React.FC = () => {
         </button>
         <button onClick={() => setActiveTab('track')} className={`module-subtab ${activeTab === 'track' ? 'active-debt' : ''}`}>
           <Calendar size={16} /> <span className="label-text">EMI Track</span>
+        </button>
+        <button onClick={() => setActiveTab('insurance')} className={`module-subtab ${activeTab === 'insurance' ? 'active-debt' : ''}`}>
+          <Shield size={16} /> <span className="label-text">Insurance</span>
         </button>
         <button onClick={() => openForm()} className={`module-subtab ${activeTab === 'add' ? 'active-debt' : ''}`}
           style={activeTab !== 'add' ? { color: '#ef4444' } : {}}>
@@ -130,6 +155,9 @@ const DebtTracker: React.FC = () => {
         )}
         {activeTab === 'track' && (
           <DebtEmiTracker debts={debts} payments={payments} settings={settings} onPay={handlePayEmi} onUnpay={handleUnpayEmi} />
+        )}
+        {activeTab === 'insurance' && (
+          <DebtInsurance settings={settings} onSave={handleSaveInsurance} onDelete={handleDeleteInsurance} />
         )}
         {activeTab === 'reports' && <DebtReports debts={debts} settings={settings} />}
         {activeTab === 'settings' && <DebtSettingsTab settings={settings} debts={debts} onSettingsChange={handleSettingsChange} />}

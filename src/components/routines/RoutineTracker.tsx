@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import type { Routine, RoutineEntry } from '../../types';
 import RoutineGrid from './RoutineGrid';
 import RoutineReports from './RoutineReports';
-import { Download, LayoutGrid, PieChart, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download, LayoutGrid, PieChart, Search, Filter, ChevronLeft, ChevronRight, ListChecks, Plus, Pencil, Trash2 } from 'lucide-react';
 
 const RoutineTracker: React.FC = () => {
   const [routines, setRoutines] = useState<Routine[]>([]);
@@ -11,9 +11,13 @@ const RoutineTracker: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [baseDate, setBaseDate] = useState(new Date());
   
-  const [view, setView] = useState<'grid' | 'reports'>('grid');
+  const [view, setView] = useState<'grid' | 'reports' | 'manage'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterFrequency, setFilterFrequency] = useState<'all' | 'daily' | 'weekly'>('all');
+  const [filterFrequency, setFilterFrequency] = useState<'all' | 'daily' | 'weekly' | 'monthly' | 'yearly'>('all');
+  const [showModal, setShowModal] = useState(false);
+  const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
+  const [formName, setFormName] = useState('');
+  const [formFreq, setFormFreq] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('daily');
 
   useEffect(() => {
     fetchData();
@@ -111,6 +115,54 @@ const RoutineTracker: React.FC = () => {
     document.body.removeChild(link);
   };
 
+  const openAddModal = () => {
+    setEditingRoutine(null);
+    setFormName('');
+    setFormFreq('daily');
+    setShowModal(true);
+  };
+
+  const openEditModal = (routine: Routine) => {
+    setEditingRoutine(routine);
+    setFormName(routine.name);
+    setFormFreq(routine.frequency);
+    setShowModal(true);
+  };
+
+  const handleSaveRoutine = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formName.trim()) return;
+
+    if (editingRoutine) {
+      const { error } = await supabase
+        .from('routines')
+        .update({ name: formName.trim(), frequency: formFreq })
+        .eq('id', editingRoutine.id);
+      if (!error) {
+        setShowModal(false);
+        fetchData();
+      }
+    } else {
+      const { error } = await supabase
+        .from('routines')
+        .insert({ name: formName.trim(), frequency: formFreq });
+      if (!error) {
+        setShowModal(false);
+        fetchData();
+      }
+    }
+  };
+
+  const handleDeleteRoutine = async (id: string) => {
+    if (confirm('Are you sure you want to delete this routine? This will delete all completion history as well.')) {
+      await supabase.from('routine_entries').delete().eq('routine_id', id);
+      const { error } = await supabase.from('routines').delete().eq('id', id);
+      if (!error) {
+        fetchData();
+      }
+    }
+  };
+
   if (loading && routines.length === 0) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -152,6 +204,14 @@ const RoutineTracker: React.FC = () => {
               }`}
             >
               <PieChart size={16} /> Reports
+            </button>
+            <button
+              onClick={() => setView('manage')}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition ${
+                view === 'manage' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <ListChecks size={16} /> Manage
             </button>
           </div>
 
@@ -195,6 +255,8 @@ const RoutineTracker: React.FC = () => {
               <option value="all">All Frequencies</option>
               <option value="daily">Daily Only</option>
               <option value="weekly">Weekly Only</option>
+              <option value="monthly">Monthly Only</option>
+              <option value="yearly">Yearly Only</option>
             </select>
           </div>
 
@@ -207,19 +269,142 @@ const RoutineTracker: React.FC = () => {
         </div>
       </div>
 
-      {view === 'grid' ? (
+      {view === 'grid' && (
         <RoutineGrid 
           routines={filteredRoutines}
           entries={entries}
           baseDate={baseDate}
           onToggle={handleToggle}
         />
-      ) : (
+      )}
+
+      {view === 'reports' && (
         <RoutineReports 
           routines={filteredRoutines}
           entries={entries}
           baseDate={baseDate}
         />
+      )}
+
+      {view === 'manage' && (
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Manage Routines</h3>
+              <p className="text-xs text-slate-500 mt-0.5">Create, edit, or delete routines tracked in your checklist</p>
+            </div>
+            <button
+              onClick={openAddModal}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition shadow-sm"
+            >
+              <Plus size={16} /> Add Routine
+            </button>
+          </div>
+
+          {routines.length === 0 ? (
+            <div className="text-center py-10">
+              <div className="text-3xl mb-2">📋</div>
+              <p className="text-sm font-bold text-slate-700">No routines defined</p>
+              <p className="text-xs text-slate-500 mt-1">Create a routine to start tracking your actions</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase">
+                    <th className="pb-2">Routine Name</th>
+                    <th className="pb-2">Frequency</th>
+                    <th className="pb-2">Created At</th>
+                    <th className="pb-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {routines.map(r => (
+                    <tr key={r.id} className="hover:bg-slate-50 transition">
+                      <td className="py-3 font-semibold text-slate-800">{r.name}</td>
+                      <td className="py-3">
+                        <span className={`status-badge ${
+                          r.frequency === 'daily' ? 'offer' :
+                          r.frequency === 'weekly' ? 'interview' :
+                          r.frequency === 'monthly' ? 'applied' : 'rejected'
+                        }`}>
+                          {r.frequency}
+                        </span>
+                      </td>
+                      <td className="py-3 text-slate-500">
+                        {r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
+                      </td>
+                      <td className="py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => openEditModal(r)}
+                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition"
+                            title="Edit"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteRoutine(r.id)}
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition"
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Modal Form */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{editingRoutine ? 'Edit Routine' : 'Add New Routine'}</h3>
+              <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+            </div>
+            <form onSubmit={handleSaveRoutine}>
+              <div className="modal-body">
+                <div className="form-grid">
+                  <div className="form-group full">
+                    <label className="form-label">Routine Name *</label>
+                    <input
+                      type="text"
+                      className="form-control-custom"
+                      placeholder="e.g. Morning Meditation"
+                      required
+                      value={formName}
+                      onChange={e => setFormName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group full">
+                    <label className="form-label">Frequency *</label>
+                    <select
+                      className="form-control-custom"
+                      value={formFreq}
+                      onChange={e => setFormFreq(e.target.value as any)}
+                    >
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="yearly">Yearly</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="btn-submit cyan">{editingRoutine ? 'Update' : 'Add'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

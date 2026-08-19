@@ -85,6 +85,21 @@ export interface DebtSettings {
   monthlyIncome: number;
   reminderDays: number;
   customCategories: string[];
+  insurances?: Insurance[];
+}
+
+export interface Insurance {
+  id: string;
+  policyName: string;
+  type: 'Term Ins' | 'Life Ins' | 'Medical Ins' | 'Other' | string;
+  policyNumber: string;
+  startDate: string;
+  expireDate: string;
+  paymentAmount: number;
+  paymentFrequency: 'monthly' | 'yearly';
+  downloadUrl?: string;
+  fileName?: string;
+  created_at: string;
 }
 
 // ── Job Application Types ──
@@ -110,7 +125,7 @@ export interface JobApplication {
 export interface Routine {
   id: string;
   name: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
   created_at: string;
 }
 
