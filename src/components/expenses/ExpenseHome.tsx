@@ -32,6 +32,8 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
   const [filterCat, setFilterCat] = useState('');
   const [slide, setSlide] = useState(0);
   const [justAdded, setJustAdded] = useState<string | null>(null);
+  const [quickPrompt, setQuickPrompt] = useState<QuickAddTemplate | null>(null);
+  const [promptAmount, setPromptAmount] = useState('');
   const trackRef = useRef<HTMLDivElement>(null);
 
   // Items per slide page (responsive: mobile shows fewer per row but more rows)
@@ -50,9 +52,18 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
     if (existing) setDayNote(existing.note);
   }, [settings.dayNotes]);
 
-  const handleQuickAdd = async (t: QuickAddTemplate) => {
+  const openQuickPrompt = (t: QuickAddTemplate) => {
+    setQuickPrompt(t);
+    setPromptAmount(String(t.amount));
+  };
+
+  const confirmQuickAdd = async () => {
+    const amount = Number(promptAmount);
+    if (!quickPrompt || !promptAmount.trim() || isNaN(amount) || amount <= 0) return;
+    const t = quickPrompt;
+    setQuickPrompt(null);
     await onAddExpense({
-      amount: t.amount, category: t.category, platform: t.platform,
+      amount, category: t.category, platform: t.platform,
       payment_method: 'UPI', date: getTodayString(), time: getCurrentTimeString(),
       description: t.name, person: 'Me', tags: '', notes: ''
     });
@@ -231,7 +242,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                 {Array.from({ length: totalSlides }).map((_, pageIdx) => (
                   <div key={pageIdx} className="shrink-0 w-full grid grid-cols-4 sm:grid-cols-4 gap-2">
                     {quickItems.slice(pageIdx * PER_PAGE, pageIdx * PER_PAGE + PER_PAGE).map(t => (
-                      <button key={t.id} onClick={() => handleQuickAdd(t)}
+                      <button key={t.id} onClick={() => openQuickPrompt(t)}
                         className={`relative bg-slate-50 border rounded-xl p-2.5 text-center transition-all active:scale-95 group ${justAdded === t.id ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-violet-400 hover:bg-violet-50'}`}>
                         {justAdded === t.id && (
                           <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
@@ -336,6 +347,48 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
           <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">{dayNote}</p>
         )}
       </div>
+      {/* Quick Add — Amount Confirm Prompt */}
+      {quickPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setQuickPrompt(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-5" onClick={e => e.stopPropagation()}>
+            <div className="text-center">
+              <div className="text-3xl mb-1">{quickPrompt.icon}</div>
+              <h4 className="text-sm font-bold text-slate-900">{quickPrompt.name}</h4>
+              <p className="text-[11px] text-slate-400 mt-0.5">{quickPrompt.category}</p>
+            </div>
+            <div className="mt-4">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Amount</label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">{settings.currencySymbol}</span>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  autoFocus
+                  onFocus={e => e.currentTarget.select()}
+                  value={promptAmount}
+                  onChange={e => setPromptAmount(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') confirmQuickAdd();
+                    if (e.key === 'Escape') setQuickPrompt(null);
+                  }}
+                  className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-lg font-bold text-slate-900 outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => setQuickPrompt(null)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition active:scale-95">
+                Cancel
+              </button>
+              <button onClick={confirmQuickAdd}
+                disabled={!promptAmount.trim() || isNaN(Number(promptAmount)) || Number(promptAmount) <= 0}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
