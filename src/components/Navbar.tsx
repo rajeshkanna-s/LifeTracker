@@ -46,9 +46,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
     <>
       {/* ════════ Desktop Top Navbar (Hidden <= 768px) ════════ */}
       <nav className="app-navbar">
-        <div className="app-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className="brand-icon">RS</div>
-          <span>MyLife Tracker</span>
+        <div className="app-brand" style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ fontWeight: 800, fontSize: '1.15rem', color: '#fff', letterSpacing: '-0.02em' }}>
+            MyLife Tracker
+          </span>
           
           {/* Active Partner Pill Badge */}
           <button
@@ -133,34 +134,13 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
 
       {/* ════════ Mobile Top App Bar (Visible <= 768px) ════════ */}
       <header className="mobile-app-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #7c3aed, #0ea5e9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontWeight: 900,
-              fontSize: '0.85rem',
-              letterSpacing: '-0.02em',
-              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)',
-              flexShrink: 0
-            }}
-          >
-            RS
-          </div>
-          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontWeight: 800, fontSize: '0.98rem', color: '#0f172a', lineHeight: 1.15, letterSpacing: '-0.01em' }}>
-              MyLife
-            </span>
-            <span style={{ fontSize: '0.68rem', color: activeTabMeta.color, fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {activeTabMeta.label}
-            </span>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <span style={{ fontWeight: 900, fontSize: '1.05rem', color: '#0f172a', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+            MyLife Tracker
+          </span>
+          <span style={{ fontSize: '0.68rem', color: activeTabMeta.color, fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {activeTabMeta.label}
+          </span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>

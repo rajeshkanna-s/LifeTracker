@@ -157,41 +157,21 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ onUnlock }) => {
         }}
         className={error ? 'animate-shake' : ''}
       >
-        {/* App Branding Top */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '1.25rem' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #7c3aed, #0ea5e9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontWeight: 900,
-              fontSize: '1.05rem',
-              letterSpacing: '-0.02em',
-              boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)'
-            }}
-          >
-            RS
-          </div>
-          <div style={{ textAlign: 'left' }}>
-            <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', display: 'block', lineHeight: 1.1 }}>
-              MyLife Tracker
-            </span>
-            <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.02em' }}>
-              Personal Life & Finance
-            </span>
-          </div>
+        {/* App Branding Top - Clean & Properly Centered */}
+        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.03em', margin: '0 0 0.25rem 0', lineHeight: 1.2 }}>
+            MyLife Tracker
+          </h1>
+          <p style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', margin: 0 }}>
+            Personal Life & Finance
+          </p>
         </div>
 
         {/* ════════ VIEW 1: CHOOSE PROFILE (RAJESH & SEETHA) ════════ */}
         {!selectedPartner ? (
           <div>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#1e293b', margin: '0 0 0.3rem 0', letterSpacing: '-0.01em' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', margin: '0 0 0.35rem 0', letterSpacing: '-0.01em' }}>
                 Select Profile
               </h2>
               <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
