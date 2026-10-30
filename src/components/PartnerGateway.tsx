@@ -578,16 +578,7 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ onUnlock }) => {
               </button>
             </div>
 
-            {/* Helper default passcode reminder */}
-            <div
-              style={{
-                fontSize: '0.72rem',
-                color: '#94a3b8',
-                fontWeight: 600
-              }}
-            >
-              Default Passcode: <span style={{ color: '#64748b', fontWeight: 700 }}>689090</span>
-            </div>
+            
           </div>
         )}
       </div>

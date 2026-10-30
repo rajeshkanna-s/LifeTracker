@@ -13,12 +13,12 @@ interface NavbarProps {
 const tabs: { id: TabId; label: string; icon: React.ReactNode; color: string }[] = [
   { id: 'expenses', label: 'Expenses', icon: <Receipt size={17} />, color: '#7c3aed' },
   { id: 'debt', label: 'Debt', icon: <CreditCard size={17} />, color: '#ef4444' },
-  { id: 'jobs', label: 'Jobs', icon: <Building2 size={17} />, color: '#6366f1' },
   { id: 'habits', label: 'Habits', icon: <CheckSquare size={17} />, color: '#10b981' },
   { id: 'fitness', label: 'Fitness', icon: <Dumbbell size={17} />, color: '#f97316' },
   { id: 'notes', label: 'Notes', icon: <StickyNote size={17} />, color: '#d97706' },
   { id: 'routines', label: 'Routines', icon: <ListChecks size={17} />, color: '#0891b2' },
   { id: 'vault', label: 'Vault', icon: <Lock size={17} />, color: '#2563eb' },
+  { id: 'jobs', label: 'Jobs', icon: <Building2 size={17} />, color: '#6366f1' },
 ];
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {

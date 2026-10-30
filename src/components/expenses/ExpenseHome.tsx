@@ -221,26 +221,26 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
       </div>
 
       {/* Spending & Budget Pills */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl p-4 relative overflow-hidden shadow-md" style={{ background: 'linear-gradient(135deg, #ef4444, #f97316)' }}>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
-              <ArrowUpRight size={14} className="text-white" />
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="rounded-2xl p-3 sm:p-4 relative overflow-hidden shadow-sm" style={{ background: 'linear-gradient(135deg, #ef4444, #f97316)' }}>
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <div className="w-6 h-6 bg-white/20 rounded-md flex items-center justify-center">
+              <ArrowUpRight size={13} className="text-white" />
             </div>
-            <span className="text-xs font-semibold text-white/80">Spending</span>
+            <span className="text-xs font-semibold text-white/90">Spending</span>
           </div>
-          <p className="text-xl font-bold text-white">{settings.currencySymbol}{todayTotal.toLocaleString()}</p>
-          <p className="text-[10px] text-white/60 mt-1">Today</p>
+          <p className="text-lg sm:text-xl font-bold text-white">{settings.currencySymbol}{todayTotal.toLocaleString()}</p>
+          <p className="text-[10px] text-white/70 mt-0.5">Today</p>
         </div>
-        <div className="rounded-2xl p-4 relative overflow-hidden shadow-md" style={{ background: 'linear-gradient(135deg, #059669, #34d399)' }}>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
-              <Target size={14} className="text-white" />
+        <div className="rounded-2xl p-3 sm:p-4 relative overflow-hidden shadow-sm" style={{ background: 'linear-gradient(135deg, #059669, #34d399)' }}>
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <div className="w-6 h-6 bg-white/20 rounded-md flex items-center justify-center">
+              <Target size={13} className="text-white" />
             </div>
-            <span className="text-xs font-semibold text-white/80">Budget</span>
+            <span className="text-xs font-semibold text-white/90">Budget</span>
           </div>
-          <p className="text-xl font-bold text-white">{settings.monthlyBudget > 0 ? `${budgetPct}%` : '—'}</p>
-          <p className="text-[10px] text-white/60 mt-1">{settings.monthlyBudget > 0 ? `${settings.currencySymbol}${(settings.monthlyBudget - monthTotal).toLocaleString()} left` : 'Not set'}</p>
+          <p className="text-lg sm:text-xl font-bold text-white">{settings.monthlyBudget > 0 ? `${budgetPct}%` : '—'}</p>
+          <p className="text-[10px] text-white/70 mt-0.5">{settings.monthlyBudget > 0 ? `${settings.currencySymbol}${(settings.monthlyBudget - monthTotal).toLocaleString()} left` : 'Not set'}</p>
         </div>
       </div>
 
