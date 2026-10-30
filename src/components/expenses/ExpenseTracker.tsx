@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Home, Plus, PieChart as ChartIcon, Settings as SettingsIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Expense, ExpenseSettings } from '../../types';
-import { getDefaultExpenseSettings } from '../../data/constants';
+import { getDefaultExpenseSettings, SEETHA_QUICK_ADD } from '../../data/constants';
 import { usePartner } from '../../context/PartnerContext';
 
 import ExpenseHome from './ExpenseHome';
@@ -16,7 +16,7 @@ const ExpenseTracker: React.FC = () => {
   const { activePartnerId } = usePartner();
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [settings, setSettings] = useState<ExpenseSettings>(getDefaultExpenseSettings());
+  const [settings, setSettings] = useState<ExpenseSettings>(getDefaultExpenseSettings(activePartnerId));
   const [settingsId, setSettingsId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -46,16 +46,25 @@ const ExpenseTracker: React.FC = () => {
       .limit(1)
       .single();
 
+    const defaults = getDefaultExpenseSettings(activePartnerId);
     if (setObj) {
       setSettingsId(setObj.id);
-      setSettings({ ...getDefaultExpenseSettings(), ...(setObj.settings_json || {}) });
+      let sJson = setObj.settings_json || {};
+      if (activePartnerId === 'partner_2') {
+        const hasSeetha = sJson.quickAddTemplates && sJson.quickAddTemplates.some((t: any) => t.id?.startsWith('seetha'));
+        if (!hasSeetha) {
+          sJson = { ...sJson, quickAddTemplates: [...SEETHA_QUICK_ADD] };
+        }
+      }
+      setSettings({ ...defaults, ...sJson });
     } else if (error && error.code === 'PGRST116') {
       const { data: newRow } = await supabase
         .from('expense_settings')
-        .insert({ settings_json: getDefaultExpenseSettings(), partner_id: activePartnerId })
+        .insert({ settings_json: defaults, partner_id: activePartnerId })
         .select()
         .single();
       if (newRow) setSettingsId(newRow.id);
+      setSettings(defaults);
     }
     setLoading(false);
   };

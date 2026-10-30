@@ -76,6 +76,19 @@ export const DEFAULT_QUICK_ADD: QuickAddTemplate[] = [
   { id: '6', name: 'Snacks', amount: 50, category: 'Food', platform: 'Local Shop', icon: '🍪' },
 ];
 
+export const SEETHA_QUICK_ADD: QuickAddTemplate[] = [
+  { id: 'seetha-1', name: 'Petrol', amount: 400, category: 'Petrol / Fuel', platform: 'Local Pump', icon: '⛽' },
+  { id: 'seetha-2', name: 'Vegetables', amount: 200, category: 'Vegetables', platform: 'Vegetable Shop', icon: '🥬' },
+  { id: 'seetha-3', name: 'Provision / DMart', amount: 2500, category: 'Grocery', platform: 'DMart', icon: '🛒' },
+  { id: 'seetha-4', name: 'Internet Bill', amount: 707, category: 'Internet Bill', platform: 'Other', icon: '🌐' },
+  { id: 'seetha-5', name: 'Bakery / Snacks', amount: 100, category: 'Food', platform: 'Local Shop', icon: '🥐' },
+  { id: 'seetha-6', name: 'Ironing Clothes', amount: 150, category: 'Home Maintenance', platform: 'Local Shop', icon: '👔' },
+  { id: 'seetha-7', name: 'Fruits / Banana', amount: 100, category: 'Grocery', platform: 'Local Market', icon: '🍌' },
+  { id: 'seetha-8', name: 'Biriyani / Hotel', amount: 300, category: 'Food', platform: 'Local Restaurant', icon: '🍲' },
+  { id: 'seetha-9', name: 'Mobile Recharge', amount: 200, category: 'Mobile Recharge', platform: 'Google Pay', icon: '📱' },
+  { id: 'seetha-10', name: 'Milk / Dairy', amount: 100, category: 'Grocery', platform: 'Kirana Shop', icon: '🥛' },
+];
+
 // ── Currencies ──
 export const CURRENCIES = [
   { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
@@ -85,13 +98,13 @@ export const CURRENCIES = [
 ];
 
 // ── Default Settings ──
-export const getDefaultExpenseSettings = (): ExpenseSettings => ({
+export const getDefaultExpenseSettings = (partnerId?: string): ExpenseSettings => ({
   currency: 'INR',
   currencySymbol: '₹',
   monthlyBudget: 0,
   bigExpenseLimit: 2000,
   categoryBudgets: [],
-  quickAddTemplates: [...DEFAULT_QUICK_ADD],
+  quickAddTemplates: partnerId === 'partner_2' ? [...SEETHA_QUICK_ADD] : [...DEFAULT_QUICK_ADD],
   customCategories: [],
   customPaymentMethods: [],
   customPlatforms: [],
