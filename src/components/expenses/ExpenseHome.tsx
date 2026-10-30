@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Sparkles, Target, ArrowUpRight, Search, Lightbulb, Save, Edit2, Trash2, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Sparkles, Target, ArrowUpRight, Search, Lightbulb, Save, Edit2, Trash2, ChevronLeft, ChevronRight, Check, Plus } from 'lucide-react';
 import type { Expense, ExpenseSettings, QuickAddTemplate } from '../../types';
 import { usePartner } from '../../context/PartnerContext';
 import { CATEGORY_EMOJIS } from '../../data/constants';
@@ -39,6 +39,72 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
   const [quickPrompt, setQuickPrompt] = useState<QuickAddTemplate | null>(null);
   const [promptAmount, setPromptAmount] = useState('');
   const trackRef = useRef<HTMLDivElement>(null);
+
+  // Touch and drag swipe state for Quick Add carousel
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [touchDiffX, setTouchDiffX] = useState<number>(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [mouseStartX, setMouseStartX] = useState<number | null>(null);
+  const [mouseDiffX, setMouseDiffX] = useState<number>(0);
+  const [isMouseDragging, setIsMouseDragging] = useState(false);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchStartY(e.touches[0].clientY);
+    setTouchDiffX(0);
+    setIsSwiping(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX === null || touchStartY === null) return;
+    const diffX = e.touches[0].clientX - touchStartX;
+    const diffY = e.touches[0].clientY - touchStartY;
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      setTouchDiffX(diffX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isSwiping) return;
+    const threshold = 40;
+    if (touchDiffX < -threshold && slide < totalSlides - 1) {
+      goTo(slide + 1);
+    } else if (touchDiffX > threshold && slide > 0) {
+      goTo(slide - 1);
+    }
+    setTouchStartX(null);
+    setTouchStartY(null);
+    setTouchDiffX(0);
+    setIsSwiping(false);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setMouseStartX(e.clientX);
+    setMouseDiffX(0);
+    setIsMouseDragging(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isMouseDragging || mouseStartX === null) return;
+    setMouseDiffX(e.clientX - mouseStartX);
+  };
+
+  const handleMouseUp = () => {
+    if (!isMouseDragging) return;
+    const threshold = 50;
+    if (mouseDiffX < -threshold && slide < totalSlides - 1) {
+      goTo(slide + 1);
+    } else if (mouseDiffX > threshold && slide > 0) {
+      goTo(slide - 1);
+    }
+    setMouseStartX(null);
+    setMouseDiffX(0);
+    setIsMouseDragging(false);
+  };
+
+  const currentDragOffset = isSwiping ? touchDiffX : (isMouseDragging ? mouseDiffX : 0);
+  const isDraggingAny = isSwiping || isMouseDragging;
 
   // Items per slide page (responsive: mobile shows fewer per row but more rows)
   const PER_PAGE = 8;
@@ -136,7 +202,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
 
   return (
     <div className="space-y-4">
-      {/* Greeting */}
+      {/* Greeting & Quick Action */}
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-bold text-violet-600 uppercase tracking-wider">{greeting()}, {partnerName} 👋</p>
@@ -144,9 +210,14 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
             {settings.currencySymbol}{monthTotal.toLocaleString()} <span className="text-sm font-normal text-slate-500">this month</span>
           </h1>
         </div>
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-          {activePartner?.avatar || (isP1 ? '👤' : '👥')}
-        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate('add')}
+          className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold rounded-xl shadow-md shadow-violet-200 active:scale-95 transition shrink-0"
+        >
+          <Plus size={15} />
+          <span>Add</span>
+        </button>
       </div>
 
       {/* Spending & Budget Pills */}
@@ -199,37 +270,60 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
           { label: 'No-Spend', value: noSpendDays, icon: '🎯', noSymbol: true },
           { label: 'Avg/Day', value: avgDaily, icon: '📈' },
         ].map(s => (
-          <div key={s.label} className="card-dark text-center !p-3">
-            <div className="text-lg mb-1">{s.icon}</div>
-            <p className="text-sm font-bold text-slate-900">
+          <div key={s.label} className="card-dark text-center !p-2.5 sm:!p-3 flex flex-col items-center justify-center min-w-0">
+            <div className="text-base sm:text-lg mb-0.5">{s.icon}</div>
+            <p className="text-xs sm:text-sm font-bold text-slate-900 truncate w-full">
               {s.noSymbol ? s.value : `${settings.currencySymbol}${s.value.toLocaleString()}`}
             </p>
-            <p className="text-[10px] text-slate-400 font-medium mt-0.5">{s.label}</p>
+            <p className="text-[10px] text-slate-400 font-semibold mt-0.5 truncate w-full">{s.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Quick Add — Slides */}
+      {/* Quick Add — Mobile Swipeable Carousel */}
       <div className="card-dark">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-sm flex items-center gap-2 text-slate-900">
-            <Sparkles size={16} className="text-amber-500" /> Quick Add
-            <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{quickItems.length}</span>
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-sm flex items-center gap-1.5 text-slate-900">
+              <Sparkles size={16} className="text-amber-500" /> Quick Add
+            </h3>
+            <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-100">
+              {quickItems.length}
+            </span>
+          </div>
           <div className="flex items-center gap-2">
             {totalSlides > 1 && (
-              <div className="flex items-center gap-1">
-                <button onClick={() => goTo(slide - 1)} disabled={slide === 0}
-                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90">
+              <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200/60">
+                <button
+                  type="button"
+                  onClick={() => goTo(slide - 1)}
+                  disabled={slide === 0}
+                  aria-label="Previous page"
+                  className="w-7 h-7 rounded-md flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-25 disabled:cursor-not-allowed transition active:scale-90"
+                >
                   <ChevronLeft size={15} />
                 </button>
-                <button onClick={() => goTo(slide + 1)} disabled={slide === totalSlides - 1}
-                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90">
+                <span className="text-[10px] font-bold text-slate-500 px-1 select-none">
+                  {slide + 1}/{totalSlides}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => goTo(slide + 1)}
+                  disabled={slide === totalSlides - 1}
+                  aria-label="Next page"
+                  className="w-7 h-7 rounded-md flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-25 disabled:cursor-not-allowed transition active:scale-90"
+                >
                   <ChevronRight size={15} />
                 </button>
               </div>
             )}
-            <button onClick={() => onNavigate('settings')} className="text-xs text-violet-600 hover:text-violet-700 font-semibold transition">Customize</button>
+            <button
+              type="button"
+              onClick={() => onNavigate('settings')}
+              className="text-xs text-violet-600 hover:text-violet-700 font-bold px-2 py-1 rounded-md hover:bg-violet-50 transition active:scale-95"
+            >
+              Customize
+            </button>
           </div>
         </div>
 
@@ -240,22 +334,48 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
           </div>
         ) : (
           <>
-            <div className="overflow-hidden">
-              <div ref={trackRef} className="flex transition-transform duration-300 ease-out"
-                style={{ transform: `translateX(-${slide * 100}%)` }}>
+            <div 
+              className="overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing select-none"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+            >
+              <div
+                ref={trackRef}
+                className="flex"
+                style={{
+                  transform: `translateX(calc(-${slide * 100}% + ${currentDragOffset}px))`,
+                  transition: isDraggingAny ? 'none' : 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)'
+                }}
+              >
                 {Array.from({ length: totalSlides }).map((_, pageIdx) => (
-                  <div key={pageIdx} className="shrink-0 w-full grid grid-cols-4 sm:grid-cols-4 gap-2">
+                  <div key={pageIdx} className="shrink-0 w-full quick-add-grid">
                     {quickItems.slice(pageIdx * PER_PAGE, pageIdx * PER_PAGE + PER_PAGE).map(t => (
-                      <button key={t.id} onClick={() => openQuickPrompt(t)}
-                        className={`relative bg-slate-50 border rounded-xl p-2.5 text-center transition-all active:scale-95 group ${justAdded === t.id ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-violet-400 hover:bg-violet-50'}`}>
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => {
+                          if (Math.abs(currentDragOffset) > 6) return;
+                          openQuickPrompt(t);
+                        }}
+                        className={`relative flex flex-col items-center justify-center p-2 rounded-xl border text-center transition-all duration-150 active:scale-95 group select-none min-h-[72px] ${
+                          justAdded === t.id
+                            ? 'border-emerald-400 bg-emerald-50 shadow-sm shadow-emerald-100'
+                            : 'border-slate-200/80 bg-slate-50/70 hover:border-violet-300 hover:bg-violet-50/60 shadow-xs'
+                        }`}
+                      >
                         {justAdded === t.id && (
-                          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
-                            <Check size={11} className="text-white" />
+                          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center animate-bounce shadow-xs">
+                            <Check size={10} className="text-white" />
                           </span>
                         )}
-                        <div className="text-xl mb-1">{t.icon}</div>
-                        <p className="text-[11px] font-semibold text-slate-800 truncate">{t.name}</p>
-                        <p className="text-[9px] text-slate-400 font-medium">{settings.currencySymbol}{t.amount.toLocaleString()}</p>
+                        <span className="text-xl sm:text-2xl mb-1 filter drop-shadow-xs transform group-hover:scale-110 transition-transform">{t.icon}</span>
+                        <span className="text-[11px] font-bold text-slate-800 truncate w-full px-0.5 leading-tight">{t.name}</span>
+                        <span className="text-[10px] font-bold text-violet-600 mt-0.5">{settings.currencySymbol}{t.amount.toLocaleString()}</span>
                       </button>
                     ))}
                   </div>
@@ -267,9 +387,17 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
             {totalSlides > 1 && (
               <div className="flex items-center justify-center gap-1.5 mt-3">
                 {Array.from({ length: totalSlides }).map((_, i) => (
-                  <button key={i} onClick={() => goTo(i)}
-                    className={`h-1.5 rounded-full transition-all ${i === slide ? 'w-5 bg-violet-500' : 'w-1.5 bg-slate-300 hover:bg-slate-400'}`}
-                    aria-label={`Go to slide ${i + 1}`} />
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => goTo(i)}
+                    aria-label={`Go to slide ${i + 1}`}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      i === slide
+                        ? 'w-6 bg-violet-600 shadow-xs'
+                        : 'w-2 bg-slate-200 hover:bg-slate-300'
+                    }`}
+                  />
                 ))}
               </div>
             )}

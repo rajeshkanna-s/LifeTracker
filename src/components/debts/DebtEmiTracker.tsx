@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Check, X, Calendar } from 'lucide-react';
+import { Check, X, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Debt, DebtSettings, DebtPayment } from '../../types';
 
 interface DebtEmiTrackerProps {
@@ -36,33 +36,43 @@ const DebtEmiTracker: React.FC<DebtEmiTrackerProps> = ({ debts, payments, settin
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-      <div className="p-4 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2 text-slate-800">
-            <Calendar size={18} className="text-orange-600" />
-            <h3 className="text-sm font-bold">Monthly EMI Tracker</h3>
+      <div className="p-3 sm:p-4 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 text-slate-800">
+          <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 shrink-0 shadow-xs">
+            <Calendar size={16} />
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">Track and pay your EMIs month by month</p>
+          <div>
+            <h3 className="text-sm font-bold leading-tight">Monthly EMI Tracker</h3>
+            <p className="text-[11px] text-slate-500">Track and pay your EMIs month by month</p>
+          </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-xs w-full sm:w-auto">
           <button 
+            type="button"
             onClick={() => setMonthOffset(prev => prev - 6)}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-lg shadow-xs border border-slate-200/60 active:scale-95 transition whitespace-nowrap"
+            title="Previous 6 months"
           >
-            &larr; Prev 6 Months
+            <ChevronLeft size={14} />
+            <span>Prev 6M</span>
           </button>
           <button 
+            type="button"
             onClick={() => setMonthOffset(-2)}
-            className="px-3 py-1.5 text-xs font-semibold text-orange-600 bg-orange-50 border border-orange-100 rounded-lg hover:bg-orange-100 transition"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200/80 active:scale-95 transition whitespace-nowrap"
+            title="Current month"
           >
-            Today
+            Current
           </button>
           <button 
+            type="button"
             onClick={() => setMonthOffset(prev => prev + 6)}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-lg shadow-xs border border-slate-200/60 active:scale-95 transition whitespace-nowrap"
+            title="Next 6 months"
           >
-            Next 6 Months &rarr;
+            <span>Next 6M</span>
+            <ChevronRight size={14} />
           </button>
         </div>
       </div>

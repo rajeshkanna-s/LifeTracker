@@ -477,7 +477,7 @@ main {
 
   main { padding: 0.75rem 0.75rem calc(88px + env(safe-area-inset-bottom, 16px)); width: 100%; max-width: 100%; box-sizing: border-box; }
   .bottom-nav-inner { justify-content: flex-start; }
-  .bottom-nav-item { min-width: 66px; padding: 7px 10px; }
+  .bottom-nav-item { min-width: 62px; padding: 6px 8px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; } .bottom-nav-item:active { transform: scale(0.92); }
   .bottom-nav-icon { width: 32px; height: 32px; }
   .summary-cards.cols-2, .summary-cards.cols-3, .summary-cards.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .summary-card { padding: 0.875rem; border-radius: 14px; }
@@ -496,7 +496,7 @@ main {
     background: rgba(255,255,255,0.94); backdrop-filter: blur(16px);
   }
   .module-subtabs::-webkit-scrollbar { display: none; }
-  .module-subtab { min-height: 44px; padding: 11px 13px; font-size: 0.8rem; flex-shrink: 0; white-space: nowrap; border-radius: 10px; }
+  .module-subtab { min-height: 38px; padding: 8px 11px; font-size: 0.78rem; flex-shrink: 0; white-space: nowrap; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; } .module-subtab:active { transform: scale(0.96); }
   .module-subtab span.label-text { display: inline-block !important; }
   .habit-week-header, .habit-row { grid-template-columns: 100px repeat(7, 1fr); gap: 2px; }
   .habit-check { width: 28px; height: 28px; border-radius: 6px; }
@@ -778,7 +778,7 @@ main {
   .p-4 { padding: 0.875rem; }
   .gap-4 { gap: 0.875rem; }
   .grid.grid-cols-2.sm\:grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .grid.grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* .grid.grid-cols-4 override removed for responsive 4-column quick add */
   .text-2xl { font-size: 1.25rem; line-height: 1.65rem; }
   .text-xl { font-size: 1.125rem; line-height: 1.55rem; }
   .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.875rem; }
@@ -1276,3 +1276,23 @@ main {
 
 
 @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+/* ── Mobile Quick Add Grid ── */
+.quick-add-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+@media (max-width: 480px) {
+  .quick-add-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+}
+@media (max-width: 360px) {
+  .quick-add-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+}
