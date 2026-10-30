@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Sparkles, Target, ArrowUpRight, Search, Lightbulb, Save, Edit2, Trash2, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import type { Expense, ExpenseSettings, QuickAddTemplate } from '../../types';
+import { usePartner } from '../../context/PartnerContext';
 import { CATEGORY_EMOJIS } from '../../data/constants';
 import { getTodayTotal, getMonthTotal, getWeekTotal, getYearTotal, getNoSpendDays, getTodayString, getCurrentTimeString } from '../../utils/expenseUtils';
 
@@ -26,6 +27,9 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpense, onSettingsChange, onNavigate, onEdit, onDelete }) => {
+  const { activePartner, activePartnerId } = usePartner();
+  const isP1 = activePartnerId === 'partner_1';
+  const partnerName = activePartner?.name || (isP1 ? 'Rajesh' : 'Seetha');
   const [dayNote, setDayNote] = useState('');
   const [editingNote, setEditingNote] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -135,13 +139,13 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
       {/* Greeting */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{greeting()}</p>
+          <p className="text-xs font-bold text-violet-600 uppercase tracking-wider">{greeting()}, {partnerName} 👋</p>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">
             {settings.currencySymbol}{monthTotal.toLocaleString()} <span className="text-sm font-normal text-slate-500">this month</span>
           </h1>
         </div>
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-          {(settings.familyMembers?.[0] || 'M').charAt(0).toUpperCase()}
+          {activePartner?.avatar || (isP1 ? '👤' : '👥')}
         </div>
       </div>
 

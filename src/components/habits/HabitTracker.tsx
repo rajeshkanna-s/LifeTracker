@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import type { Habit, HabitEntry, HabitSettings } from '../../types';
 import { getDefaultHabitSettings } from '../../data/constants';
 import HabitSettingsTab from './HabitSettings';
+import { usePartner } from '../../context/PartnerContext';
 
 const CATEGORIES = ['health', 'productivity', 'fitness', 'learning', 'mindfulness', 'other'];
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -25,6 +26,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
 };
 
 const HabitTracker: React.FC = () => {
+  const { activePartnerId } = usePartner();
   const [activeTab, setActiveTab] = useState<'home' | 'settings'>('home');
   const [habits, setHabits] = useState<Habit[]>([]);
   const [entries, setEntries] = useState<HabitEntry[]>([]);
@@ -37,20 +39,45 @@ const HabitTracker: React.FC = () => {
 
   const weekDates = getWeekDates(baseDate);
 
-  useEffect(() => { fetchAll(); }, [baseDate]);
+  useEffect(() => { fetchAll(); }, [baseDate, activePartnerId]);
 
   const fetchAll = async () => {
     setLoading(true);
-    const { data: h } = await supabase.from('habits').select('*').order('created_at', { ascending: true });
+    const { data: h } = await supabase
+      .from('habits')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .order('created_at', { ascending: true });
+
     if (h) setHabits(h);
-    const { data: e } = await supabase.from('habit_entries').select('*').gte('date', weekDates[0]).lte('date', weekDates[6]);
+    else setHabits([]);
+
+    const { data: e } = await supabase
+      .from('habit_entries')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .gte('date', weekDates[0])
+      .lte('date', weekDates[6]);
+
     if (e) setEntries(e);
-    const { data: setObj, error } = await supabase.from('habit_settings').select('*').limit(1).single();
+    else setEntries([]);
+
+    const { data: setObj, error } = await supabase
+      .from('habit_settings')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .limit(1)
+      .single();
+
     if (setObj) {
       setSettingsId(setObj.id);
       setSettings({ ...getDefaultHabitSettings(), ...(setObj.settings_json || {}) });
     } else if (error && error.code === 'PGRST116') {
-      const { data: newRow } = await supabase.from('habit_settings').insert({ settings_json: getDefaultHabitSettings() }).select().single();
+      const { data: newRow } = await supabase
+        .from('habit_settings')
+        .insert({ settings_json: getDefaultHabitSettings(), partner_id: activePartnerId })
+        .select()
+        .single();
       if (newRow) setSettingsId(newRow.id);
     }
     setLoading(false);
@@ -59,27 +86,50 @@ const HabitTracker: React.FC = () => {
   const handleSettingsChange = async (newSettings: HabitSettings) => {
     setSettings(newSettings);
     if (settingsId) {
-      await supabase.from('habit_settings').update({ settings_json: newSettings, updated_at: new Date().toISOString() }).eq('id', settingsId);
+      await supabase
+        .from('habit_settings')
+        .update({
+          settings_json: newSettings,
+          partner_id: activePartnerId,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', settingsId)
+        .eq('partner_id', activePartnerId);
     }
   };
 
   const handleAddHabit = async () => {
     if (!form.name) return;
-    await supabase.from('habits').insert({ name: form.name, frequency: form.frequency, category: form.category, target_count: 1 });
+    await supabase.from('habits').insert({
+      name: form.name,
+      frequency: form.frequency,
+      category: form.category,
+      target_count: 1,
+      partner_id: activePartnerId
+    });
     setShowModal(false); setForm({ name: '', frequency: 'Daily', category: 'health' }); fetchAll();
   };
 
   const handleDeleteHabit = async (id: string) => {
-    await supabase.from('habits').delete().eq('id', id); fetchAll();
+    await supabase.from('habits').delete().eq('id', id).eq('partner_id', activePartnerId);
+    fetchAll();
   };
 
   const toggleEntry = async (habitId: string, date: string) => {
     const existing = entries.find(e => e.habit_id === habitId && e.date === date);
     if (existing) {
-      if (existing.completed) { await supabase.from('habit_entries').delete().eq('id', existing.id); }
-      else { await supabase.from('habit_entries').update({ completed: true }).eq('id', existing.id); }
+      if (existing.completed) {
+        await supabase.from('habit_entries').delete().eq('id', existing.id).eq('partner_id', activePartnerId);
+      } else {
+        await supabase.from('habit_entries').update({ completed: true }).eq('id', existing.id).eq('partner_id', activePartnerId);
+      }
     } else {
-      await supabase.from('habit_entries').insert({ habit_id: habitId, date, completed: true });
+      await supabase.from('habit_entries').insert({
+        habit_id: habitId,
+        date,
+        completed: true,
+        partner_id: activePartnerId
+      });
     }
     fetchAll();
   };

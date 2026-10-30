@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StickyNote, Plus, Trash2, Pencil, Pin, PinOff, Search, Clock, X, Save, ChevronRight, BookOpen, FileText, Star, StarOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { usePartner } from '../../context/PartnerContext';
 
 interface DailyNote {
   id: string;
@@ -32,6 +33,7 @@ const NOTE_COLORS = [
 ];
 
 const NotesTracker: React.FC = () => {
+  const { activePartnerId } = usePartner();
   const [notes, setNotes] = useState<DailyNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
@@ -48,12 +50,12 @@ const NotesTracker: React.FC = () => {
 
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => { fetchNotes(); }, []);
+  useEffect(() => { fetchNotes(); }, [activePartnerId]);
 
   const fetchNotes = async () => {
     setLoading(true);
     const { data } = await supabase
-      .from('daily_notes').select('*')
+      .from('daily_notes').select('*').eq('partner_id', activePartnerId)
       .order('is_pinned', { ascending: false })
       .order('updated_at', { ascending: false });
     if (data) setNotes(data);
@@ -80,9 +82,9 @@ const NotesTracker: React.FC = () => {
       title: form.title.trim(),
       content: form.content.trim(),
       mood: form.mood, tags: form.tags.trim(),
-      date: form.date, updated_at: new Date().toISOString(),
+      date: form.date, updated_at: new Date().toISOString(), partner_id: activePartnerId,
     };
-    if (editId) { await supabase.from('daily_notes').update(payload).eq('id', editId); }
+    if (editId) { await supabase.from('daily_notes').update(payload).eq('id', editId).eq('partner_id', activePartnerId); }
     else { await supabase.from('daily_notes').insert(payload); }
     setShowEditor(false); resetForm(); fetchNotes();
   };
@@ -103,14 +105,14 @@ const NotesTracker: React.FC = () => {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    await supabase.from('daily_notes').delete().eq('id', id);
+    await supabase.from('daily_notes').delete().eq('id', id).eq('partner_id', activePartnerId);
     if (selectedNote?.id === id) setSelectedNote(null);
     fetchNotes();
   };
 
   const togglePin = async (note: DailyNote, e: React.MouseEvent) => {
     e.stopPropagation();
-    await supabase.from('daily_notes').update({ is_pinned: !note.is_pinned, updated_at: new Date().toISOString() }).eq('id', note.id);
+    await supabase.from('daily_notes').update({ is_pinned: !note.is_pinned, updated_at: new Date().toISOString() }).eq('id', note.id).eq('partner_id', activePartnerId);
     fetchNotes();
   };
 

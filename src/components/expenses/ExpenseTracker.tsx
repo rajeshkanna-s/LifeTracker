@@ -3,6 +3,7 @@ import { Home, Plus, PieChart as ChartIcon, Settings as SettingsIcon } from 'luc
 import { supabase } from '../../lib/supabase';
 import type { Expense, ExpenseSettings } from '../../types';
 import { getDefaultExpenseSettings } from '../../data/constants';
+import { usePartner } from '../../context/PartnerContext';
 
 import ExpenseHome from './ExpenseHome';
 import ExpenseForm from './ExpenseForm';
@@ -12,6 +13,7 @@ import ExpenseSettingsTab from './ExpenseSettings';
 type Tab = 'home' | 'add' | 'reports' | 'settings';
 
 const ExpenseTracker: React.FC = () => {
+  const { activePartnerId } = usePartner();
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [settings, setSettings] = useState<ExpenseSettings>(getDefaultExpenseSettings());
@@ -22,19 +24,37 @@ const ExpenseTracker: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activePartnerId]);
 
   const fetchData = async () => {
     setLoading(true);
-    const { data: expData } = await supabase.from('expenses').select('*').order('date', { ascending: false });
-    if (expData) setExpenses(expData);
+    // Strict partner isolation: only load expenses for the current active partner
+    const { data: expData } = await supabase
+      .from('expenses')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .order('date', { ascending: false });
 
-    const { data: setObj, error } = await supabase.from('expense_settings').select('*').limit(1).single();
+    if (expData) setExpenses(expData);
+    else setExpenses([]);
+
+    // Strict partner isolation for settings
+    const { data: setObj, error } = await supabase
+      .from('expense_settings')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .limit(1)
+      .single();
+
     if (setObj) {
       setSettingsId(setObj.id);
       setSettings({ ...getDefaultExpenseSettings(), ...(setObj.settings_json || {}) });
     } else if (error && error.code === 'PGRST116') {
-      const { data: newRow } = await supabase.from('expense_settings').insert({ settings_json: getDefaultExpenseSettings() }).select().single();
+      const { data: newRow } = await supabase
+        .from('expense_settings')
+        .insert({ settings_json: getDefaultExpenseSettings(), partner_id: activePartnerId })
+        .select()
+        .single();
       if (newRow) setSettingsId(newRow.id);
     }
     setLoading(false);
@@ -43,15 +63,32 @@ const ExpenseTracker: React.FC = () => {
   const handleSettingsChange = async (newSettings: ExpenseSettings) => {
     setSettings(newSettings);
     if (settingsId) {
-      await supabase.from('expense_settings').update({ settings_json: newSettings, updated_at: new Date().toISOString() }).eq('id', settingsId);
+      await supabase
+        .from('expense_settings')
+        .update({
+          settings_json: newSettings,
+          partner_id: activePartnerId,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', settingsId)
+        .eq('partner_id', activePartnerId);
     }
   };
 
   const handleAddExpense = async (expense: Partial<Expense>) => {
+    const payload = {
+      ...expense,
+      partner_id: activePartnerId
+    };
+
     if (expense.id) {
-      await supabase.from('expenses').update(expense).eq('id', expense.id);
+      await supabase
+        .from('expenses')
+        .update(payload)
+        .eq('id', expense.id)
+        .eq('partner_id', activePartnerId);
     } else {
-      await supabase.from('expenses').insert(expense);
+      await supabase.from('expenses').insert(payload);
     }
     setShowAddModal(false);
     setEditExpense(undefined);
@@ -60,7 +97,11 @@ const ExpenseTracker: React.FC = () => {
   };
 
   const handleDeleteExpense = async (id: string) => {
-    await supabase.from('expenses').delete().eq('id', id);
+    await supabase
+      .from('expenses')
+      .delete()
+      .eq('id', id)
+      .eq('partner_id', activePartnerId);
     fetchData();
   };
 

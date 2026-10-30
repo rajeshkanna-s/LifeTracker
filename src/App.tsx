@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import PinLock from './components/PinLock';
+import { PartnerProvider, usePartner } from './context/PartnerContext';
+import PartnerGateway from './components/PartnerGateway';
 import Navbar from './components/Navbar';
 import ExpenseTracker from './components/expenses/ExpenseTracker';
 import DebtTracker from './components/debts/DebtTracker';
@@ -12,14 +13,14 @@ import VaultTracker from './components/vault/VaultTracker';
 import type { TabId } from './types';
 import { usePWA } from './utils/usePWA';
 
-const App: React.FC = () => {
-  const [unlocked, setUnlocked] = useState(false);
+const AppContent: React.FC = () => {
+  const { isUnlocked } = usePartner();
   const [activeTab, setActiveTab] = useState<TabId>('expenses');
   const [showMobileBanner, setShowMobileBanner] = useState(true);
   const { isInstallable, install } = usePWA();
 
-  if (!unlocked) {
-    return <PinLock onUnlock={() => setUnlocked(true)} />;
+  if (!isUnlocked) {
+    return <PartnerGateway />;
   }
 
   return (
@@ -53,6 +54,14 @@ const App: React.FC = () => {
         {activeTab === 'vault' && <VaultTracker />}
       </main>
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <PartnerProvider>
+      <AppContent />
+    </PartnerProvider>
   );
 };
 

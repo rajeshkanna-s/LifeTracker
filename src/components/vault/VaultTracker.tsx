@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { usePartner } from '../../context/PartnerContext';
 import type { Credential } from '../../types';
 import { 
   Lock, Eye, EyeOff, Plus, Trash2, Pencil, Search, X, 
@@ -8,6 +9,7 @@ import {
 } from 'lucide-react';
 
 const VaultTracker: React.FC = () => {
+  const { activePartnerId } = usePartner();
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorState, setErrorState] = useState<string | null>(null);
@@ -45,7 +47,7 @@ const VaultTracker: React.FC = () => {
   useEffect(() => {
     fetchCredentials();
     generateDedicatedPassword();
-  }, []);
+  }, [activePartnerId]);
 
   const fetchCredentials = async () => {
     try {
@@ -54,6 +56,7 @@ const VaultTracker: React.FC = () => {
       const { data, error } = await supabase
         .from('credentials')
         .select('*')
+        .eq('partner_id', activePartnerId)
         .order('service_name', { ascending: true });
 
       if (error) {
@@ -84,7 +87,8 @@ const VaultTracker: React.FC = () => {
       password: form.password,
       url: form.url.trim(),
       notes: form.notes.trim(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      partner_id: activePartnerId
     };
 
     try {
@@ -92,7 +96,8 @@ const VaultTracker: React.FC = () => {
         const { error } = await supabase
           .from('credentials')
           .update(payload)
-          .eq('id', editId);
+          .eq('id', editId)
+          .eq('partner_id', activePartnerId);
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -127,7 +132,8 @@ const VaultTracker: React.FC = () => {
       const { error } = await supabase
         .from('credentials')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('partner_id', activePartnerId);
       if (error) throw error;
       fetchCredentials();
     } catch (err: any) {

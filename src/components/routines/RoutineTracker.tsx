@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { usePartner } from '../../context/PartnerContext';
 import type { Routine, RoutineEntry } from '../../types';
 import RoutineGrid from './RoutineGrid';
 import RoutineReports from './RoutineReports';
 import { Download, LayoutGrid, PieChart, Search, Filter, ChevronLeft, ChevronRight, ListChecks, Plus, Pencil, Trash2 } from 'lucide-react';
 
 const RoutineTracker: React.FC = () => {
+  const { activePartnerId } = usePartner();
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [entries, setEntries] = useState<RoutineEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,13 +23,13 @@ const RoutineTracker: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [baseDate]);
+  }, [baseDate, activePartnerId]);
 
   const fetchData = async () => {
     setLoading(true);
     
     // Fetch routines
-    const { data: rData } = await supabase.from('routines').select('*').order('created_at', { ascending: true });
+    const { data: rData } = await supabase.from('routines').select('*').eq('partner_id', activePartnerId).order('created_at', { ascending: true });
     if (rData) setRoutines(rData);
 
     // Calculate month boundaries for entries
@@ -54,14 +56,14 @@ const RoutineTracker: React.FC = () => {
       // DB Delete
       const entry = entries.find(e => e.routine_id === routineId && e.date === dateStr);
       if (entry) {
-        await supabase.from('routine_entries').delete().eq('id', entry.id);
+        await supabase.from('routine_entries').delete().eq('id', entry.id).eq('partner_id', activePartnerId);
       }
     } else {
       const newEntry = { id: crypto.randomUUID(), routine_id: routineId, date: dateStr, completed: true, created_at: new Date().toISOString() };
       setEntries(prev => [...prev, newEntry]);
       
       // DB Insert
-      await supabase.from('routine_entries').insert({ routine_id: routineId, date: dateStr, completed: true });
+      await supabase.from('routine_entries').insert({ routine_id: routineId, date: dateStr, completed: true, partner_id: activePartnerId });
     }
   };
 
@@ -136,7 +138,7 @@ const RoutineTracker: React.FC = () => {
     if (editingRoutine) {
       const { error } = await supabase
         .from('routines')
-        .update({ name: formName.trim(), frequency: formFreq })
+        .update({ name: formName.trim(), frequency: formFreq, partner_id: activePartnerId }).eq('partner_id', activePartnerId)
         .eq('id', editingRoutine.id);
       if (!error) {
         setShowModal(false);
@@ -145,7 +147,7 @@ const RoutineTracker: React.FC = () => {
     } else {
       const { error } = await supabase
         .from('routines')
-        .insert({ name: formName.trim(), frequency: formFreq });
+        .insert({ name: formName.trim(), frequency: formFreq, partner_id: activePartnerId });
       if (!error) {
         setShowModal(false);
         fetchData();
@@ -155,8 +157,8 @@ const RoutineTracker: React.FC = () => {
 
   const handleDeleteRoutine = async (id: string) => {
     if (confirm('Are you sure you want to delete this routine? This will delete all completion history as well.')) {
-      await supabase.from('routine_entries').delete().eq('routine_id', id);
-      const { error } = await supabase.from('routines').delete().eq('id', id);
+      await supabase.from('routine_entries').delete().eq('routine_id', id).eq('partner_id', activePartnerId);
+      const { error } = await supabase.from('routines').delete().eq('id', id).eq('partner_id', activePartnerId);
       if (!error) {
         fetchData();
       }

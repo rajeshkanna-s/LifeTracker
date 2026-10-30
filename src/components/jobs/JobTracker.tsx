@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import type { JobApplication, JobSettings } from '../../types';
 import { getDefaultJobSettings } from '../../data/constants';
 import JobSettingsTab from './JobSettings';
+import { usePartner } from '../../context/PartnerContext';
 
 const SOURCES = ['LinkedIn', 'Naukri', 'Indeed', 'Company Website', 'Referral', 'Other'];
 const STATUSES = ['Applied', 'Interview', 'Offer', 'Rejected'];
@@ -11,6 +12,7 @@ const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Remote', 'Freelance', 
 const MODES = ['Online', 'In-person', 'Phone'];
 
 const JobTracker: React.FC = () => {
+  const { activePartnerId } = usePartner();
   const [activeTab, setActiveTab] = useState<'home' | 'settings'>('home');
   const [jobs, setJobs] = useState<JobApplication[]>([]);
   const [settings, setSettings] = useState<JobSettings>(getDefaultJobSettings());
@@ -26,18 +28,35 @@ const JobTracker: React.FC = () => {
     interview_date: '', interview_time: '', interview_mode: '', offer_amount: '', notes: ''
   });
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [activePartnerId]);
 
   const fetchData = async () => {
     setLoading(true);
-    const { data } = await supabase.from('job_applications').select('*').order('applied_date', { ascending: false });
+    const { data } = await supabase
+      .from('job_applications')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .order('applied_date', { ascending: false });
+
     if (data) setJobs(data);
-    const { data: setObj, error } = await supabase.from('job_settings').select('*').limit(1).single();
+    else setJobs([]);
+
+    const { data: setObj, error } = await supabase
+      .from('job_settings')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .limit(1)
+      .single();
+
     if (setObj) {
       setSettingsId(setObj.id);
       setSettings({ ...getDefaultJobSettings(), ...(setObj.settings_json || {}) });
     } else if (error && error.code === 'PGRST116') {
-      const { data: newRow } = await supabase.from('job_settings').insert({ settings_json: getDefaultJobSettings() }).select().single();
+      const { data: newRow } = await supabase
+        .from('job_settings')
+        .insert({ settings_json: getDefaultJobSettings(), partner_id: activePartnerId })
+        .select()
+        .single();
       if (newRow) setSettingsId(newRow.id);
     }
     setLoading(false);
@@ -46,7 +65,15 @@ const JobTracker: React.FC = () => {
   const handleSettingsChange = async (newSettings: JobSettings) => {
     setSettings(newSettings);
     if (settingsId) {
-      await supabase.from('job_settings').update({ settings_json: newSettings, updated_at: new Date().toISOString() }).eq('id', settingsId);
+      await supabase
+        .from('job_settings')
+        .update({
+          settings_json: newSettings,
+          partner_id: activePartnerId,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', settingsId)
+        .eq('partner_id', activePartnerId);
     }
   };
 
@@ -62,10 +89,18 @@ const JobTracker: React.FC = () => {
       source: form.source, status: form.status, job_type: form.job_type,
       first_call_date: form.first_call_date || null, first_call_info: form.first_call_info,
       interview_date: form.interview_date || null, interview_time: form.interview_time || null,
-      interview_mode: form.interview_mode, offer_amount: form.offer_amount ? Number(form.offer_amount) : null, notes: form.notes
+      interview_mode: form.interview_mode, offer_amount: form.offer_amount ? Number(form.offer_amount) : null, notes: form.notes,
+      partner_id: activePartnerId
     };
-    if (editId) { await supabase.from('job_applications').update(payload).eq('id', editId); }
-    else { await supabase.from('job_applications').insert(payload); }
+    if (editId) {
+      await supabase
+        .from('job_applications')
+        .update(payload)
+        .eq('id', editId)
+        .eq('partner_id', activePartnerId);
+    } else {
+      await supabase.from('job_applications').insert(payload);
+    }
     setShowModal(false); resetForm(); fetchData();
   };
 
@@ -74,7 +109,14 @@ const JobTracker: React.FC = () => {
     setEditId(j.id); setShowModal(true);
   };
 
-  const handleDelete = async (id: string) => { await supabase.from('job_applications').delete().eq('id', id); fetchData(); };
+  const handleDelete = async (id: string) => {
+    await supabase
+      .from('job_applications')
+      .delete()
+      .eq('id', id)
+      .eq('partner_id', activePartnerId);
+    fetchData();
+  };
 
   const filtered = jobs.filter(j => {
     const matchSearch = !search || j.company?.toLowerCase().includes(search.toLowerCase()) || j.role?.toLowerCase().includes(search.toLowerCase());

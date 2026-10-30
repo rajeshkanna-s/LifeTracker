@@ -5,12 +5,14 @@ import type { Workout, FitnessSettings } from '../../types';
 import { getDefaultFitnessSettings } from '../../data/constants';
 import FitnessSettingsTab from './FitnessSettings';
 import FitnessPlan from './FitnessPlan';
+import { usePartner } from '../../context/PartnerContext';
 
 const TYPES = ['Strength', 'Cardio', 'Yoga', 'HIIT', 'Walking', 'Running', 'Cycling', 'Swimming', 'Stretching', 'Other'];
 const MOODS = ['💪 Great', '😊 Good', '😐 Okay', '😓 Tired', '😩 Exhausted'];
 const TYPE_EMOJI: Record<string, string> = { Strength: '💪', Cardio: '🏃', Yoga: '🧘', HIIT: '🔥', Walking: '🚶', Running: '🏃', Cycling: '🚴', Swimming: '🏊', Stretching: '🤸', Other: '⚡' };
 
 const FitnessTracker: React.FC = () => {
+  const { activePartnerId } = usePartner();
   const [activeTab, setActiveTab] = useState<'home' | 'plan' | 'settings'>('home');
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [settings, setSettings] = useState<FitnessSettings>(getDefaultFitnessSettings());
@@ -24,18 +26,35 @@ const FitnessTracker: React.FC = () => {
     mood: '', exercises: '', notes: ''
   });
 
-  useEffect(() => { fetchWorkouts(); }, []);
+  useEffect(() => { fetchWorkouts(); }, [activePartnerId]);
 
   const fetchWorkouts = async () => {
     setLoading(true);
-    const { data } = await supabase.from('workouts').select('*').order('date', { ascending: false });
+    const { data } = await supabase
+      .from('workouts')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .order('date', { ascending: false });
+
     if (data) setWorkouts(data);
-    const { data: setObj, error } = await supabase.from('fitness_settings').select('*').limit(1).single();
+    else setWorkouts([]);
+
+    const { data: setObj, error } = await supabase
+      .from('fitness_settings')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .limit(1)
+      .single();
+
     if (setObj) {
       setSettingsId(setObj.id);
       setSettings({ ...getDefaultFitnessSettings(), ...(setObj.settings_json || {}) });
     } else if (error && error.code === 'PGRST116') {
-      const { data: newRow } = await supabase.from('fitness_settings').insert({ settings_json: getDefaultFitnessSettings() }).select().single();
+      const { data: newRow } = await supabase
+        .from('fitness_settings')
+        .insert({ settings_json: getDefaultFitnessSettings(), partner_id: activePartnerId })
+        .select()
+        .single();
       if (newRow) setSettingsId(newRow.id);
     }
     setLoading(false);
@@ -44,7 +63,15 @@ const FitnessTracker: React.FC = () => {
   const handleSettingsChange = async (newSettings: FitnessSettings) => {
     setSettings(newSettings);
     if (settingsId) {
-      await supabase.from('fitness_settings').update({ settings_json: newSettings, updated_at: new Date().toISOString() }).eq('id', settingsId);
+      await supabase
+        .from('fitness_settings')
+        .update({
+          settings_json: newSettings,
+          partner_id: activePartnerId,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', settingsId)
+        .eq('partner_id', activePartnerId);
     }
   };
 
@@ -57,10 +84,18 @@ const FitnessTracker: React.FC = () => {
     const payload = {
       date: form.date, type: form.type, title: form.title,
       duration_min: Number(form.duration_min) || null, calories_burned: Number(form.calories_burned) || null,
-      body_weight: Number(form.body_weight) || null, mood: form.mood, exercises: form.exercises, notes: form.notes
+      body_weight: Number(form.body_weight) || null, mood: form.mood, exercises: form.exercises, notes: form.notes,
+      partner_id: activePartnerId
     };
-    if (editId) { await supabase.from('workouts').update(payload).eq('id', editId); }
-    else { await supabase.from('workouts').insert(payload); }
+    if (editId) {
+      await supabase
+        .from('workouts')
+        .update(payload)
+        .eq('id', editId)
+        .eq('partner_id', activePartnerId);
+    } else {
+      await supabase.from('workouts').insert(payload);
+    }
     setShowModal(false); resetForm(); fetchWorkouts();
   };
 
@@ -69,7 +104,14 @@ const FitnessTracker: React.FC = () => {
     setEditId(w.id); setShowModal(true);
   };
 
-  const handleDelete = async (id: string) => { await supabase.from('workouts').delete().eq('id', id); fetchWorkouts(); };
+  const handleDelete = async (id: string) => {
+    await supabase
+      .from('workouts')
+      .delete()
+      .eq('id', id)
+      .eq('partner_id', activePartnerId);
+    fetchWorkouts();
+  };
 
   const totalWorkouts = workouts.length;
   const totalDuration = workouts.reduce((s, w) => s + (Number(w.duration_min) || 0), 0);

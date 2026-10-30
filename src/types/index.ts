@@ -12,6 +12,7 @@ export interface Expense {
   person: string;
   notes: string;
   created_at: string;
+  partner_id?: string;
 }
 
 export interface QuickAddTemplate {
@@ -197,4 +198,17 @@ export interface Credential {
 
 // ── App Types ──
 export type TabId = 'expenses' | 'debt' | 'jobs' | 'habits' | 'fitness' | 'notes' | 'routines' | 'vault';
+
+// ── Multi-Partner Types ──
+export type PartnerId = 'partner_1' | 'partner_2';
+
+export interface PartnerProfile {
+  id: PartnerId;
+  name: string;
+  passcode: string;
+  avatar: string;
+  theme_color: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
