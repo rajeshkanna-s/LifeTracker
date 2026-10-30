@@ -47,7 +47,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
       {/* ════════ Desktop Top Navbar (Hidden <= 768px) ════════ */}
       <nav className="app-navbar">
         <div className="app-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className="brand-icon">M</div>
+          <div className="brand-icon">RS</div>
           <span>MyLife Tracker</span>
           
           {/* Active Partner Pill Badge */}
@@ -139,18 +139,19 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
               width: '32px',
               height: '32px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
+              background: 'linear-gradient(135deg, #7c3aed, #0ea5e9)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#fff',
-              fontWeight: 800,
-              fontSize: '0.95rem',
+              fontWeight: 900,
+              fontSize: '0.85rem',
+              letterSpacing: '-0.02em',
               boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)',
               flexShrink: 0
             }}
           >
-            M
+            RS
           </div>
           <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontWeight: 800, fontSize: '0.98rem', color: '#0f172a', lineHeight: 1.15, letterSpacing: '-0.01em' }}>

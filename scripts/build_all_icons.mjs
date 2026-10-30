@@ -1,0 +1,132 @@
+import sharp from 'sharp';
+import fs from 'fs';
+
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient: Rajesh Royal Purple to Seetha Sky Blue -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4338ca" />
+      <stop offset="42%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+
+    <!-- Top Ambient Lighting -->
+    <radialGradient id="ambientGlow" cx="20%" cy="15%" r="75%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.38" />
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.32" />
+    </radialGradient>
+
+    <!-- R Gradient (Rajesh): Crisp White with subtle silver-violet tone -->
+    <linearGradient id="rGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f1f5f9" />
+    </linearGradient>
+
+    <!-- S Gradient (Seetha): Bright Radiant Sky Blue -->
+    <linearGradient id="sGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="40%" stop-color="#7dd3fc" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+
+    <!-- Luxury 3D Drop Shadow -->
+    <filter id="monogramShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#090d16" flood-opacity="0.5" />
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+
+    <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Superellipse / Squircle Base -->
+  <rect width="512" height="512" rx="124" fill="url(#bgGrad)" />
+  <rect width="512" height="512" rx="124" fill="url(#ambientGlow)" />
+
+  <!-- Inner glass bevel border -->
+  <rect x="12" y="12" width="488" height="488" rx="114" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="4.5" />
+
+  <!-- Monogram RS -->
+  <g filter="url(#monogramShadow)">
+    <text x="256" y="342" 
+          text-anchor="middle" 
+          font-family="'Inter', 'Arial Black', -apple-system, system-ui, sans-serif" 
+          font-weight="900" 
+          font-size="228" 
+          letter-spacing="-10">
+      <tspan fill="url(#rGrad)">R</tspan><tspan fill="url(#sGrad)">S</tspan>
+    </text>
+  </g>
+
+  <!-- Golden-Cyan Partnership Diamond Star -->
+  <g transform="translate(256, 120)" filter="url(#starGlow)">
+    <path d="M 0 -14 Q 0 0 14 0 Q 0 0 0 14 Q 0 0 -14 0 Q 0 0 0 -14 Z" fill="#38bdf8" />
+    <circle cx="0" cy="0" r="3.5" fill="#ffffff" />
+  </g>
+</svg>`;
+
+async function buildAll() {
+  // 1. Save SVG
+  fs.writeFileSync('public/favicon.svg', svg.trim(), 'utf8');
+  console.log('✓ Updated public/favicon.svg');
+
+  const svgBuffer = Buffer.from(svg);
+
+  // 2. Save favicon.ico (as 48x48 icon)
+  await sharp(svgBuffer)
+    .resize(48, 48)
+    .toFormat('png')
+    .toFile('public/favicon.ico');
+  console.log('✓ Updated public/favicon.ico');
+
+  // 3. Apple Touch Icon 180x180
+  await sharp(svgBuffer)
+    .resize(180, 180)
+    .png()
+    .toFile('public/apple-touch-icon-180x180.png');
+  console.log('✓ Updated public/apple-touch-icon-180x180.png');
+
+  // 4. PWA 192x192
+  await sharp(svgBuffer)
+    .resize(192, 192)
+    .png()
+    .toFile('public/pwa-192x192.png');
+  console.log('✓ Updated public/pwa-192x192.png');
+
+  // 5. PWA 512x512
+  await sharp(svgBuffer)
+    .resize(512, 512)
+    .png()
+    .toFile('public/pwa-512x512.png');
+  console.log('✓ Updated public/pwa-512x512.png');
+
+  // 6. Maskable 512x512 (with safe area)
+  // Maskable icons need 10% padding so system circular/squircle masks don't cut content
+  await sharp(svgBuffer)
+    .resize(410, 410)
+    .extend({
+      top: 51,
+      bottom: 51,
+      left: 51,
+      right: 51,
+      background: { r: 124, g: 58, b: 237, alpha: 1 }
+    })
+    .png()
+    .toFile('public/maskable-icon-512x512.png');
+  console.log('✓ Updated public/maskable-icon-512x512.png');
+
+  // 7. PWA 64x64
+  await sharp(svgBuffer)
+    .resize(64, 64)
+    .png()
+    .toFile('public/pwa-64x64.png');
+  console.log('✓ Updated public/pwa-64x64.png');
+}
+
+buildAll().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

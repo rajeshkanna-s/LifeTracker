@@ -164,17 +164,18 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ onUnlock }) => {
               width: '40px',
               height: '40px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
+              background: 'linear-gradient(135deg, #7c3aed, #0ea5e9)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#fff',
-              fontWeight: 800,
-              fontSize: '1.2rem',
+              fontWeight: 900,
+              fontSize: '1.05rem',
+              letterSpacing: '-0.02em',
               boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)'
             }}
           >
-            M
+            RS
           </div>
           <div style={{ textAlign: 'left' }}>
             <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', display: 'block', lineHeight: 1.1 }}>
