@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Lock, ArrowLeft, Shield, AlertCircle, CheckCircle2, ChevronRight, User, Users, Delete } from 'lucide-react';
+import { Lock, ArrowLeft, AlertCircle, CheckCircle2, ChevronRight, User, Users, Delete } from 'lucide-react';
 import { usePartner } from '../context/PartnerContext';
 import type { PartnerId, PartnerProfile } from '../types';
 
@@ -275,23 +275,7 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ onUnlock }) => {
               })}
             </div>
 
-            {/* Bottom Security Info Badge */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '7px',
-                color: '#64748b',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                background: '#f1f5f9',
-                padding: '8px 14px',
-                borderRadius: '20px',
-                marginTop: '0.5rem'
-              }}
-            >
-              <Shield size={14} color="#7c3aed" /> Strict Two-Partner Data Isolation (Rajesh & Seetha)
-            </div>
+            
           </div>
         ) : (
           /* ════════ VIEW 2: NATIVE MOBILE PIN ENTRY SCREEN ════════ */
