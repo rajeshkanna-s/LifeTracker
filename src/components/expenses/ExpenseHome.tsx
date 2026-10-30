@@ -147,17 +147,19 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
     const iconFor = (category: string) => CATEGORY_EMOJIS[category]?.[0] || '📦';
     const map = new Map<string, QuickAddTemplate>();
 
-    // Seed with saved templates first (they take priority for icon/amount)
+    // Seed with user's saved templates first
     (settings.quickAddTemplates || []).forEach(t => {
       const key = (t.name || '').trim().toLowerCase();
       if (key) map.set(key, t);
     });
 
-    // expenses are ordered newest-first; only fill names not already present
-    expenses.forEach(e => {
+    // Only add recent transactions up to 16 items max (2 clean pages of 8 items)
+    const MAX_ITEMS = Math.max(16, (settings.quickAddTemplates || []).length);
+    for (const e of expenses) {
+      if (map.size >= MAX_ITEMS) break;
       const name = (e.description || e.category || '').trim();
       const key = name.toLowerCase();
-      if (!name || map.has(key)) return;
+      if (!name || map.has(key)) continue;
       map.set(key, {
         id: `tx-${e.id}`,
         name,
@@ -166,7 +168,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
         platform: e.platform || '',
         icon: iconFor(e.category || 'Miscellaneous'),
       });
-    });
+    }
 
     return Array.from(map.values());
   }, [settings.quickAddTemplates, expenses]);
@@ -281,50 +283,24 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
       </div>
 
       {/* Quick Add — Mobile Swipeable Carousel */}
-      <div className="card-dark">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-sm flex items-center gap-1.5 text-slate-900">
-              <Sparkles size={16} className="text-amber-500" /> Quick Add
+      <div className="card-dark overflow-hidden">
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-1.5">
+            <Sparkles size={16} className="text-amber-500 shrink-0" />
+            <h3 className="font-bold text-sm text-slate-900 whitespace-nowrap">
+              Quick Add
             </h3>
-            <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-100">
+            <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded-full border border-violet-100 shrink-0">
               {quickItems.length}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {totalSlides > 1 && (
-              <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200/60">
-                <button
-                  type="button"
-                  onClick={() => goTo(slide - 1)}
-                  disabled={slide === 0}
-                  aria-label="Previous page"
-                  className="w-7 h-7 rounded-md flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-25 disabled:cursor-not-allowed transition active:scale-90"
-                >
-                  <ChevronLeft size={15} />
-                </button>
-                <span className="text-[10px] font-bold text-slate-500 px-1 select-none">
-                  {slide + 1}/{totalSlides}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => goTo(slide + 1)}
-                  disabled={slide === totalSlides - 1}
-                  aria-label="Next page"
-                  className="w-7 h-7 rounded-md flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-25 disabled:cursor-not-allowed transition active:scale-90"
-                >
-                  <ChevronRight size={15} />
-                </button>
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={() => onNavigate('settings')}
-              className="text-xs text-violet-600 hover:text-violet-700 font-bold px-2 py-1 rounded-md hover:bg-violet-50 transition active:scale-95"
-            >
-              Customize
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('settings')}
+            className="text-xs text-violet-600 hover:text-violet-700 font-bold px-2 py-1 rounded-md hover:bg-violet-50 transition active:scale-95 whitespace-nowrap"
+          >
+            Customize
+          </button>
         </div>
 
         {quickItems.length === 0 ? (
@@ -335,7 +311,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
         ) : (
           <>
             <div 
-              className="overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing select-none"
+              className="overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing select-none w-full"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
@@ -346,59 +322,84 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
             >
               <div
                 ref={trackRef}
-                className="flex"
+                className="flex w-full"
                 style={{
                   transform: `translateX(calc(-${slide * 100}% + ${currentDragOffset}px))`,
                   transition: isDraggingAny ? 'none' : 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
                 {Array.from({ length: totalSlides }).map((_, pageIdx) => (
-                  <div key={pageIdx} className="shrink-0 w-full quick-add-grid">
-                    {quickItems.slice(pageIdx * PER_PAGE, pageIdx * PER_PAGE + PER_PAGE).map(t => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => {
-                          if (Math.abs(currentDragOffset) > 6) return;
-                          openQuickPrompt(t);
-                        }}
-                        className={`relative flex flex-col items-center justify-center p-2 rounded-xl border text-center transition-all duration-150 active:scale-95 group select-none min-h-[72px] ${
-                          justAdded === t.id
-                            ? 'border-emerald-400 bg-emerald-50 shadow-sm shadow-emerald-100'
-                            : 'border-slate-200/80 bg-slate-50/70 hover:border-violet-300 hover:bg-violet-50/60 shadow-xs'
-                        }`}
-                      >
-                        {justAdded === t.id && (
-                          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center animate-bounce shadow-xs">
-                            <Check size={10} className="text-white" />
-                          </span>
-                        )}
-                        <span className="text-xl sm:text-2xl mb-1 filter drop-shadow-xs transform group-hover:scale-110 transition-transform">{t.icon}</span>
-                        <span className="text-[11px] font-bold text-slate-800 truncate w-full px-0.5 leading-tight">{t.name}</span>
-                        <span className="text-[10px] font-bold text-violet-600 mt-0.5">{settings.currencySymbol}{t.amount.toLocaleString()}</span>
-                      </button>
-                    ))}
+                  <div key={pageIdx} className="quick-add-page shrink-0 w-full min-w-full max-w-full">
+                    <div className="quick-add-grid">
+                      {quickItems.slice(pageIdx * PER_PAGE, pageIdx * PER_PAGE + PER_PAGE).map(t => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => {
+                            if (Math.abs(currentDragOffset) > 6) return;
+                            openQuickPrompt(t);
+                          }}
+                          className={`quick-add-card relative flex flex-col items-center justify-center p-1.5 rounded-xl border text-center transition-all duration-150 active:scale-95 group select-none min-h-[66px] sm:min-h-[72px] overflow-hidden ${
+                            justAdded === t.id
+                              ? 'border-emerald-400 bg-emerald-50 shadow-xs'
+                              : 'border-slate-200/90 bg-slate-50/70 hover:border-violet-300 hover:bg-violet-50/60 shadow-xs'
+                          }`}
+                        >
+                          {justAdded === t.id && (
+                            <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 flex items-center justify-center animate-bounce shadow-xs">
+                              <Check size={9} className="text-white" />
+                            </span>
+                          )}
+                          <span className="text-xl sm:text-2xl mb-0.5 filter drop-shadow-xs transform group-hover:scale-105 transition-transform">{t.icon}</span>
+                          <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 truncate w-full px-1 block leading-tight text-center">{t.name}</span>
+                          <span className="text-[9px] sm:text-[10px] font-bold text-violet-600 mt-0.5 block truncate w-full text-center">{settings.currencySymbol}{t.amount.toLocaleString()}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Slide dots */}
+            {/* Slide Navigation & Dots */}
             {totalSlides > 1 && (
-              <div className="flex items-center justify-center gap-1.5 mt-3">
-                {Array.from({ length: totalSlides }).map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => goTo(i)}
-                    aria-label={`Go to slide ${i + 1}`}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      i === slide
-                        ? 'w-6 bg-violet-600 shadow-xs'
-                        : 'w-2 bg-slate-200 hover:bg-slate-300'
-                    }`}
-                  />
-                ))}
+              <div className="flex items-center justify-center gap-2.5 mt-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => goTo(slide - 1)}
+                  disabled={slide === 0}
+                  aria-label="Previous page"
+                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-500 bg-slate-100 hover:bg-slate-200 disabled:opacity-20 disabled:pointer-events-none transition active:scale-90"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <div className="flex items-center gap-1.5">
+                  {Array.from({ length: totalSlides }).map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => goTo(i)}
+                      aria-label={`Go to slide ${i + 1}`}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i === slide
+                          ? 'w-5 bg-violet-600 shadow-xs'
+                          : 'w-1.5 bg-slate-200 hover:bg-slate-300'
+                      }`}
+                    />
+                  ))}
+                  <span className="text-[10px] font-bold text-slate-400 select-none ml-1">
+                    {slide + 1}/{totalSlides}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => goTo(slide + 1)}
+                  disabled={slide === totalSlides - 1}
+                  aria-label="Next page"
+                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-500 bg-slate-100 hover:bg-slate-200 disabled:opacity-20 disabled:pointer-events-none transition active:scale-90"
+                >
+                  <ChevronRight size={14} />
+                </button>
               </div>
             )}
           </>

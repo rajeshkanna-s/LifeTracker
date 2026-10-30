@@ -1310,3 +1310,34 @@ main {
     gap: 4px;
   }
 }
+
+/* ── Mobile Quick Add Strict Grid & Page Isolation ── */
+.quick-add-page {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.quick-add-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.quick-add-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 360px) {
+  .quick-add-grid {
+    gap: 4px !important;
+  }
+}
