@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Lock, ArrowLeft, AlertCircle, CheckCircle2, ChevronRight, User, Users, Delete } from 'lucide-react';
+import { Lock, ArrowLeft, AlertCircle, CheckCircle2, ChevronRight, User, Users, Delete, Download } from 'lucide-react';
 import { usePartner } from '../context/PartnerContext';
 import type { PartnerId, PartnerProfile } from '../types';
 
 interface PartnerGatewayProps {
   onUnlock?: () => void;
+  onInstallClick?: () => void;
+  isInstalled?: boolean;
 }
 
-export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ onUnlock }) => {
+export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ 
+  onUnlock,
+  onInstallClick,
+  isInstalled = false
+}) => {
   const { partners, unlockPartner } = usePartner();
   // Start on the profile selection screen so both Rajesh and Seetha are prominently visible
   const [selectedPartner, setSelectedPartner] = useState<PartnerProfile | null>(null);
@@ -166,6 +172,36 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ onUnlock }) => {
             Personal Life & Finance
           </p>
         </div>
+
+        {/* Install App Button on Gateway */}
+        {!isInstalled && onInstallClick && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+            <button
+              type="button"
+              onClick={onInstallClick}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                border: '1.5px solid #c4b5fd',
+                background: 'rgba(245, 243, 255, 0.9)',
+                color: '#7c3aed',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.12)'
+              }}
+              onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.96)'; }}
+              onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+            >
+              <Download size={14} />
+              <span>Install App on this Device</span>
+            </button>
+          </div>
+        )}
 
         {/* ════════ VIEW 1: CHOOSE PROFILE (RAJESH & SEETHA) ════════ */}
         {!selectedPartner ? (

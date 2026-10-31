@@ -12,22 +12,26 @@ import RoutineTracker from './components/routines/RoutineTracker';
 import VaultTracker from './components/vault/VaultTracker';
 import type { TabId } from './types';
 import { usePWA } from './utils/usePWA';
+import { InstallModal } from './components/InstallModal';
 
 const AppContent: React.FC = () => {
   const { isUnlocked } = usePartner();
   const [activeTab, setActiveTab] = useState<TabId>('expenses');
   const [showMobileBanner, setShowMobileBanner] = useState(true);
-  const { isInstallable, install } = usePWA();
-
-  if (!isUnlocked) {
-    return <PartnerGateway />;
-  }
+  const { 
+    isInstallable, 
+    isInstalled, 
+    isIOS, 
+    isAndroid, 
+    install, 
+    triggerInstall, 
+    showInstallModal, 
+    setShowInstallModal 
+  } = usePWA();
 
   return (
     <div>
-      <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      {isInstallable && showMobileBanner && (
+      {!isInstalled && showMobileBanner && (
         <div className="mobile-install-banner">
           <div className="banner-content">
             <div className="banner-logo">📊</div>
@@ -37,22 +41,44 @@ const AppContent: React.FC = () => {
             </div>
           </div>
           <div className="banner-actions">
-            <button className="btn-install-mobile" onClick={install}>Install</button>
+            <button className="btn-install-mobile" onClick={triggerInstall}>Install</button>
             <button className="btn-close-banner" onClick={() => setShowMobileBanner(false)}>✕</button>
           </div>
         </div>
       )}
 
-      <main>
-        {activeTab === 'expenses' && <ExpenseTracker />}
-        {activeTab === 'debt' && <DebtTracker />}
-        {activeTab === 'jobs' && <JobTracker />}
-        {activeTab === 'habits' && <HabitTracker />}
-        {activeTab === 'fitness' && <FitnessTracker />}
-        {activeTab === 'notes' && <NotesTracker />}
-        {activeTab === 'routines' && <RoutineTracker />}
-        {activeTab === 'vault' && <VaultTracker />}
-      </main>
+      {!isUnlocked ? (
+        <PartnerGateway onInstallClick={triggerInstall} isInstalled={isInstalled} />
+      ) : (
+        <>
+          <Navbar 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab} 
+            onInstallClick={triggerInstall}
+            isInstalled={isInstalled}
+          />
+
+          <main>
+            {activeTab === 'expenses' && <ExpenseTracker />}
+            {activeTab === 'debt' && <DebtTracker />}
+            {activeTab === 'jobs' && <JobTracker />}
+            {activeTab === 'habits' && <HabitTracker />}
+            {activeTab === 'fitness' && <FitnessTracker />}
+            {activeTab === 'notes' && <NotesTracker />}
+            {activeTab === 'routines' && <RoutineTracker />}
+            {activeTab === 'vault' && <VaultTracker />}
+          </main>
+        </>
+      )}
+
+      <InstallModal
+        isOpen={showInstallModal}
+        onClose={() => setShowInstallModal(false)}
+        isInstallable={isInstallable}
+        onNativeInstall={install}
+        isIOS={isIOS}
+        isAndroid={isAndroid}
+      />
     </div>
   );
 };

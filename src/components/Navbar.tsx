@@ -8,6 +8,8 @@ import SecurityModal from './SecurityModal';
 interface NavbarProps {
   activeTab: TabId;
   onTabChange: (tab: TabId) => void;
+  onInstallClick?: () => void;
+  isInstalled?: boolean;
 }
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode; color: string }[] = [
@@ -21,8 +23,7 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode; color: string }[]
   { id: 'jobs', label: 'Jobs', icon: <Building2 size={17} />, color: '#6366f1' },
 ];
 
-const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
-  const { isInstallable, install } = usePWA();
+const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onInstallClick, isInstalled = false }) => {
   const { activePartner, activePartnerId, lockPartner } = usePartner();
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
   const bottomNavRef = useRef<HTMLDivElement>(null);
@@ -77,8 +78,8 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
             <KeyRound size={12} style={{ opacity: 0.7 }} />
           </button>
 
-          {isInstallable && (
-            <button className="btn-install-desktop" onClick={install}>
+          {!isInstalled && onInstallClick && (
+            <button className="btn-install-desktop" onClick={onInstallClick}>
               <Download size={14} />
               <span>Install App</span>
             </button>
@@ -143,7 +144,38 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          {/* Mobile Install App Button */}
+          {!isInstalled && onInstallClick && (
+            <button
+              type="button"
+              onClick={onInstallClick}
+              title="Install App"
+              aria-label="Install App"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                padding: '4px 8px',
+                borderRadius: '16px',
+                border: '1.5px solid #ddd6fe',
+                background: '#f5f3ff',
+                color: '#7c3aed',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                outline: 'none',
+                boxShadow: '0 1px 3px rgba(124, 58, 237, 0.08)'
+              }}
+              onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.95)'; }}
+              onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+            >
+              <Download size={12} />
+              <span>App</span>
+            </button>
+          )}
+
           {/* Active Partner Pill with Name */}
           <button
             type="button"
@@ -153,12 +185,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '5px 10px',
+              padding: '5px 9px',
               borderRadius: '18px',
               border: `1.5px solid ${accentColor}`,
               background: isP1 ? 'rgba(124, 58, 237, 0.08)' : 'rgba(14, 165, 233, 0.08)',
               color: accentColor,
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               fontWeight: 700,
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
@@ -236,6 +268,8 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
       <SecurityModal
         isOpen={securityModalOpen}
         onClose={() => setSecurityModalOpen(false)}
+        onInstallClick={onInstallClick}
+        isInstalled={isInstalled}
       />
     </>
   );

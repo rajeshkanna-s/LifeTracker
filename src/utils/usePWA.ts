@@ -4,17 +4,32 @@ export const usePWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+  const [showInstallModal, setShowInstallModal] = useState(false);
 
   useEffect(() => {
-    // Check if app is already launched in standalone mode
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Check if app is already launched in standalone mode (installed PWA)
+    const isStandalone = 
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true ||
+      document.referrer.includes('android-app://');
+
+    if (isStandalone) {
       setIsInstalled(true);
     }
 
+    // Detect device type
+    const ua = navigator.userAgent || '';
+    const iOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+    const android = /Android/.test(ua);
+    setIsIOS(iOS);
+    setIsAndroid(android);
+
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      // Prevent Chrome from automatically showing prompt
       e.preventDefault();
-      // Stash the event so it can be triggered later.
+      // Stash event for manual triggering
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
@@ -36,21 +51,40 @@ export const usePWA = () => {
   }, []);
 
   const install = async () => {
-    if (!deferredPrompt) return false;
-    
-    // Show the install prompt
-    deferredPrompt.prompt();
-    
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-    
-    // We've used the prompt, and can't use it again
-    setDeferredPrompt(null);
-    setIsInstallable(false);
-    
-    return outcome === 'accepted';
+    if (deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+        return outcome === 'accepted';
+      } catch (err) {
+        console.error('Install prompt error:', err);
+      }
+    }
+    // If native prompt is not available, open the guide modal
+    setShowInstallModal(true);
+    return false;
   };
 
-  return { isInstallable, isInstalled, install };
+  const triggerInstall = () => {
+    if (deferredPrompt) {
+      install();
+    } else {
+      setShowInstallModal(true);
+    }
+  };
+
+  return { 
+    isInstallable, 
+    isInstalled, 
+    isIOS, 
+    isAndroid, 
+    install, 
+    triggerInstall, 
+    showInstallModal, 
+    setShowInstallModal 
+  };
 };
+

@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { X, Lock, KeyRound, Shield, CheckCircle2, AlertCircle, RefreshCw, UserCheck, LogOut } from 'lucide-react';
+import { X, Lock, KeyRound, Shield, CheckCircle2, AlertCircle, RefreshCw, UserCheck, LogOut, Download } from 'lucide-react';
 import { usePartner } from '../context/PartnerContext';
 
 interface SecurityModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onInstallClick?: () => void;
+  isInstalled?: boolean;
 }
 
-export const SecurityModal: React.FC<SecurityModalProps> = ({ isOpen, onClose }) => {
+export const SecurityModal: React.FC<SecurityModalProps> = ({ 
+  isOpen, 
+  onClose,
+  onInstallClick,
+  isInstalled = false
+}) => {
   const { activePartner, activePartnerId, changePasscode, updatePartnerProfile, switchPartner } = usePartner();
 
   const [oldPin, setOldPin] = useState('');
@@ -362,7 +369,38 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* SECTION 3: SWITCH PARTNER / LOCK */}
+        {/* SECTION 3: APP INSTALLATION */}
+        {!isInstalled && onInstallClick && (
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onInstallClick();
+              }}
+              style={{
+                width: '100%',
+                padding: '11px',
+                borderRadius: '12px',
+                border: '1.5px solid #ddd6fe',
+                background: '#f5f3ff',
+                color: '#7c3aed',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Download size={16} /> Install App on this Device
+            </button>
+          </div>
+        )}
+
+        {/* SECTION 4: SWITCH PARTNER / LOCK */}
         <div>
           <button
             type="button"
