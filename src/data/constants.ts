@@ -156,6 +156,7 @@ export const getDefaultDebtSettings = (): DebtSettings => ({
   monthlyIncome: 0,
   reminderDays: 7,
   customCategories: [],
+  insurances: [],
 });
 
 // ── Debt Categories ──
