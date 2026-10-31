@@ -13,11 +13,11 @@ import VaultTracker from './components/vault/VaultTracker';
 import type { TabId } from './types';
 import { usePWA } from './utils/usePWA';
 import { InstallModal } from './components/InstallModal';
+import { AppInstallBanner } from './components/AppInstallBanner';
 
 const AppContent: React.FC = () => {
   const { isUnlocked } = usePartner();
   const [activeTab, setActiveTab] = useState<TabId>('expenses');
-  const [showMobileBanner, setShowMobileBanner] = useState(true);
   const { 
     isInstallable, 
     isInstalled, 
@@ -31,21 +31,11 @@ const AppContent: React.FC = () => {
 
   return (
     <div>
-      {!isInstalled && showMobileBanner && (
-        <div className="mobile-install-banner">
-          <div className="banner-content">
-            <div className="banner-logo">📊</div>
-            <div className="banner-text">
-              <strong>Install MyLife Tracker</strong>
-              <span>Add to Home screen for quick offline access</span>
-            </div>
-          </div>
-          <div className="banner-actions">
-            <button className="btn-install-mobile" onClick={triggerInstall}>Install</button>
-            <button className="btn-close-banner" onClick={() => setShowMobileBanner(false)}>✕</button>
-          </div>
-        </div>
-      )}
+      {/* Universal Top Automatic App Install Bar */}
+      <AppInstallBanner 
+        onInstall={triggerInstall} 
+        isInstalled={isInstalled} 
+      />
 
       {!isUnlocked ? (
         <PartnerGateway onInstallClick={triggerInstall} isInstalled={isInstalled} />
@@ -71,6 +61,7 @@ const AppContent: React.FC = () => {
         </>
       )}
 
+      {/* Redesigned Native Installation Modal */}
       <InstallModal
         isOpen={showInstallModal}
         onClose={() => setShowInstallModal(false)}
