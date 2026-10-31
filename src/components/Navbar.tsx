@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Receipt,
   Bell,
-  Moon,
-  Sun,
   CreditCard,
   Building2,
   CheckSquare,
@@ -69,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const { activePartner, activePartnerId, lockPartner } = usePartner();
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { isDark } = useTheme();
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
@@ -351,17 +349,6 @@ const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
-          {/* Dark Mode Toggle */}
-          <button
-            type="button"
-            className="nav-action-btn"
-            onClick={toggleTheme}
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            aria-label="Toggle dark mode"
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-
           {/* Quick Lock Button */}
           <button
             type="button"
@@ -487,29 +474,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 {notifications.length}
               </span>
             )}
-          </button>
-
-          {/* Mobile Dark Mode Toggle */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label="Toggle Dark Mode"
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '10px',
-              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
-              background: isDark ? '#1e293b' : '#f8fafc',
-              color: isDark ? '#f59e0b' : '#64748b',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-              outline: 'none'
-            }}
-          >
-            {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
 
           {/* Quick Lock Button */}

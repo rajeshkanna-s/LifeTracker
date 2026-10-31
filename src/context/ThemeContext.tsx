@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, type ReactNode } from 'react';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light';
 
 interface ThemeContextType {
   theme: Theme;
@@ -12,46 +12,31 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    try {
-      const saved = localStorage.getItem('xpenser_theme');
-      if (saved === 'dark' || saved === 'light') return saved;
-    } catch {
-      // fallback
-    }
-    return 'light';
-  });
+  const theme: Theme = 'light';
 
   useEffect(() => {
     try {
-      localStorage.setItem('xpenser_theme', theme);
+      localStorage.setItem('xpenser_theme', 'light');
     } catch {
       // ignore
     }
 
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('dark-mode');
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.setAttribute('data-bs-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark-mode');
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.setAttribute('data-bs-theme', 'light');
-    }
-  }, [theme]);
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('dark-mode');
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.setAttribute('data-bs-theme', 'light');
+  }, []);
 
   const toggleTheme = () => {
-    setThemeState(prev => (prev === 'dark' ? 'light' : 'dark'));
+    // Light mode only - dark mode removed per user request
   };
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
+  const setTheme = () => {
+    // Light mode only - dark mode removed per user request
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, isDark: theme === 'dark', toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, isDark: false, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -64,4 +49,3 @@ export const useTheme = (): ThemeContextType => {
   }
   return context;
 };
-
