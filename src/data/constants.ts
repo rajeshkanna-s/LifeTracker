@@ -34,6 +34,32 @@ export const INCOME_PLATFORMS = [
   'Other',
 ];
 
+export const CATEGORY_ICONS: Record<string, string> = {
+  'Food': '🍕',
+  'Grocery': '🛒',
+  'Vegetables': '🥬',
+  'Petrol / Fuel': '⛽',
+  'Travel / Transport': '🚗',
+  'Mobile Recharge': '📱',
+  'Internet Bill': '🌐',
+  'Electricity Bill': '⚡',
+  'Rent / Home Loan': '🏠',
+  'EMIs / Loans': '🏦',
+  'Education': '📚',
+  'Health / Medical': '🏥',
+  'Entertainment': '🎬',
+  'Cinema / Movies': '🎬',
+  'Dress / Clothing': '👕',
+  'Shopping': '🛍️',
+  'Office': '💼',
+  'Kids / Family': '👨‍👩‍👧',
+  'Gifts / Donations': '🎁',
+  'Home Maintenance': '🔧',
+  'Savings / Investments': '💰',
+  'Social / Events': '🎉',
+  'Miscellaneous': '📦',
+};
+
 export const INCOME_CATEGORY_ICONS: Record<string, string> = {
   'Salary': '💼',
   'Freelance / Consulting': '💻',

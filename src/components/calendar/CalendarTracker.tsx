@@ -18,7 +18,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import type { Expense, TabId, ExpenseSettings } from '../../types';
 import { normalizeTransaction, isIncome, formatLocalDate } from '../../utils/expenseUtils';
-import { CATEGORY_EMOJIS, INCOME_CATEGORY_ICONS, getDefaultExpenseSettings } from '../../data/constants';
+import { CATEGORY_ICONS, CATEGORY_EMOJIS, INCOME_CATEGORY_ICONS, getDefaultExpenseSettings } from '../../data/constants';
 import { usePartner } from '../../context/PartnerContext';
 import ExpenseForm from '../expenses/ExpenseForm';
 import IndianCalendarModal from './IndianCalendarModal';
@@ -29,6 +29,18 @@ interface CalendarTrackerProps {
 }
 
 const DAYS_HEADER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+const getCategoryIcon = (exp: Expense): string => {
+  if (isIncome(exp)) {
+    return INCOME_CATEGORY_ICONS[exp.category] || '💰';
+  }
+  const icon = CATEGORY_ICONS[exp.category];
+  if (icon) return icon;
+  const emojiArray = CATEGORY_EMOJIS[exp.category];
+  if (Array.isArray(emojiArray)) return emojiArray[0] || '📦';
+  if (typeof emojiArray === 'string') return emojiArray;
+  return '📦';
+};
 
 export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab }) => {
   const { activePartnerId } = usePartner();
@@ -399,11 +411,10 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${
-                  viewMode === 'grid'
+                className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${viewMode === 'grid'
                     ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
+                  }`}
                 title="Month Grid View"
               >
                 <Grid size={13} />
@@ -412,11 +423,10 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
               <button
                 type="button"
                 onClick={() => setViewMode('agenda')}
-                className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${
-                  viewMode === 'agenda'
+                className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${viewMode === 'agenda'
                     ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
+                  }`}
                 title="Agenda List View"
               >
                 <List size={13} />
@@ -522,33 +532,30 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${
-              typeFilter === 'all'
+            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${typeFilter === 'all'
                 ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-xs'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-            }`}
+              }`}
           >
             All
           </button>
           <button
             type="button"
             onClick={() => setTypeFilter('expense')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${
-              typeFilter === 'expense'
+            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${typeFilter === 'expense'
                 ? 'bg-rose-600 text-white shadow-xs'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-            }`}
+              }`}
           >
             Expenses
           </button>
           <button
             type="button"
             onClick={() => setTypeFilter('income')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${
-              typeFilter === 'income'
+            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${typeFilter === 'income'
                 ? 'bg-emerald-600 text-white shadow-xs'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-            }`}
+              }`}
           >
             Income
           </button>
@@ -567,9 +574,8 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                 return (
                   <div
                     key={d}
-                    className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${
-                      isWeekend ? 'text-amber-500 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'
-                    }`}
+                    className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${isWeekend ? 'text-amber-500 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'
+                      }`}
                   >
                     {d}
                   </div>
@@ -592,27 +598,25 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                     type="button"
                     onClick={() => setSelectedDateStr(cell.dateStr)}
                     title={cellHoliday ? `${cellHoliday.name} • ${cell.dateStr}` : cell.dateStr}
-                    className={`relative flex flex-col items-center justify-center h-12 sm:h-14 rounded-2xl transition-all duration-150 cursor-pointer active:scale-95 ${
-                      !cell.isCurrentMonth
+                    className={`relative flex flex-col items-center justify-center h-12 sm:h-14 rounded-2xl transition-all duration-150 cursor-pointer active:scale-95 ${!cell.isCurrentMonth
                         ? 'opacity-25 hover:opacity-40'
                         : isSelected
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 font-black scale-102 z-10'
-                        : cell.isToday
-                        ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black'
-                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100'
-                    }`}
+                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 font-black scale-102 z-10'
+                          : cell.isToday
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black'
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100'
+                      }`}
                   >
                     {/* Day Number */}
                     <span
-                      className={`text-xs sm:text-sm font-black transition-colors leading-none ${
-                        isSelected
+                      className={`text-xs sm:text-sm font-black transition-colors leading-none ${isSelected
                           ? 'text-white'
                           : cell.isToday
-                          ? 'text-emerald-800'
-                          : cell.isCurrentMonth
-                          ? 'text-slate-800'
-                          : 'text-slate-400'
-                      }`}
+                            ? 'text-emerald-800'
+                            : cell.isCurrentMonth
+                              ? 'text-slate-800'
+                              : 'text-slate-400'
+                        }`}
                     >
                       {cell.dayNumber}
                     </span>
@@ -621,25 +625,22 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                     <div className="flex items-center justify-center gap-1 h-2 mt-1">
                       {cellHoliday && (
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            isSelected ? 'bg-amber-300' : 'bg-orange-500'
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-300' : 'bg-orange-500'
+                            }`}
                           title={`Holiday: ${cellHoliday.name}`}
                         />
                       )}
                       {hasExpense && (
                         <span
-                          className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                            isSelected ? 'bg-white' : 'bg-rose-500'
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full transition-colors ${isSelected ? 'bg-white' : 'bg-rose-500'
+                            }`}
                           title={`Expense: -₹${Math.round(data.expenseTotal).toLocaleString('en-IN')}`}
                         />
                       )}
                       {hasIncome && (
                         <span
-                          className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                            isSelected ? 'bg-emerald-200' : 'bg-emerald-500'
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full transition-colors ${isSelected ? 'bg-emerald-200' : 'bg-emerald-500'
+                            }`}
                           title={`Income: +₹${Math.round(data.incomeTotal).toLocaleString('en-IN')}`}
                         />
                       )}
@@ -715,24 +716,28 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                   </button>
                 </div>
               ) : (
-                selectedDayExpenses.map((exp, idx) => {
+                selectedDayExpenses.map((exp) => {
                   const isInc = isIncome(exp);
-                  const icon = isInc
-                    ? INCOME_CATEGORY_ICONS[exp.category] || '💰'
-                    : CATEGORY_EMOJIS[exp.category] || '📦';
+                  const icon = getCategoryIcon(exp);
 
                   return (
                     <div
                       key={exp.id}
-                      className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-xl transition border border-slate-100/90 dark:border-slate-700/60"
+                      className="flex items-center justify-between gap-3 p-3 bg-white dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700/60 rounded-2xl transition border border-slate-200/80 dark:border-slate-700/80 shadow-2xs"
                     >
-                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                        <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-950/60 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">
-                          {idx + 1}
-                        </span>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 border select-none ${
+                            isInc
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200/80 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 shadow-2xs'
+                              : 'bg-slate-100/90 dark:bg-slate-800 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 shadow-2xs'
+                          }`}
+                        >
+                          {icon}
+                        </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate leading-snug">
+                            <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate leading-snug">
                               {exp.description || exp.category}
                             </p>
                             {isInc && (
@@ -741,20 +746,19 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate mt-0.5">
-                            {exp.category}
-                            {exp.platform ? ` • ${exp.platform}` : ''}
-                            {exp.payment_method ? ` • ${exp.payment_method}` : ''}
-                            {exp.time ? ` • ${exp.time}` : ''}
-                          </p>
+                          <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
+                            <span>{exp.category}</span>
+                            {exp.platform && <span>• {exp.platform}</span>}
+                            {exp.payment_method && <span>• {exp.payment_method}</span>}
+                            {exp.time && <span>• {exp.time}</span>}
+                          </div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
                         <span
-                          className={`text-xs sm:text-sm font-black whitespace-nowrap ${
-                            isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'
-                          }`}
+                          className={`text-xs sm:text-sm font-black whitespace-nowrap ${isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'
+                            }`}
                         >
                           {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
                         </span>
@@ -763,7 +767,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(exp)}
-                            className="w-7 h-7 rounded-full bg-white dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200/80 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-200 transition active:scale-90 cursor-pointer shadow-2xs"
+                            className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200/80 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-200 transition active:scale-90 cursor-pointer shadow-2xs"
                             title="Edit transaction"
                             aria-label="Edit transaction"
                           >
@@ -772,7 +776,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                           <button
                             type="button"
                             onClick={() => handleDeleteExpense(exp.id)}
-                            className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200/70 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
+                            className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200/70 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
                             title="Delete transaction"
                             aria-label="Delete transaction"
                           >
@@ -788,111 +792,149 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
           </div>
         </>
       )}
-{/* ════════ VIEW 2: AGENDA TIMELINE LIST ════════ */}
+
+      {/* ════════ VIEW 2: AGENDA TIMELINE LIST ════════ */}
       {viewMode === 'agenda' && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
-              Transactions Timeline ({monthLabel})
-            </h3>
-            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
-              {filteredExpenses.length} transactions
-            </span>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span>Transactions Timeline ({monthLabel})</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Chronological breakdown of all daily expenses and income
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200/70 dark:border-slate-700">
+                {filteredExpenses.length} transactions
+              </span>
+            </div>
           </div>
 
           {monthAgendaGroups.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-              <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">No transactions recorded for this month.</p>
+            <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">No transactions recorded for this month.</p>
               <button
                 type="button"
                 onClick={handleOpenAdd}
-                className="mt-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 underline cursor-pointer"
+                className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition cursor-pointer shadow-xs active:scale-95"
               >
-                + Add transaction
+                <Plus size={14} strokeWidth={2.5} />
+                <span>Add Transaction</span>
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {monthAgendaGroups.map(group => {
                 const dateObj = new Date(group.dateStr + 'T00:00:00');
-                const label = dateObj.toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  day: 'numeric',
-                  month: 'short',
-                });
+                const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayMonth = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
                 const isGroupToday = group.dateStr === todayStr;
 
                 return (
-                  <div key={group.dateStr} className="space-y-1.5">
+                  <div key={group.dateStr} className="space-y-2">
                     {/* Day Group Header */}
-                    <div className="flex items-center justify-between text-xs font-bold bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-700">
-                      <span className="text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                        {label}
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100">
+                          {weekday}, {dayMonth}
+                        </span>
                         {isGroupToday && (
-                          <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.2 rounded-full font-bold">
+                          <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full font-extrabold border border-emerald-200 dark:border-emerald-800/60">
                             Today
                           </span>
                         )}
-                      </span>
-                      <span className="text-[11px] text-slate-600 dark:text-slate-300 font-bold">
-                        {group.spent > 0 && <span className="text-rose-600 dark:text-rose-400 mr-2">-₹{group.spent.toLocaleString('en-IN')}</span>}
-                        {group.income > 0 && <span className="text-emerald-600 dark:text-emerald-400">+₹{group.income.toLocaleString('en-IN')}</span>}
-                      </span>
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 hidden sm:inline">
+                          ({group.items.length} {group.items.length === 1 ? 'item' : 'items'})
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {group.spent > 0 && (
+                          <span className="inline-flex items-center text-[11px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-md border border-rose-100 dark:border-rose-900/40">
+                            -₹{group.spent.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                        {group.income > 0 && (
+                          <span className="inline-flex items-center text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-900/40">
+                            +₹{group.income.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Day Items */}
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden">
+                    {/* Day Items Card */}
+                    <div className="divide-y divide-slate-100 dark:divide-slate-800/80 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
                       {group.items.map(exp => {
                         const isInc = isIncome(exp);
-                        const icon = isInc
-                          ? INCOME_CATEGORY_ICONS[exp.category] || '💰'
-                          : CATEGORY_EMOJIS[exp.category] || '📦';
+                        const icon = getCategoryIcon(exp);
 
                         return (
                           <div
                             key={exp.id}
-                            className="p-3 bg-white dark:bg-slate-900 flex items-center justify-between hover:bg-slate-50/70 dark:hover:bg-slate-800/60 transition"
+                            className="p-3 sm:p-3.5 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors"
                           >
-                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                            {/* Left: Icon & Description */}
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
                               <div
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 ${
-                                  isInc ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 border select-none ${
+                                  isInc
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200/80 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 shadow-2xs'
+                                    : 'bg-slate-100/90 dark:bg-slate-800 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 shadow-2xs'
                                 }`}
                               >
                                 {icon}
                               </div>
-                              <div className="min-w-0">
-                                <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                                  {exp.description || exp.category}
-                                </p>
-                                <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
-                                  {exp.category} {exp.platform ? `• ${exp.platform}` : ''}
-                                </p>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate leading-snug">
+                                    {exp.description || exp.category}
+                                  </p>
+                                  {isInc && (
+                                    <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
+                                      Income
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
+                                  <span>{exp.category}</span>
+                                  {exp.platform && <span>• {exp.platform}</span>}
+                                  {exp.payment_method && <span>• {exp.payment_method}</span>}
+                                  {exp.time && <span>• {exp.time}</span>}
+                                </div>
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
+                            {/* Right: Amount & Actions */}
+                            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
                               <span
-                                className={`text-xs font-black ${
+                                className={`text-xs sm:text-sm font-black whitespace-nowrap ${
                                   isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'
                                 }`}
                               >
                                 {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
                               </span>
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEdit(exp)}
-                                className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
-                              >
-                                <Pencil size={12} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteExpense(exp.id)}
-                                className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
-                              >
-                                <Trash2 size={12} />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEdit(exp)}
+                                  className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
+                                  title="Edit transaction"
+                                  aria-label="Edit transaction"
+                                >
+                                  <Pencil size={12} strokeWidth={2.2} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteExpense(exp.id)}
+                                  className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-500 dark:text-rose-400 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
+                                  title="Delete transaction"
+                                  aria-label="Delete transaction"
+                                >
+                                  <Trash2 size={12} strokeWidth={2.2} />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         );

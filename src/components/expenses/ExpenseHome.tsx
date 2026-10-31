@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Sparkles, Target, ArrowUpRight, ArrowDownLeft, Wallet, Search, Lightbulb, Save, Edit2, Trash2, ChevronLeft, ChevronRight, Check, Plus } from 'lucide-react';
 import type { Expense, ExpenseSettings, QuickAddTemplate } from '../../types';
 import { usePartner } from '../../context/PartnerContext';
-import { CATEGORY_EMOJIS, INCOME_CATEGORY_ICONS } from '../../data/constants';
+import { CATEGORY_EMOJIS, CATEGORY_ICONS, INCOME_CATEGORY_ICONS } from '../../data/constants';
 import { formatLocalDate, getTodayTotal, getMonthTotal, getWeekTotal, getYearTotal, getNoSpendDays, getTodayString, getCurrentTimeString, getWeekStartString, getWeekEndString, getMonthExpenseTotal, getMonthIncomeTotal, getTodayExpenseTotal, getTodayIncomeTotal, getWeekExpenseTotal, getWeekIncomeTotal, isExpense, isIncome } from '../../utils/expenseUtils';
 import { getFuelBadge, isFuelCategory } from '../../utils/fuelUtils';
 import { NoSpendChallengeModal } from './NoSpendChallengeModal';
@@ -20,16 +20,7 @@ interface ExpenseHomeProps {
   onOpenAdd?: () => void;
 }
 
-const CATEGORY_ICONS: Record<string, string> = {
-  'Food': '🍕', 'Grocery': '🛒', 'Vegetables': '🥬', 'Petrol / Fuel': '⛽',
-  'Travel / Transport': '🚗', 'Mobile Recharge': '📱', 'Internet Bill': '🌐',
-  'Electricity Bill': '⚡', 'Rent / Home Loan': '🏠', 'EMIs / Loans': '🏦',
-  'Education': '📚', 'Health / Medical': '🏥', 'Entertainment': '🎬',
-  'Cinema / Movies': '🎬', 'Dress / Clothing': '👕', 'Shopping': '🛍️',
-  'Office': '💼', 'Kids / Family': '👨‍👩‍👧', 'Gifts / Donations': '🎁',
-  'Home Maintenance': '🔧', 'Savings / Investments': '💰', 'Social / Events': '🎉',
-  'Miscellaneous': '📦',
-};
+
 
 const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpense, onSettingsChange, onNavigate, onEdit, onDelete, onOpenAdd }) => {
   const { activePartner, activePartnerId } = usePartner();
@@ -596,8 +587,8 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                             openQuickPrompt(t);
                           }}
                           className={`quick-add-card relative flex flex-col items-center justify-center p-1.5 rounded-xl border text-center transition-all duration-150 active:scale-95 group select-none min-h-[66px] sm:min-h-[72px] overflow-hidden ${justAdded === t.id
-                              ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 shadow-xs'
-                              : 'border-slate-200/90 dark:border-slate-700/80 bg-slate-50/80 dark:bg-slate-800/80 hover:border-violet-300 dark:hover:border-violet-500 shadow-xs'
+                            ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 shadow-xs'
+                            : 'border-slate-200/90 dark:border-slate-700/80 bg-slate-50/80 dark:bg-slate-800/80 hover:border-violet-300 dark:hover:border-violet-500 shadow-xs'
                             }`}
                         >
                           {justAdded === t.id && (
@@ -636,8 +627,8 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                       onClick={() => goTo(i)}
                       aria-label={`Go to slide ${i + 1}`}
                       className={`h-1.5 rounded-full transition-all duration-300 ${i === slide
-                          ? 'w-5 bg-violet-600 shadow-xs'
-                          : 'w-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+                        ? 'w-5 bg-violet-600 shadow-xs'
+                        : 'w-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
                         }`}
                     />
                   ))}
@@ -738,9 +729,8 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                   className="flex items-center justify-between gap-2.5 p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition"
                 >
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 border shadow-2xs ${
-                      isInc ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400' : 'bg-slate-50 dark:bg-slate-800 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}>
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 border shadow-2xs ${isInc ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400' : 'bg-slate-50 dark:bg-slate-800 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300'
+                      }`}>
                       {icon}
                     </div>
                     <div className="min-w-0 flex-1">
