@@ -228,10 +228,10 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
   return (
     <div className="space-y-4 pb-36">
       {/* Filters */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
         <div className="flex items-center gap-1.5 mb-3">
           <Filter size={14} className="text-emerald-500 shrink-0" />
-          <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+          <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800 dark:text-slate-100">
             Filters
           </span>
         </div>
@@ -276,8 +276,8 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </div>
 
         {/* Smart Tag Filters Bar */}
-        <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100 overflow-x-auto scrollbar-none">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider shrink-0 flex items-center gap-1">
+        <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-none">
+          <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider shrink-0 flex items-center gap-1">
             <Tag size={12} /> Tags:
           </span>
           {['all', '#reimbursable', '#tax-deductible', '#shared', '#personal', '#medical', '#recurring'].map(tag => (
@@ -289,7 +289,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
               className={`px-3 py-1 text-xs font-bold transition cursor-pointer shrink-0 ${
                 selectedTag === tag
                   ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               {tag === 'all' ? 'All Tags' : tag}
@@ -302,12 +302,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       {filters.type === 'all' ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {/* Income Card */}
-          <div className="bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">
                 Total Income
               </span>
-              <div className="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-600">
+              <div className="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                 <ArrowUpRight size={12} />
               </div>
             </div>
@@ -317,12 +317,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
           </div>
 
           {/* Expenses Card */}
-          <div className="bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/40 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
+          <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-rose-800 dark:text-rose-300 uppercase tracking-wide">
                 Total Expenses
               </span>
-              <div className="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center text-rose-600">
+              <div className="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-900/60 flex items-center justify-center text-rose-600 dark:text-rose-400">
                 <ArrowDownLeft size={12} />
               </div>
             </div>
@@ -334,8 +334,8 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
           {/* Net Cash Flow Card */}
           <div className={`border rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs ${
             netCashFlow >= 0
-              ? 'bg-sky-50/70 dark:bg-sky-950/20 border-sky-200/60 dark:border-sky-800/40'
-              : 'bg-red-50/70 dark:bg-red-950/20 border-red-200/60 dark:border-red-800/40'
+              ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800/60'
+              : 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800/60'
           }`}>
             <div className="flex items-center justify-between">
               <span className={`text-[11px] font-bold uppercase tracking-wide ${
@@ -344,7 +344,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                 Net Cash Flow
               </span>
               <div className={`w-5 h-5 rounded-md flex items-center justify-center ${
-                netCashFlow >= 0 ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-600' : 'bg-red-100 dark:bg-red-900/40 text-red-600'
+                netCashFlow >= 0 ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-600 dark:text-sky-400' : 'bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-400'
               }`}>
                 <Wallet size={12} />
               </div>
@@ -357,12 +357,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
           </div>
 
           {/* Savings Rate Card */}
-          <div className="bg-purple-50/70 dark:bg-purple-950/20 border border-purple-200/60 dark:border-purple-800/40 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
+          <div className="bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-purple-800 dark:text-purple-300 uppercase tracking-wide">
                 Savings Rate
               </span>
-              <div className="w-5 h-5 rounded-md bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600">
+              <div className="w-5 h-5 rounded-md bg-purple-100 dark:bg-purple-900/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
                 <Percent size={12} />
               </div>
             </div>
@@ -373,18 +373,18 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className={`border rounded-xl p-3 flex items-center justify-between ${filters.type === 'income' ? 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100' : 'bg-gradient-to-br from-rose-50 to-orange-50 border-rose-100'}`}>
-            <span className="text-xs font-semibold text-slate-600">{filters.type === 'income' ? 'Total Income' : 'Total Expenses'}</span>
-            <span className={`text-xl font-bold ${filters.type === 'income' ? 'text-emerald-700' : 'text-rose-700'}`}>
+          <div className={`border rounded-xl p-3 flex items-center justify-between ${filters.type === 'income' ? 'bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 border-emerald-100 dark:border-emerald-800/60' : 'bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-950/40 dark:to-orange-950/40 border-rose-100 dark:border-rose-800/60'}`}>
+            <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{filters.type === 'income' ? 'Total Income' : 'Total Expenses'}</span>
+            <span className={`text-xl font-bold ${filters.type === 'income' ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
               {filters.type === 'income' ? '+' : ''}{fmt(totalAmount)}
             </span>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-600">vs Previous Period</p>
-              <p className="text-[10px] text-slate-400">{comparison.range.from} → {comparison.range.to}</p>
+              <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">vs Previous Period</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">{comparison.range.from} → {comparison.range.to}</p>
             </div>
-            <div className={`flex items-center gap-1 font-bold text-sm ${comparison.direction === 'up' ? 'text-red-500' : comparison.direction === 'down' ? 'text-emerald-600' : 'text-slate-400'}`}>
+            <div className={`flex items-center gap-1 font-bold text-sm ${comparison.direction === 'up' ? 'text-red-500 dark:text-red-400' : comparison.direction === 'down' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
               {comparison.direction === 'up' ? <TrendingUp size={16} /> : comparison.direction === 'down' ? <TrendingDown size={16} /> : <Minus size={16} />}
               <span>{fmt(Math.abs(comparison.diff))}</span>
               {comparison.percentChange !== null && <span className="text-xs">({comparison.percentChange > 0 ? '+' : ''}{comparison.percentChange}%)</span>}
@@ -412,12 +412,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {monthOverMonthCategoryComparison.topIncrease && (
-              <div className="p-3 bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 rounded-xl">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 rounded-xl">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-300">
                     Highest Increase
                   </span>
-                  <span className="text-xs font-black text-rose-600 dark:text-rose-400">
+                  <span className="text-xs font-black text-rose-700 dark:text-rose-300">
                     +{cs}{Math.abs(monthOverMonthCategoryComparison.topIncrease.diff).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -425,7 +425,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                   <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
                     {monthOverMonthCategoryComparison.topIncrease.category}
                   </span>
-                  <span className="text-[10px] font-medium text-slate-400">
+                  <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
                     vs last month
                   </span>
                 </div>
@@ -433,12 +433,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             )}
 
             {monthOverMonthCategoryComparison.topDecrease ? (
-              <div className="p-3 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 rounded-xl">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 rounded-xl">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                     Highest Savings
                   </span>
-                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                  <span className="text-xs font-black text-emerald-700 dark:text-emerald-300">
                     -{cs}{Math.abs(monthOverMonthCategoryComparison.topDecrease.diff).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -446,13 +446,13 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                   <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
                     {monthOverMonthCategoryComparison.topDecrease.category}
                   </span>
-                  <span className="text-[10px] font-medium text-slate-400">
+                  <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
                     vs last month
                   </span>
                 </div>
               </div>
             ) : (
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl flex items-center justify-center text-xs text-slate-400 font-medium">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 font-medium">
                 Keep tracking to unlock reduction insights!
               </div>
             )}
@@ -461,17 +461,17 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       )}
 
       {/* Auto-Generated Monthly Statement PDF Hero Card */}
-      <div className="bg-slate-900 dark:bg-slate-950 text-white rounded-2xl p-3.5 sm:p-4 shadow-md border border-slate-800">
+      <div className="bg-gradient-to-r from-indigo-700 via-indigo-800 to-purple-800 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950 text-white rounded-2xl p-3.5 sm:p-4 shadow-md border border-indigo-500/30 dark:border-slate-800">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0 text-indigo-400">
+            <div className="w-10 h-10 rounded-xl bg-white/10 dark:bg-white/5 flex items-center justify-center shrink-0 text-indigo-300 dark:text-indigo-400">
               <FileText size={20} />
             </div>
             <div className="min-w-0">
               <h4 className="text-xs sm:text-sm font-bold text-white leading-tight">
                 Monthly Financial Statement
               </h4>
-              <p className="text-[11px] text-slate-300 font-medium leading-tight mt-0.5">
+              <p className="text-[11px] text-indigo-100 dark:text-slate-400 font-medium leading-tight mt-0.5">
                 Complete income, expenses, category shares & goal summary
               </p>
             </div>
@@ -480,7 +480,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             type="button"
             onClick={exportMonthlyStatement}
             style={{ borderRadius: '12px' }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition shrink-0 shadow-sm"
+            className="w-full sm:w-auto px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 dark:bg-indigo-600 dark:hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition shrink-0 shadow-sm"
           >
             <Download size={14} />
             <span>Download Statement (PDF)</span>
@@ -517,10 +517,10 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Summary Statistics */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
         <div className="flex items-center gap-1.5 mb-3">
           <BarChart3 size={15} className="text-indigo-500 shrink-0" />
-          <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+          <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800 dark:text-slate-100">
             Summary
           </span>
         </div>
@@ -533,24 +533,24 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             { label: 'Largest', value: fmt(stats.largest) },
             { label: 'Active Days', value: stats.activeDays.toString() },
           ].map(s => (
-            <div key={s.label} className="bg-slate-50 rounded-lg p-2 sm:p-2.5 text-center min-w-0">
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-wide text-slate-400 font-semibold">{s.label}</p>
-              <p className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 break-words leading-snug">{s.value}</p>
+            <div key={s.label} className="bg-slate-50 dark:bg-slate-800/80 rounded-lg p-2 sm:p-2.5 text-center min-w-0 border border-slate-100 dark:border-slate-700/60">
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-400 font-semibold">{s.label}</p>
+              <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 break-words leading-snug">{s.value}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* 6-Month Income vs Expense Bar Chart */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 min-w-0 shadow-2xs">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 min-w-0 shadow-2xs">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <div className="flex items-center gap-1.5">
-            <BarChart3 size={15} className="text-indigo-600 shrink-0" />
-            <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-900">
+            <BarChart3 size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-900 dark:text-slate-100">
               6-Month Income vs Expense Trajectory
             </span>
           </div>
-          <span className="text-[11px] font-bold text-slate-400">Monthly Cashflow</span>
+          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">Monthly Cashflow</span>
         </div>
         <div className="h-[210px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -568,25 +568,25 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Spending Trend */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 min-w-0">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-1.5">
             <TrendingUp size={15} className="text-emerald-500 shrink-0" />
-            <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+            <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800 dark:text-slate-100">
               Spending Trend
             </span>
           </div>
-          <div className="flex bg-slate-100 rounded-lg p-0.5">
+          <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/60 dark:border-slate-700/60">
             {(['day', 'week', 'month'] as TimeGranularity[]).map(g => (
               <button key={g} onClick={() => setGranularity(g)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md capitalize transition ${granularity === g ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}>
+                className={`px-3 py-1 text-xs font-semibold rounded-md capitalize transition cursor-pointer ${granularity === g ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
                 {g}
               </button>
             ))}
           </div>
         </div>
         {filteredExpenses.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-sm">No expense data available.</div>
+          <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm">No expense data available.</div>
         ) : (
           <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -611,10 +611,10 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       {/* Charts row: Category Pie + Dimension Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {catBreakdown.length > 0 && (
-          <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 min-w-0">
             <div className="flex items-center gap-1.5 mb-4">
               <PieChart size={15} className="text-purple-500 shrink-0" />
-              <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+              <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800 dark:text-slate-100">
                 By Category
               </span>
             </div>
@@ -630,12 +630,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2">
               {catBreakdown.slice(0, 6).map((item, i) => (
-                <div key={item.category} className="flex justify-between items-center text-xs p-1.5 bg-slate-50 rounded">
+                <div key={item.category} className="flex justify-between items-center text-xs p-1.5 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700/60">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                    <span className="truncate max-w-[80px]">{item.category}</span>
+                    <span className="truncate max-w-[80px] text-slate-800 dark:text-slate-200">{item.category}</span>
                   </div>
-                  <span className="font-bold">{fmt(item.amount)}</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-100">{fmt(item.amount)}</span>
                 </div>
               ))}
             </div>
@@ -643,11 +643,11 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         )}
 
         {/* Breakdown by Dimension */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 min-w-0">
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
               <Layers size={15} className="text-blue-500 shrink-0" />
-              <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+              <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800 dark:text-slate-100">
                 Breakdown
               </span>
             </div>
@@ -658,16 +658,16 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             </select>
           </div>
           {dimBreakdown.length === 0 ? (
-            <div className="text-center py-8 text-slate-400 text-sm">No data to break down.</div>
+            <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm">No data to break down.</div>
           ) : (
             <div className="space-y-2 max-h-[290px] overflow-y-auto pr-1">
               {dimBreakdown.map((item, i) => (
                 <div key={item.label}>
                   <div className="flex justify-between items-center text-xs mb-1">
-                    <span className="truncate max-w-[160px] font-medium text-slate-700">{item.label}</span>
-                    <span className="font-bold text-slate-800">{fmt(item.amount)} <span className="text-slate-400 font-normal">({item.percentage}%)</span></span>
+                    <span className="truncate max-w-[160px] font-medium text-slate-700 dark:text-slate-300">{item.label}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-100">{fmt(item.amount)} <span className="text-slate-400 dark:text-slate-500 font-normal">({item.percentage}%)</span></span>
                   </div>
-                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div className="h-full rounded-full" style={{ width: `${item.percentage}%`, backgroundColor: COLORS[i % COLORS.length] }} />
                   </div>
                 </div>
@@ -678,7 +678,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Budget vs Actual */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
         <div className="flex items-center gap-1.5 mb-3 min-w-0">
           <Wallet size={14} className="text-amber-500 shrink-0" />
           <span
@@ -700,17 +700,17 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
               const pct = Math.round((monthSpent / settings.monthlyBudget) * 100);
               const over = monthSpent >= settings.monthlyBudget;
               return (
-                <div className="p-3 bg-slate-50 rounded-lg">
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60 rounded-lg">
                   <div className="flex justify-between text-xs mb-1.5">
-                    <span className="font-semibold text-slate-700">Monthly Budget</span>
-                    <span className={`font-bold ${over ? 'text-red-500' : 'text-slate-800'}`}>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">Monthly Budget</span>
+                    <span className={`font-bold ${over ? 'text-red-500' : 'text-slate-800 dark:text-slate-100'}`}>
                       {fmt(monthSpent)} / {fmt(settings.monthlyBudget)}
                     </span>
                   </div>
-                  <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${over ? 'bg-red-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
                   </div>
-                  <p className={`text-[11px] mt-1 ${over ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
+                  <p className={`text-[11px] mt-1 ${over ? 'text-red-500 font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
                     {over ? `Over by ${fmt(monthSpent - settings.monthlyBudget)}` : `${fmt(settings.monthlyBudget - monthSpent)} remaining`} · {pct}% used
                   </p>
                 </div>
@@ -724,10 +724,10 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
               return (
                 <div key={b.category}>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="font-medium text-slate-700">{b.category}</span>
-                    <span className={`font-bold ${over ? 'text-red-500' : 'text-slate-800'}`}>{fmt(spent)} / {fmt(b.budget)} · {pct}%</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">{b.category}</span>
+                    <span className={`font-bold ${over ? 'text-red-500' : 'text-slate-800 dark:text-slate-100'}`}>{fmt(spent)} / {fmt(b.budget)} · {pct}%</span>
                   </div>
-                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${over ? 'bg-red-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
                   </div>
                 </div>
@@ -735,43 +735,43 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             })}
           </div>
         ) : (
-          <div className="text-center py-6 text-slate-400 text-sm">No budgets set. Configure budgets in Settings.</div>
+          <div className="text-center py-6 text-slate-400 dark:text-slate-500 text-sm">No budgets set. Configure budgets in Settings.</div>
         )}
       </div>
 
       {/* Top Expenses */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="flex items-center gap-1.5 mb-3">
           <Trophy size={15} className="text-yellow-500 shrink-0" />
-          <span style={{ fontSize: '11px', fontWeight: 800, margin: 0 }} className="text-slate-900">
+          <span style={{ fontSize: '11px', fontWeight: 800, margin: 0 }} className="text-slate-900 dark:text-slate-100">
             Top Expenses
           </span>
         </div>
         {topExpenses.length === 0 ? (
-          <div className="text-center py-6 text-slate-400 text-sm">No qualifying expenses.</div>
+          <div className="text-center py-6 text-slate-400 dark:text-slate-500 text-sm">No qualifying expenses.</div>
         ) : (
           <div className="space-y-1.5">
             {topExpenses.map((exp, i) => (
-              <div key={exp.id} className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl transition border border-slate-100">
+              <div key={exp.id} className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/80 dark:hover:bg-slate-800 rounded-xl transition border border-slate-100 dark:border-slate-700/60">
                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                  <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-800 text-xs font-black shrink-0">{i + 1}</span>
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">{i + 1}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">{(exp.description || '').trim() || exp.category}</p>
-                    <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate mt-0.5">
+                    <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{(exp.description || '').trim() || exp.category}</p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-medium truncate mt-0.5">
                       {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       {exp.payment_method ? ` • ${exp.payment_method}` : ''}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                  <span className="text-xs sm:text-sm font-black text-slate-900 whitespace-nowrap">{fmt(exp.amount)}</span>
+                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 whitespace-nowrap">{fmt(exp.amount)}</span>
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => onEdit?.(exp)}
                       title="Edit expense"
                       aria-label="Edit expense"
-                      className="w-7 h-7 rounded-full bg-white hover:bg-slate-200 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 transition active:scale-90 cursor-pointer shadow-2xs"
+                      className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
                     >
                       <Edit2 size={12} strokeWidth={2.2} />
                     </button>
@@ -780,7 +780,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                       onClick={() => { if (window.confirm('Are you sure you want to delete this expense?')) onDelete?.(exp.id); }}
                       title="Delete expense"
                       aria-label="Delete expense"
-                      className="w-7 h-7 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200/70 flex items-center justify-center text-rose-600 hover:text-rose-800 transition active:scale-90 cursor-pointer shadow-2xs"
+                      className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
                     >
                       <Trash2 size={12} strokeWidth={2.2} />
                     </button>
@@ -793,28 +793,28 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Expense History List */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800/50">
               <Store size={16} />
             </div>
-            <span style={{ fontSize: '12px', fontWeight: 800, margin: 0, lineHeight: 1 }} className="text-slate-900">
+            <span style={{ fontSize: '12px', fontWeight: 800, margin: 0, lineHeight: 1 }} className="text-slate-900 dark:text-slate-100">
               Expense History
             </span>
-            <span className="px-2 py-0.5 text-xs font-black bg-blue-50 text-blue-700 border border-blue-200/70 rounded-full leading-none">
+            <span className="px-2 py-0.5 text-xs font-black bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/50 rounded-full leading-none">
               {filteredExpenses.length}
             </span>
           </div>
           {filteredExpenses.length > 0 && (
-            <span className="text-[11px] font-bold text-slate-400">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">
               Total: {fmt(filteredExpenses.reduce((s, e) => s + Number(e.amount || 0), 0))}
             </span>
           )}
         </div>
 
         {filteredExpenses.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-sm">No expenses found for these filters.</div>
+          <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm">No expenses found for these filters.</div>
         ) : (
           <div className="space-y-1.5">
             {filteredExpenses.map((exp, i) => {
@@ -823,33 +823,33 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
               return (
                 <div
                   key={exp.id}
-                  className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl transition border border-slate-100/90"
+                  className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/80 dark:hover:bg-slate-800 rounded-xl transition border border-slate-100/90 dark:border-slate-700/60"
                 >
-                  {/* Left: Number circle + Details (Horizontal like Image 3) */}
+                  {/* Left: Number circle + Details */}
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                    <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-800 text-xs font-black shrink-0">
+                    <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">
                       {i + 1}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <p className="text-xs sm:text-sm font-bold text-slate-800 truncate leading-snug">
+                        <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate leading-snug">
                           {(exp.description || '').trim() || exp.category}
                         </p>
                         {isInc && (
-                          <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded border border-emerald-200 shrink-0">
+                          <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
                             Income
                           </span>
                         )}
                         {fuelBadge?.mileage && (
                           <span
-                            className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0"
+                            className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0"
                             title={`Mileage: ${fuelBadge.mileage} km/l${fuelBadge.distance ? ` · Dist: ${fuelBadge.distance} km` : ''}`}
                           >
                             ⛽ {fuelBadge.mileage} km/l
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate mt-0.5">
+                      <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-medium truncate mt-0.5">
                         {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                         {exp.payment_method ? ` • ${exp.payment_method}` : ''}
                         {exp.description && exp.category ? ` • ${exp.category}` : ''}
@@ -859,7 +859,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
 
                   {/* Right: Amount + Actions */}
                   <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                    <span className={`text-xs sm:text-sm font-black whitespace-nowrap ${isInc ? 'text-emerald-600' : 'text-slate-900'}`}>
+                    <span className={`text-xs sm:text-sm font-black whitespace-nowrap ${isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'}`}>
                       {isInc ? '+' : ''}{fmt(Number(exp.amount))}
                     </span>
                     <div className="flex items-center gap-1">
@@ -868,7 +868,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                         onClick={() => onEdit?.(exp)}
                         aria-label="Edit expense"
                         title="Edit expense"
-                        className="w-7 h-7 rounded-full bg-white hover:bg-slate-200 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 transition active:scale-90 cursor-pointer shadow-2xs"
+                        className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
                       >
                         <Edit2 size={12} strokeWidth={2.2} />
                       </button>
@@ -881,7 +881,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                         }}
                         aria-label="Delete expense"
                         title="Delete expense"
-                        className="w-7 h-7 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200/70 flex items-center justify-center text-rose-600 hover:text-rose-800 transition active:scale-90 cursor-pointer shadow-2xs"
+                        className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
                       >
                         <Trash2 size={12} strokeWidth={2.2} />
                       </button>

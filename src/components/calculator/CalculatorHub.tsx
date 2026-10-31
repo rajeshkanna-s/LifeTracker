@@ -47,19 +47,19 @@ const CalcField: React.FC<CalcFieldProps> = ({
   unitToggle
 }) => {
   return (
-    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5 transition hover:border-slate-300">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5 transition hover:border-slate-300 dark:hover:border-slate-700">
       {/* Top Header: Label & Input Badge */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
             {icon}
           </div>
-          <span className="text-sm font-bold text-slate-800 truncate">{label}</span>
+          <span className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{label}</span>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           {unitToggle && (
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
               {unitToggle.options.map(opt => (
                 <button
                   key={opt}
@@ -67,8 +67,8 @@ const CalcField: React.FC<CalcFieldProps> = ({
                   onClick={() => unitToggle.onChange(opt)}
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition cursor-pointer ${
                     unitToggle.active === opt
-                      ? 'bg-white text-emerald-800 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   {opt}
@@ -77,8 +77,8 @@ const CalcField: React.FC<CalcFieldProps> = ({
             </div>
           )}
 
-          <div className="flex items-center bg-slate-50 border border-slate-200/90 rounded-xl px-3 py-1.5 shadow-2xs focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-500/20 transition">
-            {prefix && <span className="text-xs font-black text-emerald-700 mr-1">{prefix}</span>}
+          <div className="flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-xl px-3 py-1.5 shadow-2xs focus-within:border-emerald-500 focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-2 focus-within:ring-emerald-500/20 transition">
+            {prefix && <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 mr-1">{prefix}</span>}
             <input
               type="number"
               min={min}
@@ -89,9 +89,9 @@ const CalcField: React.FC<CalcFieldProps> = ({
                 const n = parseFloat(e.target.value);
                 onChange(isNaN(n) ? 0 : n);
               }}
-              className="w-20 sm:w-26 text-right font-black text-sm text-slate-900 outline-none bg-transparent"
+              className="w-20 sm:w-26 text-right font-black text-sm text-slate-900 dark:text-slate-100 outline-none bg-transparent"
             />
-            {suffix && <span className="text-xs font-bold text-slate-500 ml-1">{suffix}</span>}
+            {suffix && <span className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>}
           </div>
         </div>
       </div>
@@ -107,7 +107,7 @@ const CalcField: React.FC<CalcFieldProps> = ({
           onChange={e => onChange(parseFloat(e.target.value))}
           className="calc-range-slider"
         />
-        <div className="flex justify-between text-[11px] font-semibold text-slate-400 mt-1.5 px-0.5">
+        <div className="flex justify-between text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-1.5 px-0.5">
           <span>{minLabel || `${prefix}${min.toLocaleString('en-IN')}${suffix}`}</span>
           <span>{maxLabel || `${prefix}${max.toLocaleString('en-IN')}${suffix}`}</span>
         </div>
@@ -403,7 +403,7 @@ export const CalculatorHub: React.FC = () => {
   return (
     <div className="space-y-4 max-w-2xl mx-auto pb-10">
       {/* ════════ White & Emerald Top Nav Bar (100% Mobile Clean Grid) ════════ */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-1.5 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-1.5 shadow-xs">
         <div className="grid grid-cols-5 gap-1 w-full">
           {calcTabs.map(tab => {
             const isActive = activeTab === tab.id;
@@ -422,11 +422,12 @@ export const CalculatorHub: React.FC = () => {
                   borderRadius: '12px',
                   border: 'none',
                   background: isActive ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
-                  color: isActive ? '#ffffff' : '#64748b',
+                  color: isActive ? '#ffffff' : undefined,
                   cursor: 'pointer',
                   boxShadow: isActive ? '0 2px 8px rgba(5, 150, 105, 0.28)' : 'none',
                   transition: 'all 0.18s ease'
                 }}
+                className={isActive ? '' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}
                 onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.95)'; }}
                 onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
               >
@@ -454,13 +455,13 @@ export const CalculatorHub: React.FC = () => {
           1. BASIC ARITHMETIC CALCULATOR
           ══════════════════════════════════════════════════════════ */}
       {activeTab === 'basic' && (
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
           {/* Crisp Display Card */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-right min-h-[96px] flex flex-col justify-end shadow-inner">
-            <div className="text-xs sm:text-sm font-semibold text-slate-500 truncate mb-1">
+          <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 text-right min-h-[96px] flex flex-col justify-end shadow-inner">
+            <div className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 truncate mb-1">
               {basicExpr || '\u00A0'}
             </div>
-            <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight overflow-x-auto whitespace-nowrap scrollbar-none">
+            <div className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight overflow-x-auto whitespace-nowrap scrollbar-none">
               {basicDisplay}
             </div>
           </div>
@@ -471,14 +472,14 @@ export const CalculatorHub: React.FC = () => {
             <button
               type="button"
               onClick={() => handleBasicInput('AC')}
-              className="h-12 sm:h-14 rounded-2xl bg-rose-50 text-rose-700 font-extrabold text-sm active:scale-95 transition flex items-center justify-center cursor-pointer border border-rose-200/70 hover:bg-rose-100"
+              className="h-12 sm:h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-extrabold text-sm active:scale-95 transition flex items-center justify-center cursor-pointer border border-rose-200/70 dark:border-rose-900/60 hover:bg-rose-100 dark:hover:bg-rose-900/50"
             >
               AC
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('DEL')}
-              className="h-12 sm:h-14 rounded-2xl bg-slate-100 text-slate-700 font-bold active:scale-95 transition flex items-center justify-center cursor-pointer border border-slate-200 hover:bg-slate-200"
+              className="h-12 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold active:scale-95 transition flex items-center justify-center cursor-pointer border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
               aria-label="Delete last digit"
             >
               <Delete size={18} />
@@ -486,14 +487,14 @@ export const CalculatorHub: React.FC = () => {
             <button
               type="button"
               onClick={() => handleBasicInput('%')}
-              className="h-12 sm:h-14 rounded-2xl bg-slate-100 text-slate-700 font-extrabold text-base active:scale-95 transition flex items-center justify-center cursor-pointer border border-slate-200 hover:bg-slate-200"
+              className="h-12 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-extrabold text-base active:scale-95 transition flex items-center justify-center cursor-pointer border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
             >
               %
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('÷')}
-              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 text-emerald-800 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 hover:bg-emerald-200"
+              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-200 dark:hover:bg-emerald-900/60"
             >
               ÷
             </button>
@@ -502,28 +503,28 @@ export const CalculatorHub: React.FC = () => {
             <button
               type="button"
               onClick={() => handleBasicInput('7')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               7
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('8')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               8
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('9')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               9
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('×')}
-              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 text-emerald-800 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 hover:bg-emerald-200"
+              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-200 dark:hover:bg-emerald-900/60"
             >
               ×
             </button>
@@ -532,28 +533,28 @@ export const CalculatorHub: React.FC = () => {
             <button
               type="button"
               onClick={() => handleBasicInput('4')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               4
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('5')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               5
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('6')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               6
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('-')}
-              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 text-emerald-800 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 hover:bg-emerald-200"
+              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-200 dark:hover:bg-emerald-900/60"
             >
               −
             </button>
@@ -562,28 +563,28 @@ export const CalculatorHub: React.FC = () => {
             <button
               type="button"
               onClick={() => handleBasicInput('1')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               1
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('2')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               2
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('3')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               3
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('+')}
-              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 text-emerald-800 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 hover:bg-emerald-200"
+              className="h-12 sm:h-14 rounded-2xl bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-black text-xl active:scale-95 transition flex items-center justify-center cursor-pointer border border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-200 dark:hover:bg-emerald-900/60"
             >
               +
             </button>
@@ -592,21 +593,21 @@ export const CalculatorHub: React.FC = () => {
             <button
               type="button"
               onClick={() => handleBasicInput('0')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               0
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('00')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-base active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-base active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               00
             </button>
             <button
               type="button"
               onClick={() => handleBasicInput('.')}
-              className="h-12 sm:h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold text-2xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 shadow-2xs"
+              className="h-12 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold text-2xl active:scale-95 transition flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs"
             >
               .
             </button>
@@ -658,16 +659,16 @@ export const CalculatorHub: React.FC = () => {
           </div>
 
           {/* Visual Ratio Card */}
-          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-2">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-2">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-emerald-700 flex items-center gap-1.5">
+              <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" /> Principal ({emiResults.principalPct}%)
               </span>
-              <span className="text-amber-700 flex items-center gap-1.5">
+              <span className="text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Interest ({emiResults.interestPct}%)
               </span>
             </div>
-            <div className="h-2.5 w-full bg-amber-100 rounded-full overflow-hidden flex">
+            <div className="h-2.5 w-full bg-amber-100 dark:bg-amber-950/60 rounded-full overflow-hidden flex">
               <div
                 style={{ width: `${emiResults.principalPct}%` }}
                 className="bg-emerald-600 h-full rounded-full transition-all duration-300"
@@ -738,15 +739,17 @@ export const CalculatorHub: React.FC = () => {
       {activeTab === 'loan' && (
         <div className="space-y-4">
           {/* Mode Switcher */}
-          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200/80">
+          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setLoanMode('eligibility')}
               style={{
                 background: loanMode === 'eligibility' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
-                color: loanMode === 'eligibility' ? '#ffffff' : '#64748b'
+                color: loanMode === 'eligibility' ? '#ffffff' : undefined
               }}
-              className="py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
+                loanMode === 'eligibility' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
             >
               <TrendingUp size={14} /> Eligibility
             </button>
@@ -755,9 +758,11 @@ export const CalculatorHub: React.FC = () => {
               onClick={() => setLoanMode('prepayment')}
               style={{
                 background: loanMode === 'prepayment' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
-                color: loanMode === 'prepayment' ? '#ffffff' : '#64748b'
+                color: loanMode === 'prepayment' ? '#ffffff' : undefined
               }}
-              className="py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
+                loanMode === 'prepayment' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
             >
               <Zap size={14} /> Prepayment
             </button>
@@ -915,15 +920,17 @@ export const CalculatorHub: React.FC = () => {
       {activeTab === 'gst' && (
         <div className="space-y-4">
           {/* Mode Switcher */}
-          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200/80">
+          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setGstMode('exclusive')}
               style={{
                 background: gstMode === 'exclusive' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
-                color: gstMode === 'exclusive' ? '#ffffff' : '#64748b'
+                color: gstMode === 'exclusive' ? '#ffffff' : undefined
               }}
-              className="py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
+                gstMode === 'exclusive' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
             >
               Exclusive (+GST)
             </button>
@@ -932,9 +939,11 @@ export const CalculatorHub: React.FC = () => {
               onClick={() => setGstMode('inclusive')}
               style={{
                 background: gstMode === 'inclusive' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
-                color: gstMode === 'inclusive' ? '#ffffff' : '#64748b'
+                color: gstMode === 'inclusive' ? '#ffffff' : undefined
               }}
-              className="py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
+                gstMode === 'inclusive' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
             >
               Inclusive (−GST)
             </button>
@@ -983,8 +992,8 @@ export const CalculatorHub: React.FC = () => {
           />
 
           {/* GST Slab Cards (Proper Grid) */}
-          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-2">
-            <label className="text-xs font-extrabold text-slate-700 block">GST Rate Slab</label>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-2">
+            <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 block">GST Rate Slab</label>
             <div className="grid grid-cols-5 gap-1.5">
               {[
                 { r: 3, label: 'Gold' },
@@ -1000,7 +1009,7 @@ export const CalculatorHub: React.FC = () => {
                   className={`py-2 px-1 text-center rounded-xl border transition cursor-pointer active:scale-95 ${
                     gstRate === item.r
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-500/20'
-                      : 'bg-slate-50 text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   <p className="text-xs font-black">{item.r}%</p>
@@ -1018,15 +1027,17 @@ export const CalculatorHub: React.FC = () => {
       {activeTab === 'interest' && (
         <div className="space-y-4">
           {/* Mode Switcher */}
-          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200/80">
+          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setInterestType('simple')}
               style={{
                 background: interestType === 'simple' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
-                color: interestType === 'simple' ? '#ffffff' : '#64748b'
+                color: interestType === 'simple' ? '#ffffff' : undefined
               }}
-              className="py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
+                interestType === 'simple' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
             >
               Simple (SI)
             </button>
@@ -1035,9 +1046,11 @@ export const CalculatorHub: React.FC = () => {
               onClick={() => setInterestType('compound')}
               style={{
                 background: interestType === 'compound' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
-                color: interestType === 'compound' ? '#ffffff' : '#64748b'
+                color: interestType === 'compound' ? '#ffffff' : undefined
               }}
-              className="py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
+                interestType === 'compound' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
             >
               Compound (CI)
             </button>
@@ -1066,16 +1079,16 @@ export const CalculatorHub: React.FC = () => {
           </div>
 
           {/* Visual Ratio Card */}
-          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-2">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-2">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-emerald-700 flex items-center gap-1.5">
+              <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" /> Principal ({interestResults.principalPct}%)
               </span>
-              <span className="text-teal-700 flex items-center gap-1.5">
+              <span className="text-teal-700 dark:text-teal-400 flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-teal-500" /> Interest ({interestResults.interestPct}%)
               </span>
             </div>
-            <div className="h-2.5 w-full bg-teal-100 rounded-full overflow-hidden flex">
+            <div className="h-2.5 w-full bg-teal-100 dark:bg-teal-950/60 rounded-full overflow-hidden flex">
               <div
                 style={{ width: `${interestResults.principalPct}%` }}
                 className="bg-emerald-600 h-full rounded-full transition-all duration-300"
@@ -1139,8 +1152,8 @@ export const CalculatorHub: React.FC = () => {
 
             {/* Compounding frequency for CI */}
             {interestType === 'compound' && (
-              <div className="bg-white border border-slate-200/90 rounded-2xl p-4 space-y-2 shadow-xs">
-                <label className="text-xs font-bold text-slate-800 block">Compounding Frequency</label>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 space-y-2 shadow-xs">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Compounding Frequency</label>
                 <div className="grid grid-cols-4 gap-1.5">
                   {[
                     { label: 'Annual', freq: 1 },
@@ -1155,7 +1168,7 @@ export const CalculatorHub: React.FC = () => {
                       className={`py-2 text-xs font-bold rounded-xl border transition cursor-pointer active:scale-95 ${
                         compoundFreq === f.freq
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-500/20'
-                          : 'bg-slate-50 text-slate-700 border-slate-200/80 hover:bg-slate-100'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                     >
                       {f.label}

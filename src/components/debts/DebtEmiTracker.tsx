@@ -35,23 +35,23 @@ const DebtEmiTracker: React.FC<DebtEmiTrackerProps> = ({ debts, payments, settin
   const activeDebts = debts.filter(d => Number(d.current_balance) > 0 || Number(d.original_amount) === 0);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-      <div className="p-3 sm:p-4 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 text-slate-800">
-          <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 shrink-0 shadow-xs">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+      <div className="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 text-slate-800 dark:text-slate-100">
+          <div className="w-8 h-8 rounded-lg bg-orange-100 dark:bg-amber-950/60 flex items-center justify-center text-orange-600 dark:text-amber-400 shrink-0 shadow-xs">
             <Calendar size={16} />
           </div>
           <div>
             <h3 className="text-sm font-bold leading-tight">Monthly EMI Tracker</h3>
-            <p className="text-[11px] text-slate-500">Track and pay your EMIs month by month</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Track and pay your EMIs month by month</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-xs w-full sm:w-auto">
+        <div className="flex items-center gap-1.5 bg-slate-100/90 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700 shadow-xs w-full sm:w-auto">
           <button 
             type="button"
             onClick={() => setMonthOffset(prev => prev - 6)}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-lg shadow-xs border border-slate-200/60 active:scale-95 transition whitespace-nowrap"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 rounded-lg shadow-xs border border-slate-200/60 dark:border-slate-600 active:scale-95 transition whitespace-nowrap"
             title="Previous 6 months"
           >
             <ChevronLeft size={14} />
@@ -60,7 +60,7 @@ const DebtEmiTracker: React.FC<DebtEmiTrackerProps> = ({ debts, payments, settin
           <button 
             type="button"
             onClick={() => setMonthOffset(-2)}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200/80 active:scale-95 transition whitespace-nowrap"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-orange-600 dark:text-amber-400 bg-orange-50 dark:bg-amber-950/50 hover:bg-orange-100 dark:hover:bg-amber-900/50 rounded-lg border border-orange-200/80 dark:border-amber-800/60 active:scale-95 transition whitespace-nowrap"
             title="Current month"
           >
             Current
@@ -68,7 +68,7 @@ const DebtEmiTracker: React.FC<DebtEmiTrackerProps> = ({ debts, payments, settin
           <button 
             type="button"
             onClick={() => setMonthOffset(prev => prev + 6)}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-lg shadow-xs border border-slate-200/60 active:scale-95 transition whitespace-nowrap"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 rounded-lg shadow-xs border border-slate-200/60 dark:border-slate-600 active:scale-95 transition whitespace-nowrap"
             title="Next 6 months"
           >
             <span>Next 6M</span>
@@ -79,32 +79,32 @@ const DebtEmiTracker: React.FC<DebtEmiTrackerProps> = ({ debts, payments, settin
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs whitespace-nowrap">
-          <thead className="bg-slate-50">
+          <thead className="bg-slate-50 dark:bg-slate-800/80">
             <tr>
-              <th className="p-3 font-semibold text-slate-600 border-b border-r border-slate-200 sticky left-0 bg-slate-50 z-10 w-48 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+              <th className="p-3 font-semibold text-slate-600 dark:text-slate-300 border-b border-r border-slate-200 dark:border-slate-800 sticky left-0 bg-slate-50 dark:bg-slate-850 z-10 w-48 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                 Debt Source
               </th>
               {months.map(m => (
-                <th key={m.key} className="p-3 font-semibold text-slate-600 text-center border-b border-slate-200 min-w-[90px]">
+                <th key={m.key} className="p-3 font-semibold text-slate-600 dark:text-slate-300 text-center border-b border-slate-200 dark:border-slate-800 min-w-[90px]">
                   {m.shortName}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {activeDebts.length === 0 ? (
               <tr>
-                <td colSpan={months.length + 1} className="p-8 text-center text-slate-500">
+                <td colSpan={months.length + 1} className="p-8 text-center text-slate-500 dark:text-slate-400">
                   No active debts to track.
                 </td>
               </tr>
             ) : (
               activeDebts.map(debt => (
-                <tr key={debt.id} className="hover:bg-slate-50/50 transition">
-                  <td className="p-3 font-semibold text-slate-800 border-r border-slate-100 sticky left-0 bg-white shadow-[2px_0_5px_-2px_rgba(0,0,0,0.02)] z-10 truncate max-w-[192px]">
+                <tr key={debt.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition">
+                  <td className="p-3 font-semibold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800 sticky left-0 bg-white dark:bg-slate-900 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.02)] z-10 truncate max-w-[192px]">
                     <div className="flex flex-col">
                       <span className="truncate">{debt.source}</span>
-                      <span className="text-[10px] text-slate-500 font-normal">EMI: {settings.currencySymbol}{Number(debt.emi_amount).toLocaleString()}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">EMI: {settings.currencySymbol}{Number(debt.emi_amount).toLocaleString()}</span>
                     </div>
                   </td>
                   {months.map(m => {
@@ -112,10 +112,10 @@ const DebtEmiTracker: React.FC<DebtEmiTrackerProps> = ({ debts, payments, settin
                     const isPaid = !!payment;
 
                     return (
-                      <td key={m.key} className="p-2 border-r border-slate-50 last:border-r-0 text-center align-middle">
+                      <td key={m.key} className="p-2 border-r border-slate-50 dark:border-slate-800 last:border-r-0 text-center align-middle">
                         {isPaid ? (
                           <div 
-                            className="inline-flex items-center justify-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1.5 rounded-md border border-emerald-100 w-full cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition group"
+                            className="inline-flex items-center justify-center gap-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-2 py-1.5 rounded-md border border-emerald-100 dark:border-emerald-800/50 w-full cursor-pointer hover:bg-red-50 dark:hover:bg-rose-950/60 hover:text-red-600 dark:hover:text-rose-400 hover:border-red-200 dark:hover:border-rose-800 transition group"
                             onClick={() => {
                               if(confirm(`Undo payment for ${m.shortName}?`)) {
                                 onUnpay(payment);
@@ -143,7 +143,7 @@ const DebtEmiTracker: React.FC<DebtEmiTrackerProps> = ({ debts, payments, settin
                                 }
                               }
                             }}
-                            className="inline-flex items-center justify-center text-slate-400 hover:text-orange-600 hover:bg-orange-50 px-2 py-1.5 rounded-md border border-dashed border-slate-200 hover:border-orange-200 w-full transition"
+                            className="inline-flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-orange-600 dark:hover:text-amber-400 hover:bg-orange-50 dark:hover:bg-amber-950/40 px-2 py-1.5 rounded-md border border-dashed border-slate-200 dark:border-slate-700 hover:border-orange-200 dark:hover:border-amber-800 w-full transition"
                             title="Mark as Paid"
                           >
                             Pay

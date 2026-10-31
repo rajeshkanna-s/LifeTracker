@@ -16,9 +16,6 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       const saved = localStorage.getItem('xpenser_theme');
       if (saved === 'dark' || saved === 'light') return saved;
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-      }
     } catch {
       // fallback
     }
@@ -35,9 +32,13 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
       document.body.classList.add('dark-mode');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.setAttribute('data-bs-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
       document.body.classList.remove('dark-mode');
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.setAttribute('data-bs-theme', 'light');
     }
   }, [theme]);
 

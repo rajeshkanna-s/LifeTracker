@@ -182,10 +182,10 @@ const JobTracker: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3">
                 <div className="flex-1 relative">
                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-indigo-400 placeholder:text-slate-400"
+                  <input className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-400 placeholder:text-slate-400"
                     placeholder="Search company or role..." value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
-                <select className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-xs text-slate-700 outline-none cursor-pointer"
+                <select className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-xs text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
                   value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
                   <option>All Status</option>{allStatuses.map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -194,14 +194,14 @@ const JobTracker: React.FC = () => {
               {filtered.length === 0 ? (
                 <div className="text-center py-10 px-4">
                   <div className="text-4xl mb-3 opacity-40">🏢</div>
-                  <h4 className="text-sm font-bold text-slate-800">No applications found</h4>
-                  <p className="text-xs text-slate-400 mt-1">Start tracking your job applications</p>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No applications found</h4>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Start tracking your job applications</p>
                 </div>
               ) : (
                 <div className="px-1">
                   {filtered.map((j, i) => (
                     <div key={j.id} className="tx-item">
-                      <div className="tx-icon" style={{ background: '#f0f0ff' }}>💼</div>
+                      <div className="tx-icon">💼</div>
                       <div className="tx-details">
                         <p className="tx-amount">{j.company}</p>
                         <p className="tx-category">{j.role || 'No role specified'} · {j.source || 'N/A'}</p>

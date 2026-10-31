@@ -104,16 +104,16 @@ export const CurrencyTracker: React.FC = () => {
       </div>
 
       {/* ════════ Interactive Quick Converter ════════ */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <Calculator size={18} className="text-purple-600" />
-            <h3 className="text-sm font-extrabold text-slate-900">Instant Currency Converter</h3>
+            <Calculator size={18} className="text-purple-600 dark:text-purple-400" />
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">Instant Currency Converter</h3>
           </div>
           <button
             type="button"
             onClick={() => setDirection(prev => (prev === 'foreignToInr' ? 'inrToForeign' : 'foreignToInr'))}
-            className="flex items-center gap-1 text-xs font-bold text-purple-600 hover:text-purple-700 bg-purple-50 px-2.5 py-1 rounded-xl transition cursor-pointer"
+            className="flex items-center gap-1 text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 bg-purple-50 dark:bg-purple-950/40 px-2.5 py-1 rounded-xl transition cursor-pointer"
           >
             <ArrowRightLeft size={13} />
             <span>Switch Direction</span>
@@ -122,10 +122,10 @@ export const CurrencyTracker: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
           {/* Source Input */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3">
+          <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-3">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">You Convert</span>
-              <span className="text-xs font-extrabold text-slate-700">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">You Convert</span>
+              <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">
                 {direction === 'foreignToInr' ? `${selectedRateObj.flag} ${selectedRateObj.code}` : '🇮🇳 INR'}
               </span>
             </div>
@@ -134,26 +134,26 @@ export const CurrencyTracker: React.FC = () => {
               value={amount || ''}
               onChange={e => setAmount(Number(e.target.value))}
               placeholder="0"
-              className="w-full bg-transparent text-2xl font-black text-slate-900 outline-none"
+              className="w-full bg-transparent text-2xl font-black text-slate-900 dark:text-slate-100 outline-none"
             />
           </div>
 
           {/* Converted Output */}
-          <div className="bg-purple-50/70 border border-purple-200 rounded-2xl p-3">
+          <div className="bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50 rounded-2xl p-3">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] font-bold text-purple-600 uppercase">You Get</span>
-              <span className="text-xs font-extrabold text-purple-800">
+              <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase">You Get</span>
+              <span className="text-xs font-extrabold text-purple-800 dark:text-purple-300">
                 {direction === 'foreignToInr' ? '🇮🇳 INR' : `${selectedRateObj.flag} ${selectedRateObj.code}`}
               </span>
             </div>
-            <p className="text-2xl font-black text-purple-950 truncate">
+            <p className="text-2xl font-black text-purple-950 dark:text-purple-200 truncate">
               {direction === 'foreignToInr' ? '₹' : selectedRateObj.code + ' '}
               {convertedResult.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
 
-        <p className="text-[11px] text-slate-400 font-medium text-center">
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium text-center">
           Exchange rate: 1 {selectedRateObj.code} = ₹{selectedRateObj.rateToInr.toFixed(2)} INR
         </p>
       </div>
@@ -161,7 +161,7 @@ export const CurrencyTracker: React.FC = () => {
       {/* ════════ Currency Pairs Grid (Matches Reference Image) ════════ */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3 px-1">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             Popular Currency Pairs
           </h3>
           <div className="relative max-w-xs w-44">
@@ -171,7 +171,7 @@ export const CurrencyTracker: React.FC = () => {
               placeholder="Search..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-500"
+              className="w-full pl-8 pr-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 outline-none focus:border-purple-500"
             />
           </div>
         </div>
@@ -186,25 +186,25 @@ export const CurrencyTracker: React.FC = () => {
                 onClick={() => setSelectedCurrency(r.code)}
                 className={`p-3.5 rounded-2xl border text-left transition cursor-pointer flex items-center justify-between shadow-2xs hover:shadow-xs ${
                   isSelected
-                    ? 'bg-purple-50 border-purple-400 ring-2 ring-purple-400/30'
-                    : 'bg-white border-slate-200 hover:border-slate-300'
+                    ? 'bg-purple-50 dark:bg-purple-950/40 border-purple-400 dark:border-purple-600 ring-2 ring-purple-400/30'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-2xl shrink-0">{r.flag}</span>
                   <div className="min-w-0">
-                    <h4 className="font-extrabold text-xs text-slate-900 truncate">
+                    <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate">
                       INR / {r.code}
                     </h4>
-                    <p className="text-[10px] text-slate-400 truncate">{r.name}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">{r.name}</p>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-black text-slate-900">
+                  <p className="text-sm font-black text-slate-900 dark:text-slate-100">
                     ₹{r.rateToInr.toFixed(2)}
                   </p>
-                  <p className="text-[9px] text-emerald-600 font-bold flex items-center justify-end gap-0.5">
+                  <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-end gap-0.5">
                     <TrendingUp size={9} /> Live
                   </p>
                 </div>

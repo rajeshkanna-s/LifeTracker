@@ -376,15 +376,15 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   return (
     <div className="space-y-4 max-w-4xl mx-auto pb-36">
       {/* ════════ Top Month Header & Controls ════════ */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xs space-y-3">
         {/* Month Selector & Controls */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs shrink-0 border border-emerald-100">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shadow-2xs shrink-0 border border-emerald-100 dark:border-emerald-800/60">
               <CalendarIcon size={19} strokeWidth={2.2} />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none truncate">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none truncate">
                 {monthLabel}
               </h2>
               <p className="text-[11px] text-slate-400 font-semibold mt-0.5 truncate">
@@ -395,14 +395,14 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
 
           <div className="flex items-center gap-1.5 shrink-0">
             {/* View Mode Toggle: Grid vs Agenda */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200/60">
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200/60 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
                 className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${
                   viewMode === 'grid'
-                    ? 'bg-white text-emerald-800 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
                 title="Month Grid View"
               >
@@ -414,8 +414,8 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                 onClick={() => setViewMode('agenda')}
                 className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${
                   viewMode === 'agenda'
-                    ? 'bg-white text-emerald-800 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
                 title="Agenda List View"
               >
@@ -425,19 +425,19 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
             </div>
 
             {/* Navigation Arrows */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200/60">
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200/60 dark:border-slate-700">
               <button
                 type="button"
                 onClick={handlePrevMonth}
                 aria-label="Previous month"
-                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-600 hover:bg-white active:scale-90 transition cursor-pointer"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 active:scale-90 transition cursor-pointer"
               >
                 <ChevronLeft size={15} />
               </button>
               <button
                 type="button"
                 onClick={handleGoToday}
-                className="px-2.5 py-0.5 text-xs font-black text-emerald-700 hover:bg-white rounded-full transition active:scale-95 cursor-pointer"
+                className="px-2.5 py-0.5 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition active:scale-95 cursor-pointer"
               >
                 Today
               </button>
@@ -445,7 +445,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                 type="button"
                 onClick={handleNextMonth}
                 aria-label="Next month"
-                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-600 hover:bg-white active:scale-90 transition cursor-pointer"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 active:scale-90 transition cursor-pointer"
               >
                 <ChevronRight size={15} />
               </button>
@@ -467,50 +467,50 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
         </div>
 
         {/* ════════ Streamlined Monthly Cashflow Banner ════════ */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-100">
-          <div className="bg-emerald-50/60 border border-emerald-100 rounded-xl p-2.5 flex items-center gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/60 rounded-xl p-2.5 flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
               <ArrowUpRight size={14} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider truncate">Income</p>
-              <p className="text-xs sm:text-sm font-black text-emerald-900 truncate">
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider truncate">Income</p>
+              <p className="text-xs sm:text-sm font-black text-emerald-900 dark:text-emerald-300 truncate">
                 +₹{monthStats.mIncome.toLocaleString('en-IN')}
               </p>
             </div>
           </div>
 
-          <div className="bg-rose-50/60 border border-rose-100 rounded-xl p-2.5 flex items-center gap-2.5">
+          <div className="bg-rose-50/70 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-800/60 rounded-xl p-2.5 flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
               <ArrowDownLeft size={14} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-rose-700 font-bold uppercase tracking-wider truncate">Expenses</p>
-              <p className="text-xs sm:text-sm font-black text-rose-900 truncate">
+              <p className="text-[10px] text-rose-700 dark:text-rose-400 font-bold uppercase tracking-wider truncate">Expenses</p>
+              <p className="text-xs sm:text-sm font-black text-rose-900 dark:text-rose-300 truncate">
                 ₹{monthStats.mExpense.toLocaleString('en-IN')}
               </p>
             </div>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-2.5 flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
               <Wallet size={14} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider truncate">Net Cashflow</p>
-              <p className={`text-xs sm:text-sm font-black truncate ${monthStats.net >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Net Cashflow</p>
+              <p className={`text-xs sm:text-sm font-black truncate ${monthStats.net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                 {monthStats.net >= 0 ? '+' : ''}₹{monthStats.net.toLocaleString('en-IN')}
               </p>
             </div>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 flex items-center gap-2.5">
+          <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-2.5 flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
               <Clock size={14} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider truncate">Daily Avg</p>
-              <p className="text-xs sm:text-sm font-black text-slate-800 truncate">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Daily Avg</p>
+              <p className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-200 truncate">
                 ₹{monthStats.avgDaily.toLocaleString('en-IN')}
               </p>
             </div>
@@ -518,14 +518,14 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
         </div>
 
         {/* ════════ Native App Segmented Control Filter ════════ */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-full gap-1">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-full gap-1 border border-slate-200/60 dark:border-slate-700">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
             className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${
               typeFilter === 'all'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
             }`}
           >
             All
@@ -536,7 +536,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
             className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${
               typeFilter === 'expense'
                 ? 'bg-rose-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
             }`}
           >
             Expenses
@@ -547,7 +547,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
             className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${
               typeFilter === 'income'
                 ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
             }`}
           >
             Income
@@ -559,16 +559,16 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
       {viewMode === 'grid' && (
         <>
           {/* Modern Mobile App Calendar Grid Card */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-3.5 sm:p-5 shadow-xs">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs">
             {/* Weekdays Header */}
-            <div className="grid grid-cols-7 gap-1 text-center py-1.5 px-0.5 mb-2 border-b border-slate-100">
+            <div className="grid grid-cols-7 gap-1 text-center py-1.5 px-0.5 mb-2 border-b border-slate-100 dark:border-slate-800">
               {DAYS_HEADER.map((d, idx) => {
                 const isWeekend = idx === 5 || idx === 6;
                 return (
                   <div
                     key={d}
                     className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${
-                      isWeekend ? 'text-amber-500' : 'text-slate-400'
+                      isWeekend ? 'text-amber-500 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'
                     }`}
                   >
                     {d}
@@ -598,8 +598,8 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                         : isSelected
                         ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 font-black scale-102 z-10'
                         : cell.isToday
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 font-black'
-                        : 'hover:bg-slate-100 text-slate-800'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black'
+                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100'
                     }`}
                   >
                     {/* Day Number */}
@@ -654,28 +654,28 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
           </div>
 
           {/* ════════ Selected Day Inspector (Sleek Horizontal List) ════════ */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
             {/* Header: Date + Action */}
-            <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
                     {formattedSelectedDate}
                   </h3>
                   {selectedDateStr === todayStr && (
-                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full shrink-0 leading-none">
+                    <span className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded-full shrink-0 leading-none">
                       Today
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                  Spent: <span className="text-rose-600 font-bold">₹{selectedDayTotals.spent.toLocaleString('en-IN')}</span> • Income: <span className="text-emerald-600 font-bold">₹{selectedDayTotals.income.toLocaleString('en-IN')}</span>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
+                  Spent: <span className="text-rose-600 dark:text-rose-400 font-bold">₹{selectedDayTotals.spent.toLocaleString('en-IN')}</span> • Income: <span className="text-emerald-600 dark:text-emerald-400 font-bold">₹{selectedDayTotals.income.toLocaleString('en-IN')}</span>
                 </p>
                 {selectedHoliday && (
-                  <p className="text-[11px] font-extrabold text-orange-800 mt-1 flex items-center gap-1.5 bg-orange-50 px-2 py-0.5 rounded-lg border border-orange-200 w-fit">
+                  <p className="text-[11px] font-extrabold text-orange-800 dark:text-orange-200 mt-1 flex items-center gap-1.5 bg-orange-50 dark:bg-orange-950/40 px-2 py-0.5 rounded-lg border border-orange-200 dark:border-orange-800 w-fit">
                     <span>🎉 {selectedHoliday.name}</span>
-                    <span className="text-[10px] text-orange-600 font-bold">({selectedHoliday.type})</span>
+                    <span className="text-[10px] text-orange-600 dark:text-orange-400 font-bold">({selectedHoliday.type})</span>
                   </p>
                 )}
               </div>
@@ -692,15 +692,14 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
               >
                 <Plus size={15} strokeWidth={2.5} />
                 <span>Add</span>
-              </button
-              >
+              </button>
             </div>
 
             {/* Transactions List */}
             <div className="space-y-1.5">
               {selectedDayExpenses.length === 0 ? (
-                <div className="text-center py-8 bg-slate-50/70 rounded-2xl border border-dashed border-slate-200">
-                  <p className="text-xs text-slate-500 font-semibold">No transactions on this date.</p>
+                <div className="text-center py-8 bg-slate-50/70 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">No transactions on this date.</p>
                   <button
                     type="button"
                     onClick={handleOpenAdd}
@@ -725,19 +724,19 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                   return (
                     <div
                       key={exp.id}
-                      className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl transition border border-slate-100/90"
+                      className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-xl transition border border-slate-100/90 dark:border-slate-700/60"
                     >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                        <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-800 text-xs font-black shrink-0">
+                        <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-950/60 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">
                           {idx + 1}
                         </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <p className="text-xs sm:text-sm font-bold text-slate-800 truncate leading-snug">
+                            <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate leading-snug">
                               {exp.description || exp.category}
                             </p>
                             {isInc && (
-                              <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded border border-emerald-200 shrink-0">
+                              <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
                                 Income
                               </span>
                             )}
@@ -754,7 +753,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                       <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
                         <span
                           className={`text-xs sm:text-sm font-black whitespace-nowrap ${
-                            isInc ? 'text-emerald-600' : 'text-slate-900'
+                            isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'
                           }`}
                         >
                           {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
@@ -764,7 +763,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(exp)}
-                            className="w-7 h-7 rounded-full bg-white hover:bg-slate-200 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 transition active:scale-90 cursor-pointer shadow-2xs"
+                            className="w-7 h-7 rounded-full bg-white dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200/80 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-200 transition active:scale-90 cursor-pointer shadow-2xs"
                             title="Edit transaction"
                             aria-label="Edit transaction"
                           >
@@ -773,7 +772,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                           <button
                             type="button"
                             onClick={() => handleDeleteExpense(exp.id)}
-                            className="w-7 h-7 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200/70 flex items-center justify-center text-rose-600 hover:text-rose-800 transition active:scale-90 cursor-pointer shadow-2xs"
+                            className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200/70 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
                             title="Delete transaction"
                             aria-label="Delete transaction"
                           >
@@ -791,23 +790,23 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
       )}
 {/* ════════ VIEW 2: AGENDA TIMELINE LIST ════════ */}
       {viewMode === 'agenda' && (
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h3 className="text-sm font-extrabold text-slate-900">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
               Transactions Timeline ({monthLabel})
             </h3>
-            <span className="text-xs font-semibold text-slate-400">
+            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
               {filteredExpenses.length} transactions
             </span>
           </div>
 
           {monthAgendaGroups.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-              <p className="text-xs text-slate-400 font-medium">No transactions recorded for this month.</p>
+            <div className="text-center py-10 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+              <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">No transactions recorded for this month.</p>
               <button
                 type="button"
                 onClick={handleOpenAdd}
-                className="mt-2 text-xs font-bold text-emerald-700 hover:text-emerald-800 underline cursor-pointer"
+                className="mt-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 underline cursor-pointer"
               >
                 + Add transaction
               </button>
@@ -826,23 +825,23 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                 return (
                   <div key={group.dateStr} className="space-y-1.5">
                     {/* Day Group Header */}
-                    <div className="flex items-center justify-between text-xs font-bold bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200/70">
-                      <span className="text-slate-800 flex items-center gap-1.5">
+                    <div className="flex items-center justify-between text-xs font-bold bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-700">
+                      <span className="text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
                         {label}
                         {isGroupToday && (
-                          <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-bold">
+                          <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.2 rounded-full font-bold">
                             Today
                           </span>
                         )}
                       </span>
-                      <span className="text-[11px] text-slate-600 font-bold">
-                        {group.spent > 0 && <span className="text-rose-600 mr-2">-₹{group.spent.toLocaleString('en-IN')}</span>}
-                        {group.income > 0 && <span className="text-emerald-600">+₹{group.income.toLocaleString('en-IN')}</span>}
+                      <span className="text-[11px] text-slate-600 dark:text-slate-300 font-bold">
+                        {group.spent > 0 && <span className="text-rose-600 dark:text-rose-400 mr-2">-₹{group.spent.toLocaleString('en-IN')}</span>}
+                        {group.income > 0 && <span className="text-emerald-600 dark:text-emerald-400">+₹{group.income.toLocaleString('en-IN')}</span>}
                       </span>
                     </div>
 
                     {/* Day Items */}
-                    <div className="divide-y divide-slate-100 border border-slate-100 rounded-xl overflow-hidden">
+                    <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden">
                       {group.items.map(exp => {
                         const isInc = isIncome(exp);
                         const icon = isInc
@@ -852,21 +851,21 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                         return (
                           <div
                             key={exp.id}
-                            className="p-3 bg-white flex items-center justify-between hover:bg-slate-50/70 transition"
+                            className="p-3 bg-white dark:bg-slate-900 flex items-center justify-between hover:bg-slate-50/70 dark:hover:bg-slate-800/60 transition"
                           >
-                            <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
                               <div
                                 className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 ${
-                                  isInc ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-700'
+                                  isInc ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                                 }`}
                               >
                                 {icon}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-xs font-bold text-slate-900 truncate">
+                                <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
                                   {exp.description || exp.category}
                                 </p>
-                                <p className="text-[10px] text-slate-400 truncate">
+                                <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
                                   {exp.category} {exp.platform ? `• ${exp.platform}` : ''}
                                 </p>
                               </div>
@@ -875,7 +874,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                             <div className="flex items-center gap-2 shrink-0">
                               <span
                                 className={`text-xs font-black ${
-                                  isInc ? 'text-emerald-600' : 'text-slate-900'
+                                  isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'
                                 }`}
                               >
                                 {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
@@ -883,14 +882,14 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                               <button
                                 type="button"
                                 onClick={() => handleOpenEdit(exp)}
-                                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition active:scale-95"
+                                className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
                               >
                                 <Pencil size={12} />
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteExpense(exp.id)}
-                                className="w-7 h-7 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 hover:text-rose-700 transition active:scale-95"
+                                className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
                               >
                                 <Trash2 size={12} />
                               </button>

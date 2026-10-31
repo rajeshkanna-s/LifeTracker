@@ -259,18 +259,18 @@ export const AccountsTracker: React.FC = () => {
             return (
               <div
                 key={acc.id}
-                className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
+                className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0 text-xl shadow-2xs">
+                    <div className="w-11 h-11 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-800/60 flex items-center justify-center shrink-0 text-xl shadow-2xs">
                       {acc.icon || ACCOUNT_TYPE_ICONS[acc.type] || '💳'}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-extrabold text-sm text-slate-900 leading-snug break-words">
+                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 leading-snug break-words">
                         {acc.name}
                       </h4>
-                      <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 mt-1">
+                      <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 mt-1">
                         {acc.type === 'checking' ? 'Salary / Checking' : acc.type}
                       </span>
                     </div>
@@ -281,7 +281,7 @@ export const AccountsTracker: React.FC = () => {
                       type="button"
                       onClick={() => handleOpenEdit(acc)}
                       aria-label="Edit account"
-                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition active:scale-95 cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition active:scale-95 cursor-pointer"
                     >
                       <Pencil size={13} />
                     </button>
@@ -289,16 +289,16 @@ export const AccountsTracker: React.FC = () => {
                       type="button"
                       onClick={() => handleDeleteAccount(acc.id)}
                       aria-label="Delete account"
-                      className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 hover:text-rose-700 transition active:scale-95 cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 flex items-center justify-center text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition active:scale-95 cursor-pointer"
                     >
                       <Trash2 size={13} />
                     </button>
                   </div>
                 </div>
 
-                <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-slate-400">Available Balance</span>
-                  <p className={`font-black text-base sm:text-lg tracking-tight ${isNegative ? 'text-rose-600' : 'text-slate-900'}`}>
+                <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">Available Balance</span>
+                  <p className={`font-black text-base sm:text-lg tracking-tight ${isNegative ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-100'}`}>
                     ₹{acc.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </p>
                 </div>
@@ -311,15 +311,15 @@ export const AccountsTracker: React.FC = () => {
       {/* ════════ Add / Edit Account Modal ════════ */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="font-extrabold text-base text-slate-900">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
                 {editingAccount ? 'Edit Account' : 'Add New Account'}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -327,22 +327,22 @@ export const AccountsTracker: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Account Name</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Account Name</label>
                 <input
                   type="text"
                   placeholder="e.g. HDFC Salary, SBI Savings, Cash"
                   value={formName}
                   onChange={e => setFormName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-sky-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Account Type</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Account Type</label>
                 <select
                   value={formType}
                   onChange={e => setFormType(e.target.value as AccountItem['type'])}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
                 >
                   <option value="cash">Cash in Hand</option>
                   <option value="checking">Checking / Salary Account</option>
@@ -354,24 +354,24 @@ export const AccountsTracker: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Current Balance (₹)</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Current Balance (₹)</label>
                 <input
                   type="number"
                   placeholder="0"
                   value={formBalance}
                   onChange={e => setFormBalance(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-sky-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Note (Optional)</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Note (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. Primary bank for UPI"
                   value={formNotes}
                   onChange={e => setFormNotes(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
@@ -381,7 +381,7 @@ export const AccountsTracker: React.FC = () => {
                 type="button"
                 onClick={() => setShowAddModal(false)}
                 style={{ minHeight: '44px', whiteSpace: 'nowrap' }}
-                className="flex-1 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -406,15 +406,15 @@ export const AccountsTracker: React.FC = () => {
       {/* ════════ Transfer Modal ════════ */}
       {showTransferModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
-                <ArrowRightLeft size={16} className="text-sky-600" /> Transfer Between Accounts
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <ArrowRightLeft size={16} className="text-sky-600 dark:text-sky-400" /> Transfer Between Accounts
               </h3>
               <button
                 type="button"
                 onClick={() => setShowTransferModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -422,11 +422,11 @@ export const AccountsTracker: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Transfer From</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Transfer From</label>
                 <select
                   value={transferFrom}
                   onChange={e => setTransferFrom(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
                 >
                   {accounts.map(a => (
                     <option key={a.id} value={a.id}>
@@ -437,11 +437,11 @@ export const AccountsTracker: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Transfer To</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Transfer To</label>
                 <select
                   value={transferTo}
                   onChange={e => setTransferTo(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
                 >
                   {accounts.map(a => (
                     <option key={a.id} value={a.id}>
@@ -452,13 +452,13 @@ export const AccountsTracker: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Transfer Amount (₹)</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Transfer Amount (₹)</label>
                 <input
                   type="number"
                   placeholder="0"
                   value={transferAmount}
                   onChange={e => setTransferAmount(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-sky-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
@@ -468,7 +468,7 @@ export const AccountsTracker: React.FC = () => {
                 type="button"
                 onClick={() => setShowTransferModal(false)}
                 style={{ minHeight: '44px', whiteSpace: 'nowrap' }}
-                className="flex-1 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
               >
                 Cancel
               </button>

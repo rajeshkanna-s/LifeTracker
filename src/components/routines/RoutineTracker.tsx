@@ -188,15 +188,15 @@ const RoutineTracker: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Top Controls */}
-      <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full lg:w-auto">
           {/* View Toggle */}
-          <div className="flex bg-slate-100 p-1 rounded-xl">
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
             <button
               onClick={() => setView('grid')}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition ${
-                view === 'grid' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                view === 'grid' ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               <LayoutGrid size={16} /> Grid
@@ -204,7 +204,7 @@ const RoutineTracker: React.FC = () => {
             <button
               onClick={() => setView('reports')}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition ${
-                view === 'reports' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                view === 'reports' ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               <PieChart size={16} /> Reports
@@ -212,7 +212,7 @@ const RoutineTracker: React.FC = () => {
             <button
               onClick={() => setView('manage')}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition ${
-                view === 'manage' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                view === 'manage' ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               <ListChecks size={16} /> Manage
@@ -220,17 +220,17 @@ const RoutineTracker: React.FC = () => {
           </div>
 
           {/* Month Selector */}
-          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1 rounded-xl">
-            <button onClick={prevMonth} className="p-1.5 text-slate-600 hover:bg-slate-200/50 rounded transition">
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1 rounded-xl">
+            <button onClick={prevMonth} className="p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700 rounded transition">
               <ChevronLeft size={16} />
             </button>
-            <span className="text-xs font-bold text-slate-700 min-w-[90px] text-center">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-200 min-w-[90px] text-center">
               {baseDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
             </span>
-            <button onClick={nextMonth} className="p-1.5 text-slate-600 hover:bg-slate-200/50 rounded transition">
+            <button onClick={nextMonth} className="p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700 rounded transition">
               <ChevronRight size={16} />
             </button>
-            <button onClick={goToday} className="px-2.5 py-1 text-xs font-semibold text-emerald-600 bg-emerald-50 rounded hover:bg-emerald-100 transition">
+            <button onClick={goToday} className="px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 rounded hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition">
               Today
             </button>
           </div>
@@ -245,7 +245,7 @@ const RoutineTracker: React.FC = () => {
               placeholder="Search actions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="!pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 w-full sm:w-48"
+              className="!pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 w-full sm:w-48"
             />
           </div>
           
@@ -254,7 +254,7 @@ const RoutineTracker: React.FC = () => {
             <select
               value={filterFrequency}
               onChange={(e) => setFilterFrequency(e.target.value as any)}
-              className="!pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 appearance-none w-full sm:w-auto"
+              className="!pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 appearance-none w-full sm:w-auto"
             >
               <option value="all">All Frequencies</option>
               <option value="daily">Daily Only</option>

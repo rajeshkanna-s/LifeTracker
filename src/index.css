@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ── Design Tokens ── */
 :root {
@@ -1555,8 +1556,20 @@ main {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   Dark Mode System (Night-Time Comfort & Contrast)
+   Dark Mode System (Consistent, High-Contrast Theming)
    ═══════════════════════════════════════════════════════════════ */
+html.dark {
+  --bg-body: #0b0f19;
+  --bg-card: #151d2e;
+  --bg-card-hover: #1e293b;
+  --bg-surface: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  color-scheme: dark;
+}
+
 html.dark,
 body.dark-mode {
   background-color: #0b0f19 !important;
@@ -1582,41 +1595,15 @@ body.dark-mode {
   color: #f8fafc !important;
 }
 
-.dark .bg-white {
-  background-color: #1e293b !important;
+.dark .card-dark {
+  background-color: #151d2e !important;
   color: #f8fafc !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-.dark .bg-slate-50 {
-  background-color: #0f172a !important;
-}
-
-.dark .bg-slate-100 {
-  background-color: #1e293b !important;
-}
-
-.dark .text-slate-900,
-.dark .text-slate-800,
-.dark .text-slate-700 {
-  color: #f1f5f9 !important;
-}
-
-.dark .text-slate-600,
-.dark .text-slate-500 {
-  color: #94a3b8 !important;
-}
-
-.dark .border-slate-200,
-.dark .border-slate-200\/90,
-.dark .border-slate-200\/80,
-.dark .border-slate-200\/60,
-.dark .border-slate-100 {
-  border-color: #334155 !important;
-}
-
-.dark .card-dark,
 .dark .modal-box {
-  background-color: #1e293b !important;
+  background-color: #151d2e !important;
   color: #f8fafc !important;
   border-color: #334155 !important;
 }
@@ -1635,4 +1622,255 @@ body.dark-mode {
 .dark .app-drawer {
   background-color: #0f172a !important;
   color: #f8fafc !important;
+  border-right-color: #1e293b !important;
+}
+
+.dark .app-navbar {
+  background: #0f172a !important;
+  border-bottom-color: #1e293b !important;
+}
+
+html.dark .module-subtabs,
+.dark .module-subtabs {
+  background: rgba(15, 23, 42, 0.94) !important;
+  border-color: rgba(51, 65, 85, 0.8) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .module-subtab,
+.dark .module-subtab {
+  color: #94a3b8 !important;
+}
+
+html.dark .module-subtab:hover,
+.dark .module-subtab:hover {
+  color: #f1f5f9 !important;
+  background: rgba(30, 41, 59, 0.8) !important;
+}
+
+html.dark .summary-card,
+.dark .summary-card {
+  background-color: #151d2e !important;
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+html.dark .summary-card:hover,
+.dark .summary-card:hover {
+  border-color: #334155 !important;
+}
+
+/* ── Dark Mode Enhancements for Trackers and Elements ── */
+html.dark .tx-item,
+.dark .tx-item {
+  border-bottom-color: #1e293b !important;
+}
+html.dark .tx-item:hover,
+.dark .tx-item:hover {
+  background: rgba(30, 41, 59, 0.4) !important;
+}
+html.dark .tx-icon,
+.dark .tx-icon {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+html.dark .tx-amount,
+.dark .tx-amount {
+  color: #f8fafc !important;
+}
+html.dark .tx-category,
+.dark .tx-category {
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-action,
+.dark .btn-action {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+html.dark .btn-action:hover,
+.dark .btn-action:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html.dark .btn-action.danger,
+.dark .btn-action.danger {
+  background-color: rgba(244, 63, 94, 0.15) !important;
+  border-color: rgba(244, 63, 94, 0.3) !important;
+  color: #fb7185 !important;
+}
+html.dark .btn-action.danger:hover,
+.dark .btn-action.danger:hover {
+  background-color: rgba(244, 63, 94, 0.25) !important;
+  color: #fda4af !important;
+}
+
+html.dark .form-label,
+.dark .form-label {
+  color: #cbd5e1 !important;
+}
+html.dark .form-control-custom,
+.dark .form-control-custom {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html.dark .form-control-custom:focus,
+.dark .form-control-custom:focus {
+  background-color: #0f172a !important;
+  border-color: #6366f1 !important;
+}
+
+html.dark .btn-cancel,
+.dark .btn-cancel {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+html.dark .btn-cancel:hover,
+.dark .btn-cancel:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .modal-header,
+.dark .modal-header {
+  border-bottom-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+html.dark .modal-header h3,
+.dark .modal-header h3 {
+  color: #f8fafc !important;
+}
+html.dark .modal-close,
+.dark .modal-close {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+html.dark .modal-close:hover,
+.dark .modal-close:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html.dark .modal-footer,
+.dark .modal-footer {
+  border-top-color: #1e293b !important;
+}
+
+html.dark .stat-card,
+.dark .stat-card {
+  background-color: #151d2e !important;
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+html.dark .stat-label,
+.dark .stat-label {
+  color: #94a3b8 !important;
+}
+html.dark .stat-value,
+.dark .stat-value {
+  color: #f8fafc !important;
+}
+
+/* ── Dark Mode for Notes App ── */
+html.dark .notes-app,
+.dark .notes-app {
+  background: #151d2e !important;
+  border-color: #1e293b !important;
+}
+html.dark .notes-search-bar,
+.dark .notes-search-bar {
+  background: #0f172a !important;
+  border-bottom-color: #1e293b !important;
+}
+html.dark .notes-search-input,
+.dark .notes-search-input {
+  color: #f8fafc !important;
+}
+html.dark .notes-search-clear,
+.dark .notes-search-clear {
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+}
+html.dark .notes-quick-add,
+.dark .notes-quick-add {
+  background: #151d2e !important;
+  border-bottom-color: #1e293b !important;
+}
+html.dark .notes-quick-form,
+.dark .notes-quick-form {
+  background: #0f172a !important;
+  border: 1px solid #1e293b;
+}
+html.dark .notes-quick-input,
+.dark .notes-quick-input {
+  color: #f8fafc !important;
+}
+html.dark .notes-row,
+.dark .notes-row {
+  border-bottom-color: #1e293b !important;
+}
+html.dark .notes-row:hover,
+.dark .notes-row:hover {
+  background: rgba(30, 41, 59, 0.4) !important;
+}
+html.dark .notes-row.active,
+.dark .notes-row.active {
+  background: rgba(124, 58, 237, 0.15) !important;
+}
+html.dark .notes-row-title,
+.dark .notes-row-title {
+  color: #f8fafc !important;
+}
+html.dark .notes-row-subtitle,
+.dark .notes-row-subtitle {
+  color: #94a3b8 !important;
+}
+html.dark .notes-tag,
+.dark .notes-tag {
+  background: #1e293b !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+}
+html.dark .notes-action-btn,
+.dark .notes-action-btn {
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+}
+html.dark .notes-action-btn:hover,
+.dark .notes-action-btn:hover {
+  background: #334155 !important;
+  color: #f8fafc !important;
+}
+html.dark .notes-preview,
+.dark .notes-preview {
+  background: #0f172a !important;
+  border-top-color: #1e293b !important;
+}
+html.dark .notes-preview-title,
+.dark .notes-preview-title {
+  color: #f8fafc !important;
+}
+html.dark .notes-preview-body,
+.dark .notes-preview-body {
+  color: #cbd5e1 !important;
+}
+
+/* ── Dark Mode for Security Modal ── */
+html.dark .security-modal-box,
+.dark .security-modal-box {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #1e293b !important;
+}
+html.dark .security-modal-box h3,
+.dark .security-modal-box h3 {
+  color: #f8fafc !important;
+}
+html.dark .security-modal-box input {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
 }

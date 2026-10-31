@@ -496,54 +496,27 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
         {/* Bought Confirm Modal Popover */}
         {buyingItem && (
           <div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(0,0,0,0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '16px',
-              zIndex: 1200
-            }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
+            style={{ zIndex: 1200 }}
             onClick={() => setBuyingItem(null)}
           >
             <div
-              style={{
-                background: '#fff',
-                borderRadius: '20px',
-                padding: '20px',
-                maxWidth: '360px',
-                width: '100%',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-              }}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 max-w-[360px] w-full shadow-2xl"
               onClick={e => e.stopPropagation()}
             >
-              <div style={{ textAlign: 'center', marginBottom: '14px' }}>
-                <div
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '14px',
-                    background: '#ecfdf5',
-                    color: '#059669',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 8px auto'
-                  }}
-                >
+              <div className="text-center mb-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2 border border-emerald-100 dark:border-emerald-800/60">
                   <PackageCheck size={24} />
                 </div>
-                <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1rem', color: '#0f172a' }}>
+                <h4 className="m-0 font-extrabold text-base text-slate-900 dark:text-slate-100 leading-snug">
                   Mark "{buyingItem.name}" as Bought
                 </h4>
-                <p style={{ margin: '4px 0 0 0', fontSize: '0.74rem', color: '#64748b' }}>
-                  Purchased by <span style={{ fontWeight: 700, color: '#059669' }}>{partnerName}</span>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  Purchased by <span className="font-bold text-emerald-600 dark:text-emerald-400">{partnerName}</span>
                 </p>
               </div>
 
-              <div style={{ marginBottom: '14px' }}>
+              <div className="mb-3.5">
                 <label className="label-unified">Actual Amount Paid (₹)</label>
                 <input
                   type="number"
@@ -555,18 +528,8 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                 />
               </div>
 
-              <div style={{ marginBottom: '18px' }}>
-                <label
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: 'pointer',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: '#334155'
-                  }}
-                >
+              <div className="mb-4">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
                   <input
                     type="checkbox"
                     checked={logAsExpense}
@@ -577,39 +540,18 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                 </label>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setBuyingItem(null)}
-                  style={{
-                    flex: 1,
-                    minHeight: '40px',
-                    borderRadius: '12px',
-                    background: '#f1f5f9',
-                    border: '1px solid #e2e8f0',
-                    color: '#475569',
-                    fontWeight: 700,
-                    fontSize: '0.82rem',
-                    cursor: 'pointer'
-                  }}
+                  className="flex-1 min-h-[40px] rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmBuy}
-                  style={{
-                    flex: 1,
-                    minHeight: '40px',
-                    borderRadius: '12px',
-                    background: '#059669',
-                    border: 'none',
-                    color: '#fff',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(5,150,105,0.3)'
-                  }}
+                  className="flex-1 min-h-[40px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs cursor-pointer shadow-md shadow-emerald-600/30 transition active:scale-95"
                 >
                   Confirm
                 </button>

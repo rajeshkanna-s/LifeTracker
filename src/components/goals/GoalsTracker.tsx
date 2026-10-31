@@ -322,10 +322,10 @@ export const GoalsTracker: React.FC = () => {
               type="button"
               onClick={() => handleOpenAdd(p)}
               style={{ borderRadius: '9999px' }}
-              className="bg-white border border-slate-200/90 hover:border-amber-400 rounded-full px-3.5 py-2 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-sm transition cursor-pointer group active:scale-95"
+              className="bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/80 hover:border-amber-400 dark:hover:border-amber-400 rounded-full px-3.5 py-2 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-sm transition cursor-pointer group active:scale-95"
             >
               <span className="text-base group-hover:scale-110 transition-transform shrink-0">{p.icon}</span>
-              <span className="text-[11px] font-extrabold text-slate-700 leading-tight whitespace-nowrap">
+              <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-200 leading-tight whitespace-nowrap">
                 {p.name}
               </span>
             </button>
@@ -334,12 +334,12 @@ export const GoalsTracker: React.FC = () => {
       </div>
 
       {/* ════════ Goals Segment Bar (Active, Paused, Reached) ════════ */}
-      <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-full" style={{ borderRadius: '9999px' }}>
+      <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-full" style={{ borderRadius: '9999px' }}>
         <button
           type="button"
           onClick={() => setGoalTab('active')}
           style={{ borderRadius: '9999px' }}
-          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'active' ? 'bg-white text-amber-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'active' ? 'bg-white dark:bg-slate-900 text-amber-900 dark:text-amber-400 shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
         >
           Active ({goals.filter(g => g.status === 'active' || (!g.status && g.savedAmount < g.targetAmount)).length})
@@ -348,7 +348,7 @@ export const GoalsTracker: React.FC = () => {
           type="button"
           onClick={() => setGoalTab('paused')}
           style={{ borderRadius: '9999px' }}
-          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'paused' ? 'bg-white text-amber-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'paused' ? 'bg-white dark:bg-slate-900 text-amber-900 dark:text-amber-400 shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
         >
           Paused ({goals.filter(g => g.status === 'paused').length})
@@ -357,7 +357,7 @@ export const GoalsTracker: React.FC = () => {
           type="button"
           onClick={() => setGoalTab('reached')}
           style={{ borderRadius: '9999px' }}
-          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'reached' ? 'bg-white text-emerald-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'reached' ? 'bg-white dark:bg-slate-900 text-emerald-900 dark:text-emerald-400 shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
         >
           Reached ({goals.filter(g => g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount)).length})
@@ -366,10 +366,10 @@ export const GoalsTracker: React.FC = () => {
 
       {/* ════════ Goals List ════════ */}
       {filteredGoals.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-6 space-y-2">
+        <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 p-6 space-y-2">
           <div className="text-3xl opacity-50">🎯</div>
-          <h4 className="text-sm font-bold text-slate-800">No {goalTab} goals</h4>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No {goalTab} goals</h4>
+          <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
             {goalTab === 'active'
               ? 'Save for your goals! Tap the New Goal button or one of the presets above to create your first goal.'
               : `Goals marked as ${goalTab} will appear here.`}
@@ -384,18 +384,18 @@ export const GoalsTracker: React.FC = () => {
             return (
               <div
                 key={g.id}
-                className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
+                className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-11 h-11 rounded-2xl bg-amber-50 text-2xl flex items-center justify-center shrink-0 border border-amber-100 shadow-2xs">
+                    <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-2xl flex items-center justify-center shrink-0 border border-amber-100 dark:border-amber-800/40 shadow-2xs">
                       {g.icon || '🎯'}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-extrabold text-sm text-slate-900 leading-snug break-words">
+                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 leading-snug break-words">
                         {g.name}
                       </h4>
-                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                         Target: {g.deadline ? `Target ${new Date(g.deadline).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : 'Ongoing'}
                       </p>
                     </div>
@@ -409,8 +409,8 @@ export const GoalsTracker: React.FC = () => {
                       style={{ borderRadius: '9999px' }}
                       className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer active:scale-95 shadow-2xs ${
                         g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount)
-                          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                          : 'bg-slate-100 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50'
+                          ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700'
                       }`}
                     >
                       <CheckCircle2 size={15} />
@@ -420,7 +420,7 @@ export const GoalsTracker: React.FC = () => {
                       onClick={() => togglePauseGoal(g)}
                       title={g.status === 'paused' ? 'Resume Goal' : 'Pause Goal'}
                       style={{ borderRadius: '9999px' }}
-                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition cursor-pointer active:scale-95 shadow-2xs"
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition cursor-pointer active:scale-95 shadow-2xs"
                     >
                       {g.status === 'paused' ? <PlayCircle size={15} /> : <PauseCircle size={15} />}
                     </button>
@@ -429,7 +429,7 @@ export const GoalsTracker: React.FC = () => {
                       onClick={() => handleOpenEdit(g)}
                       aria-label="Edit goal"
                       style={{ borderRadius: '9999px' }}
-                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition cursor-pointer active:scale-95 shadow-2xs"
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition cursor-pointer active:scale-95 shadow-2xs"
                     >
                       <Pencil size={13} />
                     </button>
@@ -438,7 +438,7 @@ export const GoalsTracker: React.FC = () => {
                       onClick={() => handleDeleteGoal(g.id)}
                       aria-label="Delete goal"
                       style={{ borderRadius: '9999px' }}
-                      className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 hover:text-rose-700 transition cursor-pointer active:scale-95 shadow-2xs"
+                      className="w-8 h-8 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 flex items-center justify-center text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition cursor-pointer active:scale-95 shadow-2xs"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -448,15 +448,15 @@ export const GoalsTracker: React.FC = () => {
                 {/* Progress bar */}
                 <div>
                   <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-                    <span className="text-amber-800 font-extrabold">
+                    <span className="text-amber-800 dark:text-amber-400 font-extrabold">
                       ₹{g.savedAmount.toLocaleString()} saved ({pct}%)
                     </span>
-                    <span className="text-slate-500 font-semibold">
+                    <span className="text-slate-500 dark:text-slate-400 font-semibold">
                       Goal: ₹{g.targetAmount.toLocaleString()}
                     </span>
                   </div>
 
-                  <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex" style={{ borderRadius: '9999px' }}>
+                  <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex" style={{ borderRadius: '9999px' }}>
                     <div
                       style={{ width: `${pct}%`, borderRadius: '9999px' }}
                       className={`h-full transition-all duration-300 rounded-full ${isCompleted
@@ -467,9 +467,9 @@ export const GoalsTracker: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between text-[11px] font-semibold mt-2.5 pt-1 gap-2 flex-wrap">
-                    <span className="text-slate-500 font-medium">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">
                       {isCompleted || g.status === 'reached' ? (
-                        <span className="text-emerald-600 font-bold flex items-center gap-1">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
                           <CheckCircle2 size={13} /> Target Reached!
                         </span>
                       ) : (
@@ -484,8 +484,8 @@ export const GoalsTracker: React.FC = () => {
                         style={{ borderRadius: '9999px' }}
                         className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-extrabold rounded-full transition cursor-pointer active:scale-95 border shadow-2xs ${
                           g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount)
-                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
-                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300'
+                            ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                            : 'bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                         }`}
                       >
                         <CheckCircle2 size={14} />
@@ -515,16 +515,16 @@ export const GoalsTracker: React.FC = () => {
 
       {/* ════════ Add / Edit Goal Modal ════════ */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="font-extrabold text-base text-slate-900">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
                 {editingGoal ? 'Edit Goal' : 'Create New Goal'}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -532,65 +532,65 @@ export const GoalsTracker: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Goal Name</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Goal Name</label>
                 <input
                   type="text"
                   placeholder="e.g. New Vehicle, Holiday trip, Education"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 dark:text-slate-100 outline-none focus:border-amber-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Target Amount (₹)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Target Amount (₹)</label>
                   <input
                     type="number"
                     placeholder="0"
                     value={targetAmount}
                     onChange={e => setTargetAmount(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-amber-500"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Saved Already (₹)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Saved Already (₹)</label>
                   <input
                     type="number"
                     placeholder="0"
                     value={savedAmount}
                     onChange={e => setSavedAmount(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Desired Date</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Desired Date</label>
                   <input
                     type="date"
                     value={deadline}
                     onChange={e => setDeadline(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Icon / Emoji</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Icon / Emoji</label>
                   <input
                     type="text"
                     value={icon}
                     onChange={e => setIcon(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-base text-center font-bold text-slate-800 outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-base text-center font-bold text-slate-800 dark:text-slate-100 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Status / Track</label>
-                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl">
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Status / Track</label>
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
                   {(['active', 'paused', 'reached'] as const).map(st => (
                     <button
                       key={st}
@@ -601,7 +601,7 @@ export const GoalsTracker: React.FC = () => {
                           ? st === 'reached'
                             ? 'bg-emerald-600 text-white shadow-xs'
                             : 'bg-amber-500 text-white shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                       }`}
                     >
                       {st}
@@ -611,13 +611,13 @@ export const GoalsTracker: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Note (Optional)</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Note (Optional)</label>
                 <input
                   type="text"
                   placeholder="Notes or monthly savings target"
                   value={note}
                   onChange={e => setNote(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none"
+                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-100 outline-none"
                 />
               </div>
             </div>
@@ -627,7 +627,7 @@ export const GoalsTracker: React.FC = () => {
                 type="button"
                 onClick={() => setShowModal(false)}
                 style={{ minHeight: '44px', whiteSpace: 'nowrap' }}
-                className="flex-1 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -651,16 +651,16 @@ export const GoalsTracker: React.FC = () => {
 
       {/* ════════ Add Funds Modal ════════ */}
       {showDepositModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-sm shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-sm shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span>{showDepositModal.icon}</span> Add Funds to {showDepositModal.name}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowDepositModal(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               >
                 <X size={16} />
               </button>
@@ -668,13 +668,13 @@ export const GoalsTracker: React.FC = () => {
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Deposit Amount (₹)</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Deposit Amount (₹)</label>
                 <input
                   type="number"
                   placeholder="0"
                   value={depositAmount}
                   onChange={e => setDepositAmount(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-lg font-black text-slate-900 outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-lg font-black text-slate-900 dark:text-slate-100 outline-none focus:border-amber-500"
                 />
               </div>
 
@@ -687,7 +687,7 @@ export const GoalsTracker: React.FC = () => {
                       const cur = parseFloat(depositAmount) || 0;
                       setDepositAmount(String(cur + amt));
                     }}
-                    className="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 shrink-0 cursor-pointer"
+                    className="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 shrink-0 cursor-pointer"
                   >
                     +₹{amt.toLocaleString()}
                   </button>
@@ -700,7 +700,7 @@ export const GoalsTracker: React.FC = () => {
                 type="button"
                 onClick={() => setShowDepositModal(null)}
                 style={{ minHeight: '44px', whiteSpace: 'nowrap' }}
-                className="flex-1 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
               >
                 Cancel
               </button>

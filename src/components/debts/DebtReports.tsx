@@ -24,10 +24,10 @@ const DebtReports: React.FC<DebtReportsProps> = ({ debts, settings }) => {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Outstanding Balance Breakdown */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm min-w-0">
-          <h3 className="text-sm font-bold text-slate-800 mb-4">Balance Breakdown</h3>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm min-w-0">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Balance Breakdown</h3>
           {chartData.length === 0 ? (
-            <div className="h-[250px] flex items-center justify-center text-slate-500 text-sm">No active debts to display</div>
+            <div className="h-[250px] flex items-center justify-center text-slate-500 dark:text-slate-400 text-sm">No active debts to display</div>
           ) : (
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -50,7 +50,7 @@ const DebtReports: React.FC<DebtReportsProps> = ({ debts, settings }) => {
           )}
           <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 mt-4">
             {chartData.map((d, i) => (
-              <span key={d.name} className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
+              <span key={d.name} className="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }}></span>
                 {d.name} ({settings.currencySymbol}{(d.value/1000).toFixed(1)}k)
               </span>
@@ -59,20 +59,19 @@ const DebtReports: React.FC<DebtReportsProps> = ({ debts, settings }) => {
         </div>
 
         {/* Repayment Progress */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm min-w-0">
-          <h3 className="text-sm font-bold text-slate-800 mb-4">Repayment Progress</h3>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm min-w-0">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Repayment Progress</h3>
           {progressData.length === 0 ? (
-            <div className="h-[250px] flex items-center justify-center text-slate-500 text-sm">No data to display</div>
+            <div className="h-[250px] flex items-center justify-center text-slate-500 dark:text-slate-400 text-sm">No data to display</div>
           ) : (
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={progressData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" opacity={0.3} />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                   <Tooltip 
                     formatter={(v: any, name: any) => [`${settings.currencySymbol}${Number(v).toLocaleString()}`, name === 'paid' ? 'Paid' : 'Remaining']}
-                    cursor={{ fill: '#f8fafc' }}
                   />
                   <Bar dataKey="paid" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
                   <Bar dataKey="remaining" stackId="a" fill="#ef4444" radius={[0, 4, 4, 0]} />
@@ -80,7 +79,7 @@ const DebtReports: React.FC<DebtReportsProps> = ({ debts, settings }) => {
               </ResponsiveContainer>
             </div>
           )}
-          <div className="flex items-center justify-center gap-4 mt-4 text-xs font-medium text-slate-600">
+          <div className="flex items-center justify-center gap-4 mt-4 text-xs font-medium text-slate-600 dark:text-slate-300">
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Paid</span>
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> Remaining</span>
           </div>

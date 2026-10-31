@@ -265,19 +265,19 @@ export const BudgetsTracker: React.FC = () => {
           return (
             <div
               key={b.id}
-              className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="font-extrabold text-sm text-slate-900 leading-snug break-words">
+                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 leading-snug break-words">
                       {b.name}
                     </h4>
-                    <span className="text-[10px] font-extrabold capitalize text-pink-700 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-100">
+                    <span className="text-[10px] font-extrabold capitalize text-pink-700 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/50 px-2 py-0.5 rounded-full border border-pink-100 dark:border-pink-800/50">
                       {b.period}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 font-medium mt-1">
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-1">
                     {b.categories?.includes('All') ? 'All categories included' : b.categories?.join(', ')}
                   </p>
                 </div>
@@ -287,7 +287,7 @@ export const BudgetsTracker: React.FC = () => {
                     type="button"
                     onClick={() => handleOpenEdit(b)}
                     aria-label="Edit budget"
-                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition active:scale-95 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition active:scale-95 cursor-pointer"
                   >
                     <Pencil size={13} />
                   </button>
@@ -295,7 +295,7 @@ export const BudgetsTracker: React.FC = () => {
                     type="button"
                     onClick={() => handleDeleteBudget(b.id)}
                     aria-label="Delete budget"
-                    className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 hover:text-rose-700 transition active:scale-95 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 flex items-center justify-center text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition active:scale-95 cursor-pointer"
                   >
                     <Trash2 size={13} />
                   </button>
@@ -305,15 +305,15 @@ export const BudgetsTracker: React.FC = () => {
               {/* Progress bar */}
               <div>
                 <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-                  <span className={isOver ? 'text-rose-600' : isWarning ? 'text-amber-600' : 'text-slate-700'}>
+                  <span className={isOver ? 'text-rose-600 dark:text-rose-400' : isWarning ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}>
                     ₹{b.spent.toLocaleString()} spent ({b.pct}%)
                   </span>
-                  <span className="text-slate-500">
+                  <span className="text-slate-500 dark:text-slate-400">
                     Budget: ₹{b.amount.toLocaleString()}
                   </span>
                 </div>
 
-                <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
                   <div
                     style={{ width: `${Math.min(b.pct, 100)}%` }}
                     className={`h-full transition-all duration-300 rounded-full ${
@@ -327,9 +327,9 @@ export const BudgetsTracker: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] font-semibold mt-1">
-                  <span className="text-slate-400">
+                  <span className="text-slate-400 dark:text-slate-500">
                     {isOver ? (
-                      <span className="text-rose-600 font-bold flex items-center gap-1">
+                      <span className="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1">
                         <AlertCircle size={12} /> Exceeded by ₹{(b.spent - b.amount).toLocaleString()}
                       </span>
                     ) : (
@@ -346,15 +346,15 @@ export const BudgetsTracker: React.FC = () => {
       {/* ════════ Create / Edit Budget Modal ════════ */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="font-extrabold text-base text-slate-900">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
                 {editingBudget ? 'Edit Budget' : 'Define Your Budget'}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -362,23 +362,23 @@ export const BudgetsTracker: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Budget Name</label>
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Budget Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Monthly Grocery, Fuel, Entertainment"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-pink-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 dark:text-slate-100 outline-none focus:border-pink-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Period</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Period</label>
                   <select
                     value={period}
                     onChange={e => setPeriod(e.target.value as BudgetPlan['period'])}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
                   >
                     <option value="monthly">Monthly</option>
                     <option value="weekly">Weekly</option>
@@ -387,27 +387,27 @@ export const BudgetsTracker: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Budget Amount (₹)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Budget Amount (₹)</label>
                   <input
                     type="number"
                     placeholder="0"
                     value={amount}
                     onChange={e => setAmount(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-pink-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-pink-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1.5">Apply to Categories</label>
-                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1 bg-slate-50 rounded-xl border border-slate-200">
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Apply to Categories</label>
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => toggleCategory('All')}
                     className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border transition cursor-pointer ${
                       selectedCategories.includes('All')
                         ? 'bg-pink-600 text-white border-pink-700'
-                        : 'bg-white text-slate-600 border-slate-200'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     All Categories
@@ -420,7 +420,7 @@ export const BudgetsTracker: React.FC = () => {
                       className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border transition cursor-pointer ${
                         selectedCategories.includes(c)
                           ? 'bg-pink-600 text-white border-pink-700'
-                          : 'bg-white text-slate-600 border-slate-200'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                       }`}
                     >
                       {c}
@@ -435,7 +435,7 @@ export const BudgetsTracker: React.FC = () => {
                 type="button"
                 onClick={() => setShowModal(false)}
                 style={{ minHeight: '44px', whiteSpace: 'nowrap' }}
-                className="flex-1 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
               >
                 Cancel
               </button>

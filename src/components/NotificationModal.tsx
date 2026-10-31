@@ -133,39 +133,19 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
 
         {/* Push Notification Opt-in Banner */}
         {pushStatus !== 'granted' && pushStatus !== 'unsupported' && (
-          <div
-            style={{
-              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-              borderBottom: '1px solid #bbf7d0',
-              padding: '12px 18px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '12px'
-            }}
-          >
-            <div style={{ minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#166534' }}>
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800/60 p-3 sm:px-4.5 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="m-0 text-xs font-bold text-emerald-800 dark:text-emerald-300">
                 Enable Native Reminders
               </p>
-              <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#15803d' }}>
+              <p className="mt-0.5 text-[11px] text-emerald-600 dark:text-emerald-400">
                 Get notified before bills, EMIs & warranties expire
               </p>
             </div>
             <button
               type="button"
               onClick={handleEnablePush}
-              style={{
-                borderRadius: '12px',
-                background: '#15803d',
-                color: '#fff',
-                border: 'none',
-                padding: '6px 12px',
-                fontSize: '0.74rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap'
-              }}
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white border-0 py-1.5 px-3 text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 transition"
             >
               Turn On
             </button>
@@ -173,28 +153,16 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
         )}
 
         {/* Notifications List */}
-        <div style={{ padding: '16px', overflowY: 'auto', flex: 1 }} className="space-y-2.5">
+        <div className="p-3 sm:p-4 overflow-y-auto flex-1 space-y-2.5">
           {notifications.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '36px 16px', color: '#64748b' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '16px',
-                  background: '#f1f5f9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 12px auto',
-                  color: '#10b981'
-                }}
-              >
+            <div className="text-center py-9 px-4 text-slate-500 dark:text-slate-400">
+              <div className="w-13 h-13 rounded-2xl bg-slate-100 dark:bg-slate-800 text-emerald-500 flex items-center justify-center mx-auto mb-3">
                 <Check size={26} strokeWidth={2.5} />
               </div>
-              <p style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b', margin: 0 }}>
+              <p className="font-extrabold text-sm text-slate-900 dark:text-slate-100 m-0">
                 All Clear! No Pending Dues
               </p>
-              <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '4px 0 0 0' }}>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                 No warranties expiring within 30 days, EMIs are settled, and budget is on track.
               </p>
             </div>
@@ -208,63 +176,40 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
                     onClose();
                   }
                 }}
-                style={{
-                  padding: '12px 14px',
-                  borderRadius: '16px',
-                  border: n.urgency === 'high' ? '1.5px solid #fecaca' : '1px solid #e2e8f0',
-                  background: n.urgency === 'high' ? '#fff5f5' : '#ffffff',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                  cursor: n.linkTab ? 'pointer' : 'default',
-                  transition: 'all 0.15s ease',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
-                }}
+                className={`p-3 rounded-2xl flex items-start gap-3 transition shadow-2xs ${
+                  n.linkTab ? 'cursor-pointer hover:border-violet-300 dark:hover:border-violet-600' : 'cursor-default'
+                } ${
+                  n.urgency === 'high'
+                    ? 'border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30'
+                    : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                }`}
               >
                 <div
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '12px',
-                    background: n.urgency === 'high' ? '#fee2e2' : '#f8fafc',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    n.urgency === 'high' ? 'bg-rose-100 dark:bg-rose-950/60' : 'bg-slate-100 dark:bg-slate-800'
+                  }`}
                 >
                   {getIcon(n.type)}
                 </div>
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
-                    <h4 style={{ margin: 0, fontWeight: 800, fontSize: '0.84rem', color: '#0f172a' }}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <h4 className="m-0 font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100">
                       {n.title}
                     </h4>
                     {n.urgency === 'high' && (
-                      <span
-                        style={{
-                          fontSize: '0.65rem',
-                          fontWeight: 800,
-                          padding: '2px 6px',
-                          borderRadius: '8px',
-                          background: '#fee2e2',
-                          color: '#dc2626',
-                          letterSpacing: '0.02em',
-                          textTransform: 'uppercase'
-                        }}
-                      >
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 uppercase tracking-wide shrink-0">
                         Action Due
                       </span>
                     )}
                   </div>
-                  <p style={{ margin: '3px 0 0 0', fontSize: '0.74rem', color: '#475569', lineHeight: 1.35 }}>
+                  <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 leading-snug">
                     {n.message}
                   </p>
                 </div>
 
                 {n.linkTab && (
-                  <ChevronRight size={16} style={{ color: '#94a3b8', marginTop: '10px', flexShrink: 0 }} />
+                  <ChevronRight size={16} className="text-slate-400 mt-2 shrink-0" />
                 )}
               </div>
             ))
@@ -272,32 +217,14 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div
-          style={{
-            padding: '12px 18px',
-            background: '#f8fafc',
-            borderTop: '1px solid #e2e8f0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
+        <div className="p-3 sm:px-4.5 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <span className="text-xs text-slate-500 dark:text-slate-400">
             {notifications.length} active {notifications.length === 1 ? 'alert' : 'alerts'}
           </span>
           <button
             type="button"
             onClick={onClose}
-            style={{
-              padding: '6px 16px',
-              borderRadius: '10px',
-              background: '#0f172a',
-              color: '#fff',
-              fontSize: '0.76rem',
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer'
-            }}
+            className="py-1.5 px-4 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold border-0 cursor-pointer transition"
           >
             Done
           </button>

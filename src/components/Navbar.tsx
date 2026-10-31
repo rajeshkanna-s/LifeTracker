@@ -218,8 +218,8 @@ const Navbar: React.FC<NavbarProps> = ({
               width: '34px',
               height: '34px',
               borderRadius: '10px',
-              border: '1px solid #e5e7eb',
-              background: '#fff',
+              border: isDark ? '1px solid #334155' : '1px solid #e5e7eb',
+              background: isDark ? '#1e293b' : '#fff',
               color: isDark ? '#f59e0b' : '#6b7280',
               cursor: 'pointer',
               marginLeft: '4px',
@@ -240,9 +240,9 @@ const Navbar: React.FC<NavbarProps> = ({
               gap: '5px',
               padding: '6px 12px',
               borderRadius: '10px',
-              border: '1px solid #e5e7eb',
-              background: '#fff',
-              color: '#6b7280',
+              border: isDark ? '1px solid #334155' : '1px solid #e5e7eb',
+              background: isDark ? '#1e293b' : '#fff',
+              color: isDark ? '#f1f5f9' : '#6b7280',
               fontSize: '0.8rem',
               fontWeight: 700,
               cursor: 'pointer',
@@ -276,12 +276,12 @@ const Navbar: React.FC<NavbarProps> = ({
               width: '38px',
               height: '38px',
               borderRadius: '11px',
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              background: isDark ? '#1e293b' : '#f8fafc',
+              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#1e293b',
+              color: isDark ? '#f1f5f9' : '#1e293b',
               cursor: 'pointer',
               flexShrink: 0,
               transition: 'transform 0.15s ease'
@@ -293,7 +293,7 @@ const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <span style={{ fontWeight: 900, fontSize: '1.05rem', color: '#0f172a', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+            <span style={{ fontWeight: 900, fontSize: '1.05rem', color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
               Xpenser
             </span>
             <span style={{ fontSize: '0.68rem', color: activeTabMeta.color, fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -315,7 +315,7 @@ const Navbar: React.FC<NavbarProps> = ({
               padding: '5px 9px',
               borderRadius: '18px',
               border: `1.5px solid ${accentColor}`,
-              background: isP1 ? 'rgba(124, 58, 237, 0.08)' : 'rgba(14, 165, 233, 0.08)',
+              background: isP1 ? (isDark ? 'rgba(124, 58, 237, 0.2)' : 'rgba(124, 58, 237, 0.08)') : (isDark ? 'rgba(14, 165, 233, 0.2)' : 'rgba(14, 165, 233, 0.08)'),
               color: accentColor,
               fontSize: '0.76rem',
               fontWeight: 700,
@@ -341,9 +341,9 @@ const Navbar: React.FC<NavbarProps> = ({
               width: '32px',
               height: '32px',
               borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              background: '#f8fafc',
-              color: notifications.length > 0 ? '#ef4444' : '#64748b',
+              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+              background: isDark ? '#1e293b' : '#f8fafc',
+              color: notifications.length > 0 ? '#ef4444' : isDark ? '#94a3b8' : '#64748b',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -369,7 +369,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1.5px solid #fff'
+                  border: isDark ? '1.5px solid #1e293b' : '1.5px solid #fff'
                 }}
               >
                 {notifications.length}
@@ -386,8 +386,8 @@ const Navbar: React.FC<NavbarProps> = ({
               width: '32px',
               height: '32px',
               borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              background: '#f8fafc',
+              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+              background: isDark ? '#1e293b' : '#f8fafc',
               color: isDark ? '#f59e0b' : '#64748b',
               display: 'flex',
               alignItems: 'center',
@@ -410,9 +410,9 @@ const Navbar: React.FC<NavbarProps> = ({
               width: '32px',
               height: '32px',
               borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              background: '#f8fafc',
-              color: '#64748b',
+              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+              background: isDark ? '#1e293b' : '#f8fafc',
+              color: isDark ? '#94a3b8' : '#64748b',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -547,8 +547,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   padding: '11px 16px',
                   borderRadius: '9999px',
                   border: 'none',
-                  background: isActive ? '#e0f2fe' : 'transparent',
-                  color: isActive ? '#0284c7' : '#1e293b',
+                  background: isActive ? (isDark ? 'rgba(14, 165, 233, 0.2)' : '#e0f2fe') : 'transparent',
+                  color: isActive ? '#38bdf8' : (isDark ? '#f1f5f9' : '#1e293b'),
                   fontWeight: isActive ? 700 : 600,
                   fontSize: '0.92rem',
                   textAlign: 'left',

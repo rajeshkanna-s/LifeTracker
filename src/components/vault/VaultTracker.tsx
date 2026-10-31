@@ -317,13 +317,13 @@ const VaultTracker: React.FC = () => {
               <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredCredentials.length === 0 ? (
-            <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center space-y-4 shadow-sm">
-              <div className="w-16 h-16 bg-blue-50/50 text-blue-500/70 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-12 rounded-2xl text-center space-y-4 shadow-sm">
+              <div className="w-16 h-16 bg-blue-50/50 dark:bg-blue-950/40 text-blue-500/70 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto shadow-inner">
                 <KeyRound size={28} />
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-slate-800 text-sm">No accounts found</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">No accounts found</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                   {searchQuery ? "No matches for your current search filters." : "Your vault is empty. Click 'Add Account' in sub-tabs above to secure your first login details."}
                 </p>
               </div>
@@ -340,7 +340,7 @@ const VaultTracker: React.FC = () => {
                       {/* Card Title Header */}
                       <div className="flex justify-between items-start">
                         <div className="space-y-0.5">
-                          <h3 className="font-bold text-slate-800 text-sm truncate max-w-[180px]">
+                          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm truncate max-w-[180px]">
                             {cred.service_name}
                           </h3>
                           {cred.url && (
@@ -348,7 +348,7 @@ const VaultTracker: React.FC = () => {
                               href={cred.url.startsWith('http') ? cred.url : `https://${cred.url}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-500 hover:underline"
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-500 dark:text-blue-400 hover:underline"
                             >
                               Visit link <ExternalLink size={10} />
                             </a>
@@ -357,14 +357,14 @@ const VaultTracker: React.FC = () => {
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleEdit(cred)}
-                            className="p-1.5 text-slate-400 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 border border-slate-100 rounded-lg transition"
+                            className="p-1.5 text-slate-400 hover:text-blue-600 bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 rounded-lg transition"
                             title="Edit Account"
                           >
                             <Pencil size={13} />
                           </button>
                           <button
                             onClick={() => handleDelete(cred.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 border border-slate-100 rounded-lg transition"
+                            className="p-1.5 text-slate-400 hover:text-red-600 bg-slate-50 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-rose-950/40 border border-slate-100 dark:border-slate-700 rounded-lg transition"
                             title="Delete Account"
                           >
                             <Trash2 size={13} />
@@ -372,19 +372,19 @@ const VaultTracker: React.FC = () => {
                         </div>
                       </div>
 
-                      <hr className="border-slate-100" />
+                      <hr className="border-slate-100 dark:border-slate-800" />
 
                       {/* Vault Item Details */}
                       <div className="space-y-3">
                         {/* Username */}
                         {cred.username && (
                           <div className="space-y-1">
-                            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Username / ID</span>
-                            <div className="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100 gap-2">
-                              <span className="text-xs text-slate-700 font-semibold truncate select-all">{cred.username}</span>
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Username / ID</span>
+                            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 p-2 rounded-xl border border-slate-100 dark:border-slate-700 gap-2">
+                              <span className="text-xs text-slate-700 dark:text-slate-200 font-semibold truncate select-all">{cred.username}</span>
                               <button
                                 onClick={() => copyToClipboard(cred.username || '', cred.id, 'username')}
-                                className="p-1 text-slate-400 hover:text-slate-600 transition"
+                                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
                                 title="Copy Username"
                               >
                                 {copiedState?.id === cred.id && copiedState?.type === 'username' ? (
@@ -401,27 +401,27 @@ const VaultTracker: React.FC = () => {
                         {cred.password && (
                           <div className="space-y-1">
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Password</span>
+                              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Password</span>
                               <div className="flex items-center gap-1.5">
                                 <span className={`w-2 h-2 rounded-full ${strength.color}`} title={`Strength: ${strength.label}`} />
-                                <span className="text-[9px] font-bold text-slate-400 uppercase">{strength.label}</span>
+                                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">{strength.label}</span>
                               </div>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100 gap-2">
-                              <span className="text-xs text-slate-700 font-bold truncate font-mono select-all tracking-wider">
+                            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 p-2 rounded-xl border border-slate-100 dark:border-slate-700 gap-2">
+                              <span className="text-xs text-slate-700 dark:text-slate-200 font-bold truncate font-mono select-all tracking-wider">
                                 {isPasswordVisible ? cred.password : '••••••••••••••••'}
                               </span>
                               <div className="flex items-center gap-1">
                                 <button
                                   onClick={() => togglePasswordVisibility(cred.id)}
-                                  className="p-1 text-slate-400 hover:text-slate-600 transition"
+                                  className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
                                   title={isPasswordVisible ? 'Hide Password' : 'Show Password'}
                                 >
                                   {isPasswordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
                                 </button>
                                 <button
                                   onClick={() => copyToClipboard(cred.password || '', cred.id, 'password')}
-                                  className="p-1 text-slate-400 hover:text-slate-600 transition"
+                                  className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
                                   title="Copy Password"
                                 >
                                   {copiedState?.id === cred.id && copiedState?.type === 'password' ? (
@@ -439,9 +439,9 @@ const VaultTracker: React.FC = () => {
 
                     {/* Notes */}
                     {cred.notes && (
-                      <div className="pt-2 border-t border-dashed border-slate-100 space-y-1">
-                        <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400">Security Notes</span>
-                        <p className="text-xs text-slate-500 bg-slate-50/50 p-2 rounded-lg border border-slate-100/50 leading-relaxed max-h-20 overflow-y-auto font-sans">
+                      <div className="pt-2 border-t border-dashed border-slate-100 dark:border-slate-800 space-y-1">
+                        <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Security Notes</span>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100/50 dark:border-slate-700/50 leading-relaxed max-h-20 overflow-y-auto font-sans">
                           {cred.notes}
                         </p>
                       </div>

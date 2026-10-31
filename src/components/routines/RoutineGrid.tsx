@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Check, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { Check, Calendar } from 'lucide-react';
 import type { Routine, RoutineEntry } from '../../types';
 
 interface RoutineGridProps {
@@ -39,8 +39,8 @@ const RoutineGrid: React.FC<RoutineGridProps> = ({
 
   const renderRow = (routine: Routine, bgClass: string, textClass: string) => {
     return (
-      <tr key={routine.id} className="hover:bg-slate-50/50 transition">
-        <td className={`p-2 border border-slate-200 sticky left-0 z-10 font-bold text-xs truncate max-w-[200px] ${bgClass} ${textClass}`}>
+      <tr key={routine.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition">
+        <td className={`p-2 border border-slate-200 dark:border-slate-800 sticky left-0 z-10 font-bold text-xs truncate max-w-[200px] ${bgClass} ${textClass}`}>
           {routine.name}
         </td>
         {days.map(d => {
@@ -49,15 +49,15 @@ const RoutineGrid: React.FC<RoutineGridProps> = ({
           const isChecked = entry ? entry.completed : false;
 
           return (
-            <td key={d.dateStr} className={`p-1 border border-slate-200 text-center align-middle transition-colors ${
-              isChecked ? 'bg-emerald-50' : isToday ? 'bg-slate-50' : ''
+            <td key={d.dateStr} className={`p-1 border border-slate-200 dark:border-slate-800 text-center align-middle transition-colors ${
+              isChecked ? 'bg-emerald-50 dark:bg-emerald-950/40' : isToday ? 'bg-slate-50 dark:bg-slate-800/40' : ''
             }`}>
               <button
                 onClick={() => onToggle(routine.id, d.dateStr, isChecked)}
                 className={`w-full h-8 flex items-center justify-center rounded-lg transition-all ${
                   isChecked 
-                    ? 'bg-emerald-100/80 text-emerald-700 font-bold shadow-sm'
-                    : 'text-transparent hover:bg-slate-100 hover:text-slate-300'
+                    ? 'bg-emerald-100/80 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold shadow-sm'
+                    : 'text-transparent hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-300 dark:hover:text-slate-600'
                 }`}
               >
                 {isChecked ? <Check size={16} strokeWidth={3} /> : '✓'}
@@ -70,39 +70,39 @@ const RoutineGrid: React.FC<RoutineGridProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-      <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-slate-800">
-          <Calendar size={18} className="text-emerald-600" />
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+      <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100">
+          <Calendar size={18} className="text-emerald-600 dark:text-emerald-400" />
           <h3 className="text-sm font-bold">Routine Checklist</h3>
         </div>
-        <div className="text-xs font-semibold text-slate-500">
+        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
           {baseDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
         </div>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs whitespace-nowrap border-collapse">
-          <thead className="bg-slate-100">
+          <thead className="bg-slate-100 dark:bg-slate-800">
             <tr>
-              <th className="p-2 font-bold text-slate-700 border border-slate-200 sticky left-0 bg-slate-100 z-20 w-52 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+              <th className="p-2 font-bold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 sticky left-0 bg-slate-100 dark:bg-slate-800 z-20 w-52 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                 ACTION
               </th>
               {days.map(d => {
                 const isToday = d.dateStr === todayStr;
                 return (
-                  <th key={d.dateStr} className={`p-2 font-bold text-center border border-slate-200 min-w-[70px] ${isToday ? 'bg-blue-100 text-blue-800' : 'text-slate-700'}`}>
+                  <th key={d.dateStr} className={`p-2 font-bold text-center border border-slate-200 dark:border-slate-700 min-w-[70px] ${isToday ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300' : 'text-slate-700 dark:text-slate-300'}`}>
                     {d.shortLabel}
                   </th>
                 );
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
-            {dailyRoutines.length > 0 && dailyRoutines.map(r => renderRow(r, 'bg-emerald-100', 'text-emerald-950'))}
-            {weeklyRoutines.length > 0 && weeklyRoutines.map(r => renderRow(r, 'bg-amber-100', 'text-amber-950'))}
-            {monthlyRoutines.length > 0 && monthlyRoutines.map(r => renderRow(r, 'bg-sky-100', 'text-blue-950'))}
-            {yearlyRoutines.length > 0 && yearlyRoutines.map(r => renderRow(r, 'bg-purple-100', 'text-purple-950'))}
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            {dailyRoutines.length > 0 && dailyRoutines.map(r => renderRow(r, 'bg-emerald-100 dark:bg-emerald-950/80', 'text-emerald-950 dark:text-emerald-200'))}
+            {weeklyRoutines.length > 0 && weeklyRoutines.map(r => renderRow(r, 'bg-amber-100 dark:bg-amber-950/80', 'text-amber-950 dark:text-amber-200'))}
+            {monthlyRoutines.length > 0 && monthlyRoutines.map(r => renderRow(r, 'bg-sky-100 dark:bg-sky-950/80', 'text-blue-950 dark:text-sky-200'))}
+            {yearlyRoutines.length > 0 && yearlyRoutines.map(r => renderRow(r, 'bg-purple-100 dark:bg-purple-950/80', 'text-purple-950 dark:text-purple-200'))}
           </tbody>
         </table>
       </div>

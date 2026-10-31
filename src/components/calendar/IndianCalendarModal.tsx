@@ -306,14 +306,14 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                       isSelected
                         ? 'bg-emerald-600 text-white font-black shadow-sm ring-2 ring-emerald-400'
                         : isToday
-                        ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 font-extrabold border-2 border-emerald-500 shadow-2xs'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-extrabold border-2 border-emerald-500 shadow-2xs'
                         : cell.isCurrentMonth
                         ? hasHoliday
                           ? isNational
-                            ? 'bg-orange-50 dark:bg-orange-950/30 text-orange-950 dark:text-orange-200 font-extrabold border border-orange-200 dark:border-orange-800/60'
-                            : 'bg-emerald-50/70 dark:bg-emerald-950/20 text-emerald-950 dark:text-emerald-200 font-bold border border-emerald-200/80 dark:border-emerald-800/40'
-                          : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold shadow-2xs'
-                        : 'bg-transparent text-slate-300 dark:text-slate-700 font-normal'
+                            ? 'bg-orange-100/80 dark:bg-orange-950/50 text-orange-950 dark:text-orange-200 font-extrabold border border-orange-300 dark:border-orange-800'
+                            : 'bg-emerald-100/70 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 font-bold border border-emerald-300 dark:border-emerald-800'
+                          : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold border border-slate-200 dark:border-slate-700/80 shadow-2xs'
+                        : 'bg-transparent text-slate-400 dark:text-slate-600 font-normal border-transparent'
                     }`}
                   >
                     <span className="text-xs leading-none">{cell.dayNum}</span>
@@ -401,8 +401,8 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                       onClick={() => setSelectedDateStr(h.date)}
                       className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-between gap-2.5 ${
                         selectedDateStr === h.date
-                          ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 shadow-2xs'
-                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 shadow-2xs'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -445,8 +445,8 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
         </div>
 
         {/* ════════ Footer ════════ */}
-        <div className="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
-          <span className="text-[11px] text-slate-400 font-medium">
+        <div className="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
             Tap any date to check holidays
           </span>
 
