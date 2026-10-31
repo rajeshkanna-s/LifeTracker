@@ -3,6 +3,7 @@ import { Home, Plus, PieChart as ChartIcon, Settings as SettingsIcon } from 'luc
 import { supabase } from '../../lib/supabase';
 import type { Expense, ExpenseSettings } from '../../types';
 import { getDefaultExpenseSettings, SEETHA_QUICK_ADD } from '../../data/constants';
+import { normalizeTransaction } from '../../utils/expenseUtils';
 import { usePartner } from '../../context/PartnerContext';
 
 import ExpenseHome from './ExpenseHome';
@@ -35,7 +36,7 @@ const ExpenseTracker: React.FC = () => {
       .eq('partner_id', activePartnerId)
       .order('date', { ascending: false });
 
-    if (expData) setExpenses(expData);
+    if (expData) setExpenses(expData.map(normalizeTransaction));
     else setExpenses([]);
 
     // Strict partner isolation for settings
@@ -43,6 +44,7 @@ const ExpenseTracker: React.FC = () => {
       .from('expense_settings')
       .select('*')
       .eq('partner_id', activePartnerId)
+      .order('updated_at', { ascending: false })
       .limit(1)
       .single();
 
@@ -85,8 +87,22 @@ const ExpenseTracker: React.FC = () => {
   };
 
   const handleAddExpense = async (expense: Partial<Expense>) => {
+    const isInc = expense.type === 'income';
+    let tags = expense.tags || '';
+    if (isInc) {
+      if (!tags.includes('Income')) {
+        tags = tags ? `${tags}, Income` : 'Income';
+      }
+    } else {
+      tags = tags.split(',').map(t => t.trim()).filter(t => t.toLowerCase() !== 'income' && t.toLowerCase() !== 'type:income').join(', ');
+    }
+
+    // Strip type before saving to Supabase because public.expenses has no 'type' column
+    const { type: _type, ...dbFields } = expense;
+
     const payload = {
-      ...expense,
+      ...dbFields,
+      tags,
       partner_id: activePartnerId
     };
 
@@ -119,6 +135,21 @@ const ExpenseTracker: React.FC = () => {
     setShowAddModal(true);
   };
 
+  const handleNavigate = (tab: 'home' | 'add' | 'reports' | 'settings') => {
+    if (tab === 'add') {
+      openForm();
+    } else {
+      setActiveTab(tab);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'add') {
+      openForm();
+      setActiveTab('home');
+    }
+  }, [activeTab]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -131,18 +162,18 @@ const ExpenseTracker: React.FC = () => {
     <div className="space-y-4">
       {/* Module Sub-tabs */}
       <div className="module-subtabs">
-        <button onClick={() => setActiveTab('home')} className={`module-subtab ${activeTab === 'home' ? 'active-expense' : ''}`}>
-          <Home size={16} /> <span className="label-text">Home</span>
+        <button onClick={() => setActiveTab('home')} title="Home" aria-label="Home" className={`module-subtab ${activeTab === 'home' ? 'active-expense' : ''}`}>
+          <Home size={20} /> <span className="label-text">Home</span>
         </button>
-        <button onClick={() => openForm()} className={`module-subtab ${activeTab === 'add' ? 'active-expense' : ''}`}
+        <button onClick={() => openForm()} title="Add Expense" aria-label="Add Expense" className={`module-subtab ${activeTab === 'add' ? 'active-expense' : ''}`}
           style={activeTab !== 'add' ? { color: '#a78bfa' } : {}}>
-          <Plus size={16} /> <span className="label-text">Add</span>
+          <Plus size={20} /> <span className="label-text">Add</span>
         </button>
-        <button onClick={() => setActiveTab('reports')} className={`module-subtab ${activeTab === 'reports' ? 'active-expense' : ''}`}>
-          <ChartIcon size={16} /> <span className="label-text">Reports</span>
+        <button onClick={() => setActiveTab('reports')} title="Reports" aria-label="Reports" className={`module-subtab ${activeTab === 'reports' ? 'active-expense' : ''}`}>
+          <ChartIcon size={20} /> <span className="label-text">Reports</span>
         </button>
-        <button onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-expense' : ''}`}>
-          <SettingsIcon size={16} /> <span className="label-text">Settings</span>
+        <button onClick={() => setActiveTab('settings')} title="Settings" aria-label="Settings" className={`module-subtab ${activeTab === 'settings' ? 'active-expense' : ''}`}>
+          <SettingsIcon size={20} /> <span className="label-text">Settings</span>
         </button>
       </div>
 
@@ -154,7 +185,8 @@ const ExpenseTracker: React.FC = () => {
             settings={settings}
             onAddExpense={handleAddExpense}
             onSettingsChange={handleSettingsChange}
-            onNavigate={setActiveTab}
+            onNavigate={handleNavigate}
+            onOpenAdd={() => openForm()}
             onEdit={openForm}
             onDelete={handleDeleteExpense}
           />

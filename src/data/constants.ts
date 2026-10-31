@@ -10,6 +10,42 @@ export const DEFAULT_CATEGORIES = [
   'Savings / Investments', 'Social / Events', 'Miscellaneous',
 ];
 
+
+// ── Income Categories & Platforms ──
+export const DEFAULT_INCOME_CATEGORIES = [
+  'Salary',
+  'Freelance / Consulting',
+  'Business / Profit',
+  'Investments / Dividends',
+  'Rental Income',
+  'Interest',
+  'Gifts / Bonus',
+  'Refunds / Cashback',
+  'Other Income',
+];
+
+export const INCOME_PLATFORMS = [
+  'Bank Transfer',
+  'UPI',
+  'Cash',
+  'Client / Employer',
+  'Cheque',
+  'Online / Gateway',
+  'Other',
+];
+
+export const INCOME_CATEGORY_ICONS: Record<string, string> = {
+  'Salary': '💼',
+  'Freelance / Consulting': '💻',
+  'Business / Profit': '📈',
+  'Investments / Dividends': '📊',
+  'Rental Income': '🏠',
+  'Interest': '🪙',
+  'Gifts / Bonus': '🎁',
+  'Refunds / Cashback': '💰',
+  'Other Income': '💵',
+};
+
 // ── Platforms by Category ──
 export const PLATFORMS_BY_CATEGORY: Record<string, string[]> = {
   'Food': ['Swiggy', 'Zomato', 'Local Restaurant', 'Canteen', 'Street Food', 'Home Cooked', 'Other'],

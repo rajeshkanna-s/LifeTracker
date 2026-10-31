@@ -33,13 +33,13 @@ export const AppInstallBanner: React.FC<AppInstallBannerProps> = ({ onInstall, i
         <div className="flex items-center gap-2.5 min-w-0">
           <img 
             src="/favicon.svg" 
-            alt="MyLife Tracker" 
+            alt="Xpenser" 
             className="w-9 h-9 rounded-xl shadow-md shadow-violet-500/30 ring-2 ring-violet-500/40 shrink-0 object-cover" 
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <h2 className="font-extrabold text-xs sm:text-sm text-white truncate">
-                Install MyLife App
+                Install Xpenser App
               </h2>
               <span className="hidden xs:inline-flex items-center gap-0.5 text-[9px] font-bold text-violet-300 bg-violet-950 px-1.5 py-0.2 rounded-full border border-violet-800 shrink-0">
                 <Sparkles size={9} className="text-amber-400" /> Fast
@@ -76,3 +76,4 @@ export const AppInstallBanner: React.FC<AppInstallBannerProps> = ({ onInstall, i
 };
 
 export default AppInstallBanner;
+

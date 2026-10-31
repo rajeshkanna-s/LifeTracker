@@ -26,7 +26,7 @@ const DEFAULT_PARTNERS: PartnerProfile[] = [
   },
   {
     id: 'partner_2',
-    name: 'Seetha',
+    name: 'Mia',
     passcode: '689090',
     avatar: '👥',
     theme_color: '#0ea5e9'

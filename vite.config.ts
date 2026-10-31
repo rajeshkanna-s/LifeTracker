@@ -12,8 +12,8 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon-180x180.png', 'pwa-192x192.png', 'pwa-512x512.png', 'maskable-icon-512x512.png'],
       manifest: {
         id: '/',
-        name: 'MyLife Tracker',
-        short_name: 'MyLife',
+        name: 'Xpenser',
+        short_name: 'Xpenser',
         description: 'Track expenses, debts, jobs, habits & fitness all in one place',
         start_url: '/',
         scope: '/',

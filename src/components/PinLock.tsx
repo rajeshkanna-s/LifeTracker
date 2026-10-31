@@ -93,7 +93,7 @@ const PinLock: React.FC<PinLockProps> = ({ onUnlock }) => {
           {success ? <CheckCircle2 size={34} color="#fff" /> : <Lock size={34} color="#fff" />}
         </div>
 
-        <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1e1b4b', marginBottom: '0.25rem' }}>MyLife Tracker</h1>
+        <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1e1b4b', marginBottom: '0.25rem' }}>Xpenser</h1>
         <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '2rem' }}>Enter your 6-digit PIN</p>
 
         {/* PIN Inputs */}

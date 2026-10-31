@@ -24,11 +24,11 @@ export const InstallModal: React.FC<InstallModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[100005] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-white rounded-t-[32px] sm:rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 overflow-hidden relative animate-slideUp sm:animate-scaleUp max-h-[92vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
@@ -48,9 +48,9 @@ export const InstallModal: React.FC<InstallModalProps> = ({
         {/* App Identity Banner */}
         <div className="flex flex-col items-center text-center mb-5">
           <div className="relative mb-3">
-            <img 
-              src="/favicon.svg" 
-              alt="MyLife Tracker" 
+            <img
+              src="/favicon.svg"
+              alt="Xpenser"
               className="w-16 h-16 rounded-2xl shadow-xl shadow-violet-500/20 ring-4 ring-violet-500/10 object-cover"
             />
             <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] ring-2 ring-white font-bold shadow-xs">
@@ -59,7 +59,7 @@ export const InstallModal: React.FC<InstallModalProps> = ({
           </div>
 
           <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-1.5">
-            Install MyLife Tracker
+            Install Xpenser
           </h2>
           <p className="text-xs text-slate-500 font-medium mt-1 max-w-xs">
             Add to your home screen for fast 1-tap launch, full-screen mobile view, and offline tracking.
@@ -100,9 +100,8 @@ export const InstallModal: React.FC<InstallModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('ios')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all ${
-              activeTab === 'ios' ? 'bg-white text-violet-700 shadow-sm' : 'hover:text-slate-900'
-            }`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all ${activeTab === 'ios' ? 'bg-white text-violet-700 shadow-sm' : 'hover:text-slate-900'
+              }`}
           >
             <Smartphone size={13} />
             <span>iPhone / iPad</span>
@@ -110,9 +109,8 @@ export const InstallModal: React.FC<InstallModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('android')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all ${
-              activeTab === 'android' ? 'bg-white text-violet-700 shadow-sm' : 'hover:text-slate-900'
-            }`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all ${activeTab === 'android' ? 'bg-white text-violet-700 shadow-sm' : 'hover:text-slate-900'
+              }`}
           >
             <Smartphone size={13} />
             <span>Android</span>
@@ -120,9 +118,8 @@ export const InstallModal: React.FC<InstallModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('desktop')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all ${
-              activeTab === 'desktop' ? 'bg-white text-violet-700 shadow-sm' : 'hover:text-slate-900'
-            }`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all ${activeTab === 'desktop' ? 'bg-white text-violet-700 shadow-sm' : 'hover:text-slate-900'
+              }`}
           >
             <Monitor size={13} />
             <span>PC / Mac</span>
@@ -163,7 +160,7 @@ export const InstallModal: React.FC<InstallModalProps> = ({
               <div className="text-xs">
                 <p className="font-bold text-slate-900">Tap "Add" in Top-Right Corner</p>
                 <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                  Confirm by tapping <strong>Add</strong>. The official MyLife Tracker RS icon will now appear on your iPhone screen like a native app!
+                  Confirm by tapping <strong>Add</strong>. The official Xpenser RS icon will now appear on your iPhone screen like a native app!
                 </p>
               </div>
             </div>
@@ -233,7 +230,7 @@ export const InstallModal: React.FC<InstallModalProps> = ({
               <div className="text-xs">
                 <p className="font-bold text-slate-900">Click Install</p>
                 <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                  Click the install icon or click the browser menu <strong>(⋮) → "Install MyLife Tracker"</strong> to create a dedicated desktop app.
+                  Click the install icon or click the browser menu <strong>(⋮) → "Install Xpenser"</strong> to create a dedicated desktop app.
                 </p>
               </div>
             </div>

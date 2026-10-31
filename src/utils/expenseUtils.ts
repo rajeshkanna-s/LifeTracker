@@ -1,4 +1,5 @@
-import type { Expense } from '../types';
+import type { Expense, TransactionType } from '../types';
+import { DEFAULT_INCOME_CATEGORIES } from '../data/constants';
 import { format, parseISO, startOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 
 export const getTodayString = () => format(new Date(), 'yyyy-MM-dd');
@@ -7,32 +8,83 @@ export const getMonthStartString = () => format(startOfMonth(new Date()), 'yyyy-
 export const getWeekStartString = () => format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 export const getWeekEndString = () => format(endOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
-export const getTodayTotal = (expenses: Expense[]) => {
+export const isExpense = (e: Partial<Expense>): boolean => e.type !== 'income';
+export const isIncome = (e: Partial<Expense>): boolean => e.type === 'income';
+
+export function getTransactionType(row: any): TransactionType {
+  if (row.type === 'income' || row.type === 'expense') return row.type;
+  if (row.tags && (/(?:^|,|\s)income(?:$|,|\s)/i.test(row.tags) || /type:income/i.test(row.tags))) {
+    return 'income';
+  }
+  if (row.category && DEFAULT_INCOME_CATEGORIES.includes(row.category)) {
+    return 'income';
+  }
+  return 'expense';
+}
+
+export function normalizeTransaction(row: any): Expense {
+  return {
+    ...row,
+    type: getTransactionType(row)
+  };
+}
+
+export const getTodayExpenseTotal = (expenses: Expense[]) => {
   const today = getTodayString();
-  return expenses.filter(e => e.date === today).reduce((sum, e) => sum + e.amount, 0);
+  return expenses.filter(e => isExpense(e) && e.date === today).reduce((sum, e) => sum + Number(e.amount), 0);
 };
 
-export const getWeekTotal = (expenses: Expense[]) => {
+export const getTodayIncomeTotal = (expenses: Expense[]) => {
+  const today = getTodayString();
+  return expenses.filter(e => isIncome(e) && e.date === today).reduce((sum, e) => sum + Number(e.amount), 0);
+};
+
+export const getTodayTotal = (expenses: Expense[]) => getTodayExpenseTotal(expenses);
+
+export const getWeekExpenseTotal = (expenses: Expense[]) => {
   const start = getWeekStartString();
   const end = getWeekEndString();
-  return expenses.filter(e => e.date >= start && e.date <= end).reduce((sum, e) => sum + e.amount, 0);
+  return expenses.filter(e => isExpense(e) && e.date >= start && e.date <= end).reduce((sum, e) => sum + Number(e.amount), 0);
 };
 
-export const getMonthTotal = (expenses: Expense[]) => {
+export const getWeekIncomeTotal = (expenses: Expense[]) => {
+  const start = getWeekStartString();
+  const end = getWeekEndString();
+  return expenses.filter(e => isIncome(e) && e.date >= start && e.date <= end).reduce((sum, e) => sum + Number(e.amount), 0);
+};
+
+export const getWeekTotal = (expenses: Expense[]) => getWeekExpenseTotal(expenses);
+
+export const getMonthExpenseTotal = (expenses: Expense[]) => {
   const monthStart = getMonthStartString();
-  return expenses.filter(e => e.date >= monthStart).reduce((sum, e) => sum + e.amount, 0);
+  return expenses.filter(e => isExpense(e) && e.date >= monthStart).reduce((sum, e) => sum + Number(e.amount), 0);
 };
 
-export const getYearTotal = (expenses: Expense[]) => {
-  const yearStart = `${new Date().getFullYear()}-01-01`;
-  return expenses.filter(e => e.date >= yearStart).reduce((sum, e) => sum + e.amount, 0);
+export const getMonthIncomeTotal = (expenses: Expense[]) => {
+  const monthStart = getMonthStartString();
+  return expenses.filter(e => isIncome(e) && e.date >= monthStart).reduce((sum, e) => sum + Number(e.amount), 0);
 };
+
+export const getMonthTotal = (expenses: Expense[]) => getMonthExpenseTotal(expenses);
+
+export const getYearExpenseTotal = (expenses: Expense[]) => {
+  const yearStart = `${new Date().getFullYear()}-01-01`;
+  return expenses.filter(e => isExpense(e) && e.date >= yearStart).reduce((sum, e) => sum + Number(e.amount), 0);
+};
+
+export const getYearIncomeTotal = (expenses: Expense[]) => {
+  const yearStart = `${new Date().getFullYear()}-01-01`;
+  return expenses.filter(e => isIncome(e) && e.date >= yearStart).reduce((sum, e) => sum + Number(e.amount), 0);
+};
+
+export const getYearTotal = (expenses: Expense[]) => getYearExpenseTotal(expenses);
 
 export const getNoSpendDays = (expenses: Expense[], year: number, month: number) => {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const spentDays = new Set(
     expenses
       .filter(e => {
+        if (!isExpense(e)) return false;
         const d = parseISO(e.date);
         return d.getFullYear() === year && d.getMonth() === month;
       })

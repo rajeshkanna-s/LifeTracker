@@ -1,4 +1,6 @@
 // ── Expense Types ──
+export type TransactionType = 'expense' | 'income';
+
 export interface Expense {
   id: string;
   amount: number;
@@ -13,6 +15,7 @@ export interface Expense {
   notes: string;
   created_at: string;
   partner_id?: string;
+  type?: TransactionType;
 }
 
 export interface QuickAddTemplate {
@@ -22,6 +25,7 @@ export interface QuickAddTemplate {
   category: string;
   platform: string;
   icon: string;
+  type?: TransactionType;
 }
 
 export interface CategoryBudget {
@@ -35,6 +39,50 @@ export interface SavingsGoal {
   targetAmount: number;
   savedAmount: number;
   deadline: string;
+  category?: string;
+  color?: string;
+  icon?: string;
+  note?: string;
+  status?: 'active' | 'paused' | 'reached';
+}
+
+export interface AccountItem {
+  id: string;
+  name: string;
+  type: 'cash' | 'checking' | 'savings' | 'credit' | 'investment' | 'other';
+  balance: number;
+  currency?: string;
+  color?: string;
+  icon?: string;
+  accountNumber?: string;
+  notes?: string;
+  updated_at?: string;
+}
+
+export interface BudgetPlan {
+  id: string;
+  name: string;
+  amount: number;
+  period: 'monthly' | 'weekly' | 'yearly';
+  categories?: string[];
+  accounts?: string[];
+  currency?: string;
+  color?: string;
+  created_at?: string;
+}
+
+export interface WarrantyItem {
+  id: string;
+  productName: string;
+  purchaseDate: string;
+  durationMonths: number;
+  expiryDate: string;
+  brand?: string;
+  store?: string;
+  price?: number;
+  invoiceNumber?: string;
+  notes?: string;
+  status?: 'active' | 'expiring' | 'expired';
 }
 
 export interface DayNote {
@@ -197,7 +245,7 @@ export interface Credential {
 }
 
 // ── App Types ──
-export type TabId = 'expenses' | 'debt' | 'jobs' | 'habits' | 'fitness' | 'notes' | 'routines' | 'vault';
+export type TabId = 'expenses' | 'accounts' | 'budgets' | 'goals' | 'calendar' | 'calculator' | 'warranties' | 'debt' | 'jobs' | 'habits' | 'fitness' | 'notes' | 'routines' | 'vault';
 
 // ── Multi-Partner Types ──
 export type PartnerId = 'partner_1' | 'partner_2';

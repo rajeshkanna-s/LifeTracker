@@ -9,7 +9,7 @@ interface PartnerGatewayProps {
   isInstalled?: boolean;
 }
 
-export const PartnerGateway: React.FC<PartnerGatewayProps> = ({ 
+export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
   onUnlock,
   onInstallClick,
   isInstalled = false
@@ -22,10 +22,10 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
   const [checking, setChecking] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
 
-  // Guarantee Rajesh and Seetha exist even if Supabase is still loading
+  // Guarantee Rajesh and Mia exist even if Supabase is still loading
   const partnerList: PartnerProfile[] = partners.length >= 2 ? partners : [
     { id: 'partner_1', name: 'Rajesh', passcode: '689090', avatar: '👤', theme_color: '#7c3aed' },
-    { id: 'partner_2', name: 'Seetha', passcode: '689090', avatar: '👥', theme_color: '#0ea5e9' }
+    { id: 'partner_2', name: 'Mia', passcode: '689090', avatar: '👥', theme_color: '#0ea5e9' }
   ];
 
   const handleSelectPartner = (partner: PartnerProfile) => {
@@ -166,41 +166,43 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
         {/* App Branding Top - Clean & Properly Centered */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.03em', margin: '0 0 0.25rem 0', lineHeight: 1.2 }}>
-            MyLife Tracker
+            Xpenser
           </h1>
           <p style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', margin: 0 }}>
             Personal Life & Finance
           </p>
         </div>
 
-        {/* Install App Button on Gateway */}
+        {/* Small Install App Icon Button on Gateway */}
         {!isInstalled && onInstallClick && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
-            <button
-              type="button"
-              onClick={onInstallClick}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '20px',
-                border: '1.5px solid #c4b5fd',
-                background: 'rgba(245, 243, 255, 0.9)',
-                color: '#7c3aed',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.12)'
-              }}
-              onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.96)'; }}
-              onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-            >
-              <Download size={14} />
-              <span>Install App on this Device</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onInstallClick}
+            title="Install App"
+            aria-label="Install App"
+            style={{
+              position: 'absolute',
+              top: '18px',
+              right: '18px',
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              border: '1.5px solid #c4b5fd',
+              background: 'rgba(245, 243, 255, 0.95)',
+              color: '#7c3aed',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.15)',
+              zIndex: 10
+            }}
+            onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.92)'; }}
+            onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+          >
+            <Download size={18} />
+          </button>
         )}
 
         {/* ════════ VIEW 1: CHOOSE PROFILE (RAJESH & SEETHA) ════════ */}
@@ -218,7 +220,7 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '1.5rem' }}>
               {partnerList.map(partner => {
                 const isRajesh = partner.id === 'partner_1' || partner.name.toLowerCase().includes('rajesh');
-                const displayName = isRajesh ? 'Rajesh' : 'Seetha';
+                const displayName = partner.name || (isRajesh ? 'Rajesh' : 'Mia');
                 const accentColor = isRajesh ? '#7c3aed' : '#0ea5e9';
                 const gradient = isRajesh
                   ? 'linear-gradient(135deg, #7c3aed, #6366f1)'
@@ -311,7 +313,7 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
               })}
             </div>
 
-            
+
           </div>
         ) : (
           /* ════════ VIEW 2: NATIVE MOBILE PIN ENTRY SCREEN ════════ */
@@ -355,8 +357,8 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                   background: success
                     ? 'linear-gradient(135deg, #10b981, #059669)'
                     : selectedPartner.id === 'partner_1'
-                    ? 'linear-gradient(135deg, #7c3aed, #6366f1)'
-                    : 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
+                      ? 'linear-gradient(135deg, #7c3aed, #6366f1)'
+                      : 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
                   boxShadow: success
                     ? '0 8px 24px rgba(16,185,129,0.35)'
                     : '0 8px 24px rgba(124,58,237,0.25)',
@@ -614,7 +616,7 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
               </button>
             </div>
 
-            
+
           </div>
         )}
       </div>

@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PartnerProvider, usePartner } from './context/PartnerContext';
 import PartnerGateway from './components/PartnerGateway';
 import Navbar from './components/Navbar';
 import ExpenseTracker from './components/expenses/ExpenseTracker';
+import AccountsTracker from './components/accounts/AccountsTracker';
+import BudgetsTracker from './components/budgets/BudgetsTracker';
+import GoalsTracker from './components/goals/GoalsTracker';
+import CalendarTracker from './components/calendar/CalendarTracker';
+import CalculatorHub from './components/calculator/CalculatorHub';
+import WarrantiesTracker from './components/warranties/WarrantiesTracker';
 import DebtTracker from './components/debts/DebtTracker';
 import JobTracker from './components/jobs/JobTracker';
 import HabitTracker from './components/habits/HabitTracker';
@@ -18,38 +24,44 @@ import { AppInstallBanner } from './components/AppInstallBanner';
 const AppContent: React.FC = () => {
   const { isUnlocked } = usePartner();
   const [activeTab, setActiveTab] = useState<TabId>('expenses');
-  const { 
-    isInstallable, 
-    isInstalled, 
-    isIOS, 
-    isAndroid, 
-    install, 
-    triggerInstall, 
-    showInstallModal, 
-    setShowInstallModal 
+  const {
+    isInstallable,
+    isInstalled,
+    isIOS,
+    isAndroid,
+    install,
+    triggerInstall,
+    showInstallModal,
+    setShowInstallModal
   } = usePWA();
 
   return (
     <div>
       {/* Universal Top Automatic App Install Bar */}
-      <AppInstallBanner 
-        onInstall={triggerInstall} 
-        isInstalled={isInstalled} 
+      <AppInstallBanner
+        onInstall={triggerInstall}
+        isInstalled={isInstalled}
       />
 
       {!isUnlocked ? (
         <PartnerGateway onInstallClick={triggerInstall} isInstalled={isInstalled} />
       ) : (
         <>
-          <Navbar 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab} 
+          <Navbar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
             onInstallClick={triggerInstall}
             isInstalled={isInstalled}
           />
 
           <main>
             {activeTab === 'expenses' && <ExpenseTracker />}
+            {activeTab === 'accounts' && <AccountsTracker />}
+            {activeTab === 'budgets' && <BudgetsTracker />}
+            {activeTab === 'goals' && <GoalsTracker />}
+            {activeTab === 'calendar' && <CalendarTracker onNavigateTab={setActiveTab} />}
+            {activeTab === 'calculator' && <CalculatorHub />}
+            {activeTab === 'warranties' && <WarrantiesTracker />}
             {activeTab === 'debt' && <DebtTracker />}
             {activeTab === 'jobs' && <JobTracker />}
             {activeTab === 'habits' && <HabitTracker />}

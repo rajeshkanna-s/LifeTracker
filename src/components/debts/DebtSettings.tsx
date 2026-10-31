@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Calculator, Settings, RefreshCw, XCircle, ChevronDown, ChevronRight, Coins } from 'lucide-react';
+import { Calculator, Settings, XCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import type { DebtSettings, Debt } from '../../types';
-import { CURRENCIES, DEBT_CATEGORIES } from '../../data/constants';
-import { Download } from 'lucide-react';
+import { DEBT_CATEGORIES } from '../../data/constants';
 
 interface DebtSettingsProps {
   settings: DebtSettings;
@@ -29,8 +28,8 @@ const Section: React.FC<{
   </div>
 );
 
-const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSettingsChange }) => {
-  const [openSection, setOpenSection] = useState('currency');
+const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts: _debts, onSettingsChange }) => {
+  const [openSection, setOpenSection] = useState('income');
   const [newCategory, setNewCategory] = useState('');
 
   const [calcPrincipal, setCalcPrincipal] = useState('');
@@ -38,8 +37,6 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
   const [calcTenure, setCalcTenure] = useState('');
 
   const update = (partial: Partial<DebtSettings>) => onSettingsChange({ ...settings, ...partial });
-
-
 
   const calculateEMI = (principal: number, ratePerAnnum: number, months: number): number => {
     if (ratePerAnnum === 0) return Math.round(principal / months);
@@ -60,19 +57,6 @@ const DebtSettingsTab: React.FC<DebtSettingsProps> = ({ settings, debts, onSetti
 
   return (
     <div className="max-w-3xl mx-auto space-y-2">
-      {/* Currency */}
-      <Section id="currency" title="Currency" Icon={Coins} open={openSection} setOpen={setOpenSection}>
-        <div className="space-y-2 pt-4">
-          <label className="text-xs font-medium text-slate-600 block">Select Currency</label>
-          <select value={settings.currency} onChange={e => {
-            const curr = CURRENCIES.find(c => c.code === e.target.value);
-            if (curr) update({ currency: curr.code, currencySymbol: curr.symbol });
-          }} className="input-unified">
-            {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.symbol} — {c.name} ({c.code})</option>)}
-          </select>
-        </div>
-      </Section>
-
       {/* Income & Reminders */}
       <Section id="income" title="Income & Reminders" Icon={Settings} open={openSection} setOpen={setOpenSection}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">

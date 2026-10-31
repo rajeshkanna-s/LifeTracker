@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { FileSpreadsheet, Filter, PieChart, TrendingUp, TrendingDown, Minus, Store, Edit2, Trash2, FileText, BarChart3, Trophy, Wallet, Layers } from 'lucide-react';
+import { FileSpreadsheet, Filter, PieChart, TrendingUp, TrendingDown, Minus, Store, Edit2, Trash2, FileText, BarChart3, Trophy, Wallet, Layers, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import type { Expense, ExpenseSettings } from '../../types';
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, AreaChart, Area, CartesianGrid } from 'recharts';
 import {
@@ -8,7 +8,9 @@ import {
   getDimensionBreakdown, getTopExpenses,
 } from '../../utils/expenseUtils';
 import { exportExpensesToPDF, exportExpensesToExcel } from '../../utils/exportUtils';
-import { DEFAULT_CATEGORIES, ALL_PLATFORMS, PAYMENT_METHODS } from '../../data/constants';
+import { getFuelBadge } from '../../utils/fuelUtils';
+import { DEFAULT_CATEGORIES, DEFAULT_INCOME_CATEGORIES, ALL_PLATFORMS, INCOME_PLATFORMS, PAYMENT_METHODS, INCOME_CATEGORY_ICONS } from '../../data/constants';
+import { isExpense, isIncome } from '../../utils/expenseUtils';
 import type { TimeGranularity, BreakdownDimension } from '../../utils/expenseUtils';
 
 interface ExpenseReportsProps {
@@ -32,6 +34,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
   const [filters, setFilters] = useState({
     fromDate: getMonthStartString(),
     toDate: getTodayString(),
+    type: 'all' as 'all' | 'expense' | 'income',
     category: 'all',
     platform: 'all',
     paymentMethod: 'all',
@@ -46,6 +49,8 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
     return expenses.filter(e => {
       const d = e.date;
       if (d < filters.fromDate || d > filters.toDate) return false;
+      if (filters.type === 'expense' && !isExpense(e)) return false;
+      if (filters.type === 'income' && !isIncome(e)) return false;
       if (filters.category !== 'all' && e.category !== filters.category) return false;
       if (filters.platform !== 'all' && e.platform !== filters.platform) return false;
       if (filters.paymentMethod !== 'all' && e.payment_method !== filters.paymentMethod) return false;
@@ -85,15 +90,23 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
     return totals;
   }, [expenses]);
 
-  const allCategories = [...DEFAULT_CATEGORIES, ...settings.customCategories];
+  const totalIncome = useMemo(() => filteredExpenses.filter(isIncome).reduce((s, e) => s + Number(e.amount), 0), [filteredExpenses]);
+  const totalExpense = useMemo(() => filteredExpenses.filter(isExpense).reduce((s, e) => s + Number(e.amount), 0), [filteredExpenses]);
+  const netCashFlow = totalIncome - totalExpense;
+
+  const allCategories = filters.type === 'income'
+    ? DEFAULT_INCOME_CATEGORIES
+    : filters.type === 'expense'
+    ? [...DEFAULT_CATEGORIES, ...settings.customCategories]
+    : Array.from(new Set([...DEFAULT_CATEGORIES, ...DEFAULT_INCOME_CATEGORIES, ...settings.customCategories]));
   const allPlatforms = [...ALL_PLATFORMS, ...settings.customPlatforms];
   const allPayments = [...PAYMENT_METHODS, ...settings.customPaymentMethods];
 
   // Quick CSV Export
   const exportCSV = () => {
-    const headers = "Date,Time,Category,Platform,Amount,Payment Method,Notes\n";
+    const headers = "Date,Time,Type,Category,Platform,Amount,Payment Method,Notes\n";
     const rows = filteredExpenses.map(e =>
-      `${e.date},${e.time || ''},"${e.category}","${e.platform || ''}",${e.amount},"${e.payment_method || ''}","${(e.description || '').replace(/"/g, '""')}"`
+      `${e.date},${e.time || ''},"${isIncome(e) ? 'Income' : 'Expense'}","${e.category}","${e.platform || ''}",${e.amount},"${e.payment_method || ''}","${(e.description || '').replace(/"/g, '""')}"`
     ).join("\n");
     const blob = new Blob([headers + rows], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -125,13 +138,13 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-36">
       {/* Filters */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
         <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2 mb-3">
           <Filter size={14} className="text-emerald-500" /> Filters
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           <div>
             <label className="label-unified">From</label>
             <input type="date" value={filters.fromDate} onChange={e => setFilters({...filters, fromDate: e.target.value})} className="input-unified" />
@@ -139,6 +152,14 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
           <div>
             <label className="label-unified">To</label>
             <input type="date" value={filters.toDate} onChange={e => setFilters({...filters, toDate: e.target.value})} className="input-unified" />
+          </div>
+          <div>
+            <label className="label-unified">Type</label>
+            <select value={filters.type} onChange={e => setFilters({...filters, type: e.target.value as any, category: 'all'})} className="input-unified font-semibold">
+              <option value="all">All (Income & Exp)</option>
+              <option value="expense">Expenses Only</option>
+              <option value="income">Income Only</option>
+            </select>
           </div>
           <div>
             <label className="label-unified">Category</label>
@@ -165,34 +186,67 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Summary + Comparison Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-3 flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-600">Total Filtered</span>
-          <span className="text-xl font-bold text-emerald-700">{fmt(totalAmount)}</span>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-slate-600">vs Previous Period</p>
-            <p className="text-[10px] text-slate-400">{comparison.range.from} → {comparison.range.to}</p>
+      {filters.type === 'all' ? (
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-3">
+            <span className="text-[11px] font-semibold text-emerald-800 block">Total Income</span>
+            <span className="text-base sm:text-xl font-extrabold text-emerald-700 block truncate">+{fmt(totalIncome)}</span>
           </div>
-          <div className={`flex items-center gap-1 font-bold text-sm ${comparison.direction === 'up' ? 'text-red-500' : comparison.direction === 'down' ? 'text-emerald-600' : 'text-slate-400'}`}>
-            {comparison.direction === 'up' ? <TrendingUp size={16} /> : comparison.direction === 'down' ? <TrendingDown size={16} /> : <Minus size={16} />}
-            <span>{fmt(Math.abs(comparison.diff))}</span>
-            {comparison.percentChange !== null && <span className="text-xs">({comparison.percentChange > 0 ? '+' : ''}{comparison.percentChange}%)</span>}
+          <div className="bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-100 rounded-xl p-3">
+            <span className="text-[11px] font-semibold text-rose-800 block">Total Expenses</span>
+            <span className="text-base sm:text-xl font-extrabold text-rose-700 block truncate">{fmt(totalExpense)}</span>
+          </div>
+          <div className={`border rounded-xl p-3 ${netCashFlow >= 0 ? 'bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 text-blue-900' : 'bg-gradient-to-br from-red-50 to-rose-50 border-red-100 text-red-900'}`}>
+            <span className="text-[11px] font-semibold block opacity-80">Net Cash Flow</span>
+            <span className="text-base sm:text-xl font-extrabold block truncate">
+              {netCashFlow >= 0 ? '+' : ''}{fmt(netCashFlow)}
+            </span>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className={`border rounded-xl p-3 flex items-center justify-between ${filters.type === 'income' ? 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100' : 'bg-gradient-to-br from-rose-50 to-orange-50 border-rose-100'}`}>
+            <span className="text-xs font-semibold text-slate-600">{filters.type === 'income' ? 'Total Income' : 'Total Expenses'}</span>
+            <span className={`text-xl font-bold ${filters.type === 'income' ? 'text-emerald-700' : 'text-rose-700'}`}>
+              {filters.type === 'income' ? '+' : ''}{fmt(totalAmount)}
+            </span>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-600">vs Previous Period</p>
+              <p className="text-[10px] text-slate-400">{comparison.range.from} → {comparison.range.to}</p>
+            </div>
+            <div className={`flex items-center gap-1 font-bold text-sm ${comparison.direction === 'up' ? 'text-red-500' : comparison.direction === 'down' ? 'text-emerald-600' : 'text-slate-400'}`}>
+              {comparison.direction === 'up' ? <TrendingUp size={16} /> : comparison.direction === 'down' ? <TrendingDown size={16} /> : <Minus size={16} />}
+              <span>{fmt(Math.abs(comparison.diff))}</span>
+              {comparison.percentChange !== null && <span className="text-xs">({comparison.percentChange > 0 ? '+' : ''}{comparison.percentChange}%)</span>}
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Export Buttons */}
-      <div className="flex flex-wrap gap-2">
-        <button onClick={exportCSV} className="flex-1 sm:flex-none justify-center px-4 py-2.5 border border-slate-200 rounded-xl flex items-center gap-2 text-sm font-semibold hover:bg-slate-50 transition bg-white">
-          <FileSpreadsheet size={16} className="text-emerald-600" /> CSV
+      {/* Export Buttons — One line & slim */}
+      <div className="grid grid-cols-3 gap-2 w-full">
+        <button
+          onClick={exportCSV}
+          className="flex items-center justify-center gap-1.5 py-1.5 px-2 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700"
+        >
+          <FileSpreadsheet size={14} className="text-emerald-600 shrink-0" />
+          <span>CSV</span>
         </button>
-        <button onClick={exportExcel} className="flex-1 sm:flex-none justify-center px-4 py-2.5 border border-slate-200 rounded-xl flex items-center gap-2 text-sm font-semibold hover:bg-slate-50 transition bg-white">
-          <FileSpreadsheet size={16} className="text-green-700" /> Excel
+        <button
+          onClick={exportExcel}
+          className="flex items-center justify-center gap-1.5 py-1.5 px-2 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700"
+        >
+          <FileSpreadsheet size={14} className="text-green-700 shrink-0" />
+          <span>Excel</span>
         </button>
-        <button onClick={exportPDF} className="flex-1 sm:flex-none justify-center px-4 py-2.5 border border-slate-200 rounded-xl flex items-center gap-2 text-sm font-semibold hover:bg-slate-50 transition bg-white">
-          <FileText size={16} className="text-red-500" /> PDF
+        <button
+          onClick={exportPDF}
+          className="flex items-center justify-center gap-1.5 py-1.5 px-2 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700"
+        >
+          <FileText size={14} className="text-red-500 shrink-0" />
+          <span>PDF</span>
         </button>
       </div>
 
@@ -370,22 +424,49 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Top Expenses */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4">
-        <h3 className="text-sm font-bold flex items-center gap-2 mb-3">
-          <Trophy size={16} className="text-yellow-500" /> Top Expenses
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
+        <h3 className="text-sm font-black text-slate-900 flex items-center gap-2 mb-3">
+          <Trophy size={16} className="text-yellow-500 shrink-0" /> Top Expenses
         </h3>
         {topExpenses.length === 0 ? (
           <div className="text-center py-6 text-slate-400 text-sm">No qualifying expenses.</div>
         ) : (
           <div className="space-y-1.5">
             {topExpenses.map((exp, i) => (
-              <div key={exp.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
-                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold shrink-0">{i + 1}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-slate-800 truncate">{(exp.description || '').trim() || exp.category}</p>
-                  <p className="text-[10px] text-slate-400">{new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+              <div key={exp.id} className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl transition border border-slate-100">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-800 text-xs font-black shrink-0">{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">{(exp.description || '').trim() || exp.category}</p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate mt-0.5">
+                      {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      {exp.payment_method ? ` • ${exp.payment_method}` : ''}
+                    </p>
+                  </div>
                 </div>
-                <span className="text-sm font-bold text-slate-800 shrink-0">{fmt(exp.amount)}</span>
+                <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                  <span className="text-xs sm:text-sm font-black text-slate-900 whitespace-nowrap">{fmt(exp.amount)}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => onEdit?.(exp)}
+                      title="Edit expense"
+                      aria-label="Edit expense"
+                      className="w-7 h-7 rounded-full bg-white hover:bg-slate-200 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 transition active:scale-90 cursor-pointer shadow-2xs"
+                    >
+                      <Edit2 size={12} strokeWidth={2.2} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { if (window.confirm('Are you sure you want to delete this expense?')) onDelete?.(exp.id); }}
+                      title="Delete expense"
+                      aria-label="Delete expense"
+                      className="w-7 h-7 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200/70 flex items-center justify-center text-rose-600 hover:text-rose-800 transition active:scale-90 cursor-pointer shadow-2xs"
+                    >
+                      <Trash2 size={12} strokeWidth={2.2} />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -393,35 +474,103 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       </div>
 
       {/* Expense History List */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4">
-        <h3 className="text-sm font-bold flex items-center gap-2 mb-4">
-          <Store size={16} className="text-blue-500" /> Expense History
-        </h3>
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+              <Store size={16} />
+            </div>
+            <h3 className="text-sm font-black text-slate-900 leading-none">
+              Expense History
+            </h3>
+            <span className="px-2 py-0.5 text-xs font-black bg-blue-50 text-blue-700 border border-blue-200/70 rounded-full leading-none">
+              {filteredExpenses.length}
+            </span>
+          </div>
+          {filteredExpenses.length > 0 && (
+            <span className="text-[11px] font-bold text-slate-400">
+              Total: {fmt(filteredExpenses.reduce((s, e) => s + Number(e.amount || 0), 0))}
+            </span>
+          )}
+        </div>
 
         {filteredExpenses.length === 0 ? (
           <div className="text-center py-8 text-slate-400 text-sm">No expenses found for these filters.</div>
         ) : (
-          <div className="space-y-1">
-            {filteredExpenses.map(exp => (
-              <div key={exp.id} className="tx-item">
-                <div className="tx-details">
-                  <p className="tx-amount">{fmt(Number(exp.amount))}</p>
-                  <p className="tx-category">{exp.description || exp.category}</p>
+          <div className="space-y-1.5">
+            {filteredExpenses.map((exp, i) => {
+              const fuelBadge = getFuelBadge(exp);
+              const isInc = isIncome(exp);
+              return (
+                <div
+                  key={exp.id}
+                  className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl transition border border-slate-100/90"
+                >
+                  {/* Left: Number circle + Details (Horizontal like Image 3) */}
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                    <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-800 text-xs font-black shrink-0">
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <p className="text-xs sm:text-sm font-bold text-slate-800 truncate leading-snug">
+                          {(exp.description || '').trim() || exp.category}
+                        </p>
+                        {isInc && (
+                          <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded border border-emerald-200 shrink-0">
+                            Income
+                          </span>
+                        )}
+                        {fuelBadge?.mileage && (
+                          <span
+                            className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0"
+                            title={`Mileage: ${fuelBadge.mileage} km/l${fuelBadge.distance ? ` · Dist: ${fuelBadge.distance} km` : ''}`}
+                          >
+                            ⛽ {fuelBadge.mileage} km/l
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate mt-0.5">
+                        {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {exp.payment_method ? ` • ${exp.payment_method}` : ''}
+                        {exp.description && exp.category ? ` • ${exp.category}` : ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Right: Amount + Actions */}
+                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                    <span className={`text-xs sm:text-sm font-black whitespace-nowrap ${isInc ? 'text-emerald-600' : 'text-slate-900'}`}>
+                      {isInc ? '+' : ''}{fmt(Number(exp.amount))}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => onEdit?.(exp)}
+                        aria-label="Edit expense"
+                        title="Edit expense"
+                        className="w-7 h-7 rounded-full bg-white hover:bg-slate-200 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 transition active:scale-90 cursor-pointer shadow-2xs"
+                      >
+                        <Edit2 size={12} strokeWidth={2.2} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to delete this expense?')) {
+                            onDelete?.(exp.id);
+                          }
+                        }}
+                        aria-label="Delete expense"
+                        title="Delete expense"
+                        className="w-7 h-7 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200/70 flex items-center justify-center text-rose-600 hover:text-rose-800 transition active:scale-90 cursor-pointer shadow-2xs"
+                      >
+                        <Trash2 size={12} strokeWidth={2.2} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="tx-meta">
-                  <p className="tx-date">{new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
-                  <p className="tx-payment">{exp.payment_method}</p>
-                </div>
-                <div className="flex items-center gap-1 ml-2">
-                  <button onClick={() => onEdit?.(exp)} className="btn-action">
-                    <Edit2 size={16} />
-                  </button>
-                  <button onClick={() => { if (window.confirm('Are you sure you want to delete this expense?')) onDelete?.(exp.id); }} className="btn-action danger">
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
