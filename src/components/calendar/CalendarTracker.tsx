@@ -21,6 +21,8 @@ import { normalizeTransaction, isIncome } from '../../utils/expenseUtils';
 import { CATEGORY_EMOJIS, INCOME_CATEGORY_ICONS, getDefaultExpenseSettings } from '../../data/constants';
 import { usePartner } from '../../context/PartnerContext';
 import ExpenseForm from '../expenses/ExpenseForm';
+import IndianCalendarModal from './IndianCalendarModal';
+import { findIndianHoliday } from '../../data/indianHolidays';
 
 interface CalendarTrackerProps {
   onNavigateTab?: (tab: TabId) => void;
@@ -47,6 +49,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   // Modal state for Add/Edit transaction
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [showHolidayModal, setShowHolidayModal] = useState(false);
 
   // Fetch all transactions for active partner
   useEffect(() => {
@@ -368,6 +371,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
     month: 'short',
     year: 'numeric',
   });
+  const selectedHoliday = findIndianHoliday(selectedDateStr);
 
   return (
     <div className="space-y-4 max-w-4xl mx-auto pb-36">
@@ -446,6 +450,19 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                 <ChevronRight size={15} />
               </button>
             </div>
+
+            {/* Real Calendar & Indian Govt Holidays Button (Top Right Corner) */}
+            <button
+              type="button"
+              onClick={() => setShowHolidayModal(true)}
+              aria-label="Open Indian Govt Holidays & Real Calendar"
+              title="Real Calendar with Indian Govt Holidays for all years"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 hover:from-orange-600 hover:to-emerald-700 text-white rounded-full text-xs font-black shadow-xs active:scale-95 transition cursor-pointer shrink-0"
+            >
+              <CalendarIcon size={14} strokeWidth={2.4} />
+              <span className="hidden sm:inline">Real Calendar</span>
+              <span>🇮🇳</span>
+            </button>
           </div>
         </div>
 
@@ -567,12 +584,14 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                 const data = dateDataMap[cell.dateStr];
                 const hasExpense = data && data.expenseTotal > 0;
                 const hasIncome = data && data.incomeTotal > 0;
+                const cellHoliday = findIndianHoliday(cell.dateStr);
 
                 return (
                   <button
                     key={cell.dateStr}
                     type="button"
                     onClick={() => setSelectedDateStr(cell.dateStr)}
+                    title={cellHoliday ? `${cellHoliday.name} • ${cell.dateStr}` : cell.dateStr}
                     className={`relative flex flex-col items-center justify-center h-12 sm:h-14 rounded-2xl transition-all duration-150 cursor-pointer active:scale-95 ${
                       !cell.isCurrentMonth
                         ? 'opacity-25 hover:opacity-40'
@@ -598,8 +617,16 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                       {cell.dayNumber}
                     </span>
 
-                    {/* Financial Indicator Dots */}
+                    {/* Financial & Holiday Indicator Dots */}
                     <div className="flex items-center justify-center gap-1 h-2 mt-1">
+                      {cellHoliday && (
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            isSelected ? 'bg-amber-300' : 'bg-orange-500'
+                          }`}
+                          title={`Holiday: ${cellHoliday.name}`}
+                        />
+                      )}
                       {hasExpense && (
                         <span
                           className={`w-1.5 h-1.5 rounded-full transition-colors ${
@@ -616,7 +643,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                           title={`Income: +₹${Math.round(data.incomeTotal).toLocaleString('en-IN')}`}
                         />
                       )}
-                      {!hasExpense && !hasIncome && (
+                      {!hasExpense && !hasIncome && !cellHoliday && (
                         <span className="w-1.5 h-1.5 opacity-0" />
                       )}
                     </div>
@@ -645,6 +672,12 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">
                   Spent: <span className="text-rose-600 font-bold">₹{selectedDayTotals.spent.toLocaleString('en-IN')}</span> • Income: <span className="text-emerald-600 font-bold">₹{selectedDayTotals.income.toLocaleString('en-IN')}</span>
                 </p>
+                {selectedHoliday && (
+                  <p className="text-[11px] font-extrabold text-orange-800 mt-1 flex items-center gap-1.5 bg-orange-50 px-2 py-0.5 rounded-lg border border-orange-200 w-fit">
+                    <span>🎉 {selectedHoliday.name}</span>
+                    <span className="text-[10px] text-orange-600 font-bold">({selectedHoliday.type})</span>
+                  </p>
+                )}
               </div>
 
               {/* Clean App Add Button */}
@@ -880,6 +913,20 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
           }}
         />
       )}
+
+      {/* ════════ Real Calendar & Indian Govt Holidays Modal ════════ */}
+      <IndianCalendarModal
+        isOpen={showHolidayModal}
+        onClose={() => setShowHolidayModal(false)}
+        initialDate={currentDate}
+        onSelectDate={dStr => {
+          setSelectedDateStr(dStr);
+          const parts = dStr.split('-');
+          if (parts.length === 3) {
+            setCurrentDate(new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1));
+          }
+        }}
+      />
     </div>
   );
 };

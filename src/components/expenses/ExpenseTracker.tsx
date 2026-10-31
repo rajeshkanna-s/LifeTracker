@@ -25,7 +25,20 @@ const ExpenseTracker: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    setActiveTab('home');
   }, [activePartnerId]);
+
+  // Handle back button from header: return to 'home' subtab if on reports/add/settings
+  useEffect(() => {
+    const handleBackEvent = (e: Event) => {
+      if (activeTab !== 'home') {
+        e.preventDefault();
+        setActiveTab('home');
+      }
+    };
+    window.addEventListener('app-back-pressed', handleBackEvent);
+    return () => window.removeEventListener('app-back-pressed', handleBackEvent);
+  }, [activeTab]);
 
   const fetchData = async () => {
     setLoading(true);

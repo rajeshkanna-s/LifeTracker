@@ -22,8 +22,10 @@ import { InstallModal } from './components/InstallModal';
 import { AppInstallBanner } from './components/AppInstallBanner';
 
 const AppContent: React.FC = () => {
-  const { isUnlocked } = usePartner();
+  const { isUnlocked, activePartnerId } = usePartner();
   const [activeTab, setActiveTab] = useState<TabId>('expenses');
+  const [tabHistory, setTabHistory] = useState<TabId[]>(['expenses']);
+
   const {
     isInstallable,
     isInstalled,
@@ -34,6 +36,38 @@ const AppContent: React.FC = () => {
     showInstallModal,
     setShowInstallModal
   } = usePWA();
+
+  // Reset to first page ('expenses') whenever partner is switched or application is unlocked
+  useEffect(() => {
+    setActiveTab('expenses');
+    setTabHistory(['expenses']);
+  }, [activePartnerId, isUnlocked]);
+
+  const handleTabChange = (newTab: TabId) => {
+    if (newTab === activeTab) return;
+    setTabHistory(prev => [...prev, newTab]);
+    setActiveTab(newTab);
+  };
+
+  const handleBack = () => {
+    // First dispatch event for nested module handlers (e.g. Expense subtabs)
+    const event = new CustomEvent('app-back-pressed', { cancelable: true });
+    window.dispatchEvent(event);
+    if (event.defaultPrevented) return;
+
+    if (tabHistory.length > 1) {
+      const newHistory = [...tabHistory];
+      newHistory.pop();
+      const prevTab = newHistory[newHistory.length - 1];
+      setTabHistory(newHistory);
+      setActiveTab(prevTab);
+    } else if (activeTab !== 'expenses') {
+      setActiveTab('expenses');
+      setTabHistory(['expenses']);
+    }
+  };
+
+  const canGoBack = activeTab !== 'expenses' || tabHistory.length > 1;
 
   return (
     <div>
@@ -49,7 +83,7 @@ const AppContent: React.FC = () => {
         <>
           <Navbar
             activeTab={activeTab}
-            onTabChange={setActiveTab}
+            onTabChange={handleTabChange}
             onInstallClick={triggerInstall}
             isInstalled={isInstalled}
           />
@@ -59,7 +93,7 @@ const AppContent: React.FC = () => {
             {activeTab === 'accounts' && <AccountsTracker />}
             {activeTab === 'budgets' && <BudgetsTracker />}
             {activeTab === 'goals' && <GoalsTracker />}
-            {activeTab === 'calendar' && <CalendarTracker onNavigateTab={setActiveTab} />}
+            {activeTab === 'calendar' && <CalendarTracker onNavigateTab={handleTabChange} />}
             {activeTab === 'calculator' && <CalculatorHub />}
             {activeTab === 'warranties' && <WarrantiesTracker />}
             {activeTab === 'debt' && <DebtTracker />}

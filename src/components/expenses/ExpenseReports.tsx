@@ -187,18 +187,18 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
 
       {/* Summary + Comparison Row */}
       {filters.type === 'all' ? (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-3">
-            <span className="text-[11px] font-semibold text-emerald-800 block">Total Income</span>
-            <span className="text-base sm:text-xl font-extrabold text-emerald-700 block truncate">+{fmt(totalIncome)}</span>
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-2 sm:p-3 min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-emerald-800 block leading-tight">Total Income</span>
+            <span className="text-xs sm:text-base lg:text-lg font-black text-emerald-700 block break-words leading-snug mt-0.5">+{fmt(totalIncome)}</span>
           </div>
-          <div className="bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-100 rounded-xl p-3">
-            <span className="text-[11px] font-semibold text-rose-800 block">Total Expenses</span>
-            <span className="text-base sm:text-xl font-extrabold text-rose-700 block truncate">{fmt(totalExpense)}</span>
+          <div className="bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-100 rounded-xl p-2 sm:p-3 min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-rose-800 block leading-tight">Total Expenses</span>
+            <span className="text-xs sm:text-base lg:text-lg font-black text-rose-700 block break-words leading-snug mt-0.5">{fmt(totalExpense)}</span>
           </div>
-          <div className={`border rounded-xl p-3 ${netCashFlow >= 0 ? 'bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 text-blue-900' : 'bg-gradient-to-br from-red-50 to-rose-50 border-red-100 text-red-900'}`}>
-            <span className="text-[11px] font-semibold block opacity-80">Net Cash Flow</span>
-            <span className="text-base sm:text-xl font-extrabold block truncate">
+          <div className={`border rounded-xl p-2 sm:p-3 min-w-0 ${netCashFlow >= 0 ? 'bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 text-blue-900' : 'bg-gradient-to-br from-red-50 to-rose-50 border-red-100 text-red-900'}`}>
+            <span className="text-[10px] sm:text-[11px] font-semibold block opacity-80 leading-tight">Net Cash Flow</span>
+            <span className="text-xs sm:text-base lg:text-lg font-black block break-words leading-snug mt-0.5">
               {netCashFlow >= 0 ? '+' : ''}{fmt(netCashFlow)}
             </span>
           </div>
@@ -225,27 +225,30 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </div>
       )}
 
-      {/* Export Buttons — One line & slim */}
+      {/* Export Buttons — Clean & prominent buttons with proper padding */}
       <div className="grid grid-cols-3 gap-2 w-full">
         <button
           onClick={exportCSV}
-          className="flex items-center justify-center gap-1.5 py-1.5 px-2 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700"
+          style={{ borderRadius: '12px' }}
+          className="flex items-center justify-center gap-2 py-2 px-3 border border-slate-200/90 rounded-xl text-xs font-bold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700 shadow-2xs"
         >
-          <FileSpreadsheet size={14} className="text-emerald-600 shrink-0" />
+          <FileSpreadsheet size={15} className="text-emerald-600 shrink-0" />
           <span>CSV</span>
         </button>
         <button
           onClick={exportExcel}
-          className="flex items-center justify-center gap-1.5 py-1.5 px-2 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700"
+          style={{ borderRadius: '12px' }}
+          className="flex items-center justify-center gap-2 py-2 px-3 border border-slate-200/90 rounded-xl text-xs font-bold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700 shadow-2xs"
         >
-          <FileSpreadsheet size={14} className="text-green-700 shrink-0" />
+          <FileSpreadsheet size={15} className="text-green-700 shrink-0" />
           <span>Excel</span>
         </button>
         <button
           onClick={exportPDF}
-          className="flex items-center justify-center gap-1.5 py-1.5 px-2 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700"
+          style={{ borderRadius: '12px' }}
+          className="flex items-center justify-center gap-2 py-2 px-3 border border-slate-200/90 rounded-xl text-xs font-bold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700 shadow-2xs"
         >
-          <FileText size={14} className="text-red-500 shrink-0" />
+          <FileText size={15} className="text-red-500 shrink-0" />
           <span>PDF</span>
         </button>
       </div>
@@ -264,9 +267,9 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             { label: 'Largest', value: fmt(stats.largest) },
             { label: 'Active Days', value: stats.activeDays.toString() },
           ].map(s => (
-            <div key={s.label} className="bg-slate-50 rounded-lg p-2.5 text-center">
-              <p className="text-[10px] uppercase tracking-wide text-slate-400 font-semibold">{s.label}</p>
-              <p className="text-sm font-bold text-slate-800 mt-0.5">{s.value}</p>
+            <div key={s.label} className="bg-slate-50 rounded-lg p-2 sm:p-2.5 text-center min-w-0">
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-wide text-slate-400 font-semibold">{s.label}</p>
+              <p className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 break-words leading-snug">{s.value}</p>
             </div>
           ))}
         </div>

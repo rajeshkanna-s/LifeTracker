@@ -51,7 +51,12 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode; color: string; de
   { id: 'jobs', label: 'Jobs', icon: <Building2 size={18} />, color: '#6366f1', desc: 'Job Application Tracker' },
 ];
 
-const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, onInstallClick, isInstalled = false }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  activeTab,
+  onTabChange,
+  onInstallClick,
+  isInstalled = false
+}) => {
   const { activePartner, activePartnerId, lockPartner } = usePartner();
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);

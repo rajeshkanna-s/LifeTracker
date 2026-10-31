@@ -134,9 +134,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ initialData, settings, expens
       }
     }
 
+    const finalDescription = isIncome
+      ? (form.category || form.description || 'Income')
+      : (form.description || 'Expense');
+
     await onSubmit({
       ...form,
       type,
+      description: finalDescription,
       amount: Number(form.amount),
       notes: finalNotes,
       tags: finalTags,
@@ -265,27 +270,29 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ initialData, settings, expens
             />
           </div>
 
-          <div>
-            <label className="label-unified">{isIncome ? 'Income Source / Title' : 'What was this for?'}</label>
-            <input
-              placeholder={isIncome ? 'e.g. Monthly Salary, Freelance project' : 'Short description'}
-              value={form.description}
-              onChange={e => setForm({...form, description: e.target.value})}
-              className="input-unified"
-              required
-            />
-          </div>
+          {!isIncome && (
+            <div>
+              <label className="label-unified">What was this for?</label>
+              <input
+                placeholder="Short description"
+                value={form.description}
+                onChange={e => setForm({...form, description: e.target.value})}
+                className="input-unified"
+                required
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="label-unified">Category</label>
+              <label className="label-unified">{isIncome ? 'Income Source' : 'Category'}</label>
               <select value={form.category} onChange={e => setForm({...form, category: e.target.value, platform: ''})} className="input-unified" required>
                 <option value="">Select...</option>
                 {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="label-unified">{isIncome ? 'Source / Mode' : 'Platform / Shop'}</label>
+              <label className="label-unified">{isIncome ? 'Received Via' : 'Platform / Shop'}</label>
               <select value={form.platform} onChange={e => setForm({...form, platform: e.target.value})} className="input-unified">
                 <option value="">Select...</option>
                 {contextPlatforms.map(p => <option key={p} value={p}>{p}</option>)}

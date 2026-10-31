@@ -134,25 +134,21 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
   }, [settings.dayNotes]);
 
   const openQuickPrompt = (t: QuickAddTemplate) => {
-    if (isFuelCategory(t.category) || isFuelCategory(t.name)) {
-      onEdit?.({
-        id: '',
-        amount: t.amount,
-        category: t.category,
-        platform: t.platform,
-        description: t.name,
-        payment_method: 'UPI',
-        date: getTodayString(),
-        time: getCurrentTimeString(),
-        person: 'Me',
-        tags: '',
-        notes: '',
-        created_at: new Date().toISOString()
-      });
-      return;
-    }
-    setQuickPrompt(t);
-    setPromptAmount(String(t.amount));
+    onEdit?.({
+      id: '',
+      type: 'expense',
+      amount: t.amount,
+      category: t.category,
+      platform: t.platform || '',
+      description: t.name,
+      payment_method: 'UPI',
+      date: getTodayString(),
+      time: getCurrentTimeString(),
+      person: 'Me',
+      tags: '',
+      notes: '',
+      created_at: new Date().toISOString()
+    });
   };
 
   const confirmQuickAdd = async () => {
