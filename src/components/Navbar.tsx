@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Receipt,
   Bell,
@@ -24,7 +24,10 @@ import {
   WalletCards,
   PieChart,
   Target,
-  ShieldCheck
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown
 } from 'lucide-react';
 import type { TabId } from '../types';
 import { usePartner } from '../context/PartnerContext';
@@ -84,6 +87,71 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const activeTabMeta = tabs.find(t => t.id === activeTab) || tabs[0];
 
+  // Desktop horizontal tabs scrolling & smart dropdown state
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const activeTabRef = useRef<HTMLButtonElement>(null);
+  const moreDropdownRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const checkScrollability = () => {
+    if (tabsScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsScrollRef.current;
+      setCanScrollLeft(scrollLeft > 4);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 4);
+    }
+  };
+
+  useEffect(() => {
+    checkScrollability();
+    window.addEventListener('resize', checkScrollability);
+    return () => window.removeEventListener('resize', checkScrollability);
+  }, []);
+
+  useEffect(() => {
+    if (activeTabRef.current && tabsScrollRef.current) {
+      activeTabRef.current.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'nearest',
+        block: 'nearest'
+      });
+    }
+    checkScrollability();
+  }, [activeTab]);
+
+  const scrollTabs = (offset: number) => {
+    if (tabsScrollRef.current) {
+      tabsScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+      setTimeout(checkScrollability, 160);
+    }
+  };
+
+  const handleTabsWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (tabsScrollRef.current) {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        tabsScrollRef.current.scrollLeft += e.deltaY;
+      } else {
+        tabsScrollRef.current.scrollLeft += e.deltaX;
+      }
+      checkScrollability();
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (moreDropdownRef.current && !moreDropdownRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    if (moreOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [moreOpen]);
+
   // Prevent background scroll and support Escape key when drawer is open
   useEffect(() => {
     if (drawerOpen) {
@@ -95,6 +163,7 @@ const Navbar: React.FC<NavbarProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setDrawerOpen(false);
+        setMoreOpen(false);
       }
     };
 
@@ -109,8 +178,19 @@ const Navbar: React.FC<NavbarProps> = ({
     <>
       {/* ════════ Desktop Top Navbar (Hidden <= 768px) ════════ */}
       <nav className="app-navbar">
-        <div className="app-brand" style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ fontWeight: 800, fontSize: '1.15rem', color: '#fff', letterSpacing: '-0.02em' }}>
+        {/* Left: Brand, Menu Toggle, Partner, Install */}
+        <div className="nav-brand-section">
+          <button
+            type="button"
+            className="desktop-menu-toggle"
+            onClick={() => setDrawerOpen(true)}
+            title="Open all trackers & sidebar menu"
+            aria-label="Open navigation sidebar"
+          >
+            <Menu size={18} strokeWidth={2.2} />
+          </button>
+
+          <span className="nav-brand-title">
             Xpenser
           </span>
 
@@ -118,21 +198,11 @@ const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={() => setSecurityModalOpen(true)}
+            className="nav-partner-pill"
             title="Click to manage profile or change passcode"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 11px',
-              borderRadius: '20px',
-              border: `1.5px solid ${accentColor}`,
-              background: isP1 ? 'rgba(124, 58, 237, 0.09)' : 'rgba(14, 165, 233, 0.09)',
-              color: accentColor,
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              marginLeft: '8px'
+              borderColor: accentColor,
+              color: accentColor
             }}
           >
             <span>{activePartner?.avatar || (isP1 ? '👤' : '👥')}</span>
@@ -141,67 +211,142 @@ const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {!isInstalled && onInstallClick && (
-            <button className="btn-install-desktop" onClick={onInstallClick}>
+            <button className="btn-install-desktop" onClick={onInstallClick} title="Install App to Desktop">
               <Download size={14} />
               <span>Install App</span>
             </button>
           )}
         </div>
 
-        <div className="nav-tabs-custom" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          {tabs.map(tab => (
+        {/* Center: Scrollable Tabs with Chevrons and More Dropdown */}
+        <div className="nav-tabs-wrapper">
+          {canScrollLeft && (
             <button
-              key={tab.id}
-              className={`nav-tab-item ${activeTab === tab.id ? `active-${tab.id}` : ''}`}
-              onClick={() => onTabChange(tab.id)}
+              type="button"
+              className="nav-scroll-btn left"
+              onClick={() => scrollTabs(-240)}
+              title="Scroll left"
+              aria-label="Scroll tabs left"
             >
-              {tab.icon}
-              <span>{tab.label}</span>
+              <ChevronLeft size={16} strokeWidth={2.5} />
             </button>
-          ))}
+          )}
 
+          <div
+            ref={tabsScrollRef}
+            className="nav-tabs-scroll"
+            onWheel={handleTabsWheel}
+            onScroll={checkScrollability}
+          >
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                ref={activeTab === tab.id ? activeTabRef : null}
+                className={`nav-tab-item ${activeTab === tab.id ? `active active-${tab.id}` : ''}`}
+                onClick={() => onTabChange(tab.id)}
+                title={tab.desc}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {canScrollRight && (
+            <button
+              type="button"
+              className="nav-scroll-btn right"
+              onClick={() => scrollTabs(240)}
+              title="Scroll right"
+              aria-label="Scroll tabs right"
+            >
+              <ChevronRight size={16} strokeWidth={2.5} />
+            </button>
+          )}
+
+          {/* "More ▾" Dropdown for Instant Access to All Modules */}
+          <div className="nav-more-container" ref={moreDropdownRef}>
+            <button
+              type="button"
+              className={`nav-more-btn ${moreOpen ? 'open' : ''}`}
+              onClick={() => setMoreOpen(!moreOpen)}
+              title="View all 14 apps & trackers"
+              aria-expanded={moreOpen}
+            >
+              <span>More</span>
+              <ChevronDown
+                size={14}
+                style={{
+                  transform: moreOpen ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.2s ease'
+                }}
+              />
+            </button>
+
+            {moreOpen && (
+              <div className="nav-more-dropdown shadow-2xl">
+                <div className="nav-more-group-header">FINANCE</div>
+                {tabs.filter(t => ['expenses', 'accounts', 'budgets', 'goals', 'warranties', 'debt', 'calculator'].includes(t.id)).map(tab => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    className={`nav-more-item ${activeTab === tab.id ? 'active' : ''}`}
+                    onClick={() => {
+                      onTabChange(tab.id);
+                      setMoreOpen(false);
+                    }}
+                  >
+                    <span className="nav-more-item-icon" style={{ color: tab.color }}>
+                      {tab.icon}
+                    </span>
+                    <div className="nav-more-item-info">
+                      <span className="nav-more-item-label">{tab.label}</span>
+                      <span className="nav-more-item-desc">{tab.desc}</span>
+                    </div>
+                    {activeTab === tab.id && <span className="nav-more-badge">Active</span>}
+                  </button>
+                ))}
+
+                <div className="nav-more-group-header" style={{ marginTop: '8px' }}>LIFESTYLE & PRODUCTIVITY</div>
+                {tabs.filter(t => ['calendar', 'habits', 'fitness', 'notes', 'routines', 'vault', 'jobs'].includes(t.id)).map(tab => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    className={`nav-more-item ${activeTab === tab.id ? 'active' : ''}`}
+                    onClick={() => {
+                      onTabChange(tab.id);
+                      setMoreOpen(false);
+                    }}
+                  >
+                    <span className="nav-more-item-icon" style={{ color: tab.color }}>
+                      {tab.icon}
+                    </span>
+                    <div className="nav-more-item-info">
+                      <span className="nav-more-item-label">{tab.label}</span>
+                      <span className="nav-more-item-desc">{tab.desc}</span>
+                    </div>
+                    {activeTab === tab.id && <span className="nav-more-badge">Active</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right: Actions (Bell, Theme, Lock) - Guaranteed Visible & Pinned */}
+        <div className="nav-actions-desktop">
           {/* Alerts & Reminders Bell */}
           <button
             type="button"
+            className="nav-action-btn bell-btn"
             onClick={() => setNotificationModalOpen(true)}
             title="Alerts & Reminders (EMIs, Warranties, Insurance)"
-            style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '34px',
-              height: '34px',
-              borderRadius: '10px',
-              border: '1px solid #e5e7eb',
-              background: '#fff',
-              color: notifications.length > 0 ? '#ef4444' : '#6b7280',
-              cursor: 'pointer',
-              marginLeft: '4px',
-              transition: 'all 0.2s'
-            }}
+            aria-label="Alerts and reminders"
           >
-            <Bell size={15} />
+            <Bell size={16} />
             {notifications.length > 0 && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: '-4px',
-                  right: '-4px',
-                  background: '#ef4444',
-                  color: '#fff',
-                  fontSize: '0.62rem',
-                  fontWeight: 900,
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid #fff'
-                }}
-              >
-                {notifications.length}
+              <span className="nav-notification-badge">
+                {notifications.length > 9 ? '9+' : notifications.length}
               </span>
             )}
           </button>
@@ -209,57 +354,24 @@ const Navbar: React.FC<NavbarProps> = ({
           {/* Dark Mode Toggle */}
           <button
             type="button"
+            className="nav-action-btn"
             onClick={toggleTheme}
             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '34px',
-              height: '34px',
-              borderRadius: '10px',
-              border: isDark ? '1px solid #334155' : '1px solid #e5e7eb',
-              background: isDark ? '#1e293b' : '#fff',
-              color: isDark ? '#f59e0b' : '#6b7280',
-              cursor: 'pointer',
-              marginLeft: '4px',
-              transition: 'all 0.2s'
-            }}
+            aria-label="Toggle dark mode"
           >
-            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
           {/* Quick Lock Button */}
           <button
             type="button"
+            className="nav-action-btn lock-btn"
             onClick={lockPartner}
-            title="Lock & Switch Partner"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '6px 12px',
-              borderRadius: '10px',
-              border: isDark ? '1px solid #334155' : '1px solid #e5e7eb',
-              background: isDark ? '#1e293b' : '#fff',
-              color: isDark ? '#f1f5f9' : '#6b7280',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              marginLeft: '8px',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = '#dc2626';
-              e.currentTarget.style.borderColor = '#fecaca';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = '#6b7280';
-              e.currentTarget.style.borderColor = '#e5e7eb';
-            }}
+            title="Lock & Switch Profile"
+            aria-label="Lock application"
           >
             <LogOut size={14} />
-            <span>Lock</span>
+            <span className="lock-text">Lock</span>
           </button>
         </div>
       </nav>
