@@ -37,7 +37,7 @@ export const BudgetsTracker: React.FC = () => {
 
   // Form State
   const [name, setName] = useState('');
-  const [amount, setAmount] = useState<number>(10000);
+  const [amount, setAmount] = useState<string>('10000');
   const [period, setPeriod] = useState<BudgetPlan['period']>('monthly');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['All']);
 
@@ -71,10 +71,12 @@ export const BudgetsTracker: React.FC = () => {
       setSettingsId(setObj.id);
       const sJson = setObj.settings_json || {};
       setSettings({ ...defaults, ...sJson });
-      if (sJson.customBudgets && sJson.customBudgets.length > 0) {
+      if (Array.isArray(sJson.customBudgets)) {
         setBudgets(sJson.customBudgets);
-      } else {
+      } else if (activePartnerId === 'partner_1') {
         setBudgets(DEFAULT_BUDGETS);
+      } else {
+        setBudgets([]);
       }
     } else {
       setSettings(defaults);
@@ -140,7 +142,7 @@ export const BudgetsTracker: React.FC = () => {
   const handleOpenAdd = () => {
     setEditingBudget(null);
     setName('');
-    setAmount(10000);
+    setAmount('10000');
     setPeriod('monthly');
     setSelectedCategories(['All']);
     setShowModal(true);
@@ -149,19 +151,20 @@ export const BudgetsTracker: React.FC = () => {
   const handleOpenEdit = (b: BudgetPlan) => {
     setEditingBudget(b);
     setName(b.name);
-    setAmount(b.amount);
+    setAmount(b.amount !== undefined ? String(b.amount) : '');
     setPeriod(b.period);
     setSelectedCategories(b.categories && b.categories.length > 0 ? b.categories : ['All']);
     setShowModal(true);
   };
 
   const handleSaveBudget = async () => {
-    if (!name.trim() || amount <= 0) return;
+    const numAmount = parseFloat(amount) || 0;
+    if (!name.trim() || numAmount <= 0) return;
 
     if (editingBudget) {
       const updated = budgets.map(b =>
         b.id === editingBudget.id
-          ? { ...b, name: name.trim(), amount, period, categories: selectedCategories }
+          ? { ...b, name: name.trim(), amount: numAmount, period, categories: selectedCategories }
           : b
       );
       await persistBudgets(updated);
@@ -169,7 +172,7 @@ export const BudgetsTracker: React.FC = () => {
       const newBudget: BudgetPlan = {
         id: `budget-${Date.now()}`,
         name: name.trim(),
-        amount,
+        amount: numAmount,
         period,
         categories: selectedCategories,
         created_at: new Date().toISOString()
@@ -246,10 +249,13 @@ export const BudgetsTracker: React.FC = () => {
       {/* ════════ Active Budgets List ════════ */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <p
+            style={{ fontSize: '11px', margin: 0 }}
+            className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider"
+          >
             Active Budget Limits ({budgets.length})
-          </h3>
-          <span className="text-[11px] font-bold text-slate-400">Current Month</span>
+          </p>
+          <span className="text-[10px] font-medium text-slate-400">Current Month</span>
         </div>
 
         {budgetsWithSpent.map(b => {
@@ -384,8 +390,9 @@ export const BudgetsTracker: React.FC = () => {
                   <label className="font-bold text-slate-700 block mb-1">Budget Amount (₹)</label>
                   <input
                     type="number"
+                    placeholder="0"
                     value={amount}
-                    onChange={e => setAmount(Number(e.target.value))}
+                    onChange={e => setAmount(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-pink-500"
                   />
                 </div>

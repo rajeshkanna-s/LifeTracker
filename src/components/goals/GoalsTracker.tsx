@@ -16,6 +16,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import type { SavingsGoal, ExpenseSettings } from '../../types';
 import { getDefaultExpenseSettings } from '../../data/constants';
+import { formatLocalDate } from '../../utils/expenseUtils';
 import { usePartner } from '../../context/PartnerContext';
 
 const PRESET_GOALS = [
@@ -40,17 +41,17 @@ export const GoalsTracker: React.FC = () => {
   // Modals
   const [showModal, setShowModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState<SavingsGoal | null>(null);
-  const [depositAmount, setDepositAmount] = useState<number>(0);
+  const [depositAmount, setDepositAmount] = useState<string>('');
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
 
   // Form State
   const [name, setName] = useState('');
-  const [targetAmount, setTargetAmount] = useState<number>(50000);
-  const [savedAmount, setSavedAmount] = useState<number>(0);
+  const [targetAmount, setTargetAmount] = useState<string>('50000');
+  const [savedAmount, setSavedAmount] = useState<string>('0');
   const [deadline, setDeadline] = useState<string>(() => {
     const d = new Date();
     d.setMonth(d.getMonth() + 12);
-    return d.toISOString().split('T')[0];
+    return formatLocalDate(d);
   });
   const [color, setColor] = useState('#f59e0b');
   const [icon, setIcon] = useState('🎯');
@@ -76,10 +77,9 @@ export const GoalsTracker: React.FC = () => {
       setSettingsId(setObj.id);
       const sJson = setObj.settings_json || {};
       setSettings({ ...defaults, ...sJson });
-      if (sJson.customGoals && sJson.customGoals.length > 0) {
+      if (Array.isArray(sJson.customGoals)) {
         setGoals(sJson.customGoals);
-      } else {
-        // Initial sample goals if none exist
+      } else if (activePartnerId === 'partner_1') {
         setGoals([
           {
             id: 'g-1',
@@ -102,6 +102,8 @@ export const GoalsTracker: React.FC = () => {
             status: 'active'
           }
         ]);
+      } else {
+        setGoals([]);
       }
     } else {
       setSettings(defaults);
@@ -165,16 +167,16 @@ export const GoalsTracker: React.FC = () => {
     setEditingGoal(null);
     if (preset) {
       setName(preset.name);
-      setTargetAmount(preset.defaultTarget);
+      setTargetAmount(String(preset.defaultTarget));
       setIcon(preset.icon);
       setColor(preset.color);
     } else {
       setName('');
-      setTargetAmount(50000);
+      setTargetAmount('50000');
       setIcon('🎯');
       setColor('#f59e0b');
     }
-    setSavedAmount(0);
+    setSavedAmount('0');
     setNote('');
     setStatus('active');
     setShowModal(true);
@@ -183,8 +185,8 @@ export const GoalsTracker: React.FC = () => {
   const handleOpenEdit = (g: SavingsGoal) => {
     setEditingGoal(g);
     setName(g.name);
-    setTargetAmount(g.targetAmount);
-    setSavedAmount(g.savedAmount);
+    setTargetAmount(g.targetAmount !== undefined ? String(g.targetAmount) : '');
+    setSavedAmount(g.savedAmount !== undefined ? String(g.savedAmount) : '');
     setDeadline(g.deadline || '');
     setColor(g.color || '#f59e0b');
     setIcon(g.icon || '🎯');
@@ -194,7 +196,9 @@ export const GoalsTracker: React.FC = () => {
   };
 
   const handleSaveGoal = async () => {
-    if (!name.trim() || targetAmount <= 0) return;
+    const numTarget = parseFloat(targetAmount) || 0;
+    const numSaved = parseFloat(savedAmount) || 0;
+    if (!name.trim() || numTarget <= 0) return;
 
     if (editingGoal) {
       const updated = goals.map(g =>
@@ -202,13 +206,13 @@ export const GoalsTracker: React.FC = () => {
           ? {
             ...g,
             name: name.trim(),
-            targetAmount,
-            savedAmount,
+            targetAmount: numTarget,
+            savedAmount: numSaved,
             deadline,
             color,
             icon,
             note,
-            status: status || (savedAmount >= targetAmount ? 'reached' : 'active')
+            status: status || (numSaved >= numTarget ? 'reached' : 'active')
           }
           : g
       );
@@ -217,13 +221,13 @@ export const GoalsTracker: React.FC = () => {
       const newGoal: SavingsGoal = {
         id: `goal-${Date.now()}`,
         name: name.trim(),
-        targetAmount,
-        savedAmount,
+        targetAmount: numTarget,
+        savedAmount: numSaved,
         deadline,
         color,
         icon,
         note,
-        status: status || (savedAmount >= targetAmount ? 'reached' : 'active')
+        status: status || (numSaved >= numTarget ? 'reached' : 'active')
       };
       await persistGoals([...goals, newGoal]);
     }
@@ -238,11 +242,12 @@ export const GoalsTracker: React.FC = () => {
   };
 
   const handleDeposit = async () => {
-    if (!showDepositModal || depositAmount <= 0) return;
+    const numDeposit = parseFloat(depositAmount) || 0;
+    if (!showDepositModal || numDeposit <= 0) return;
 
     const updated = goals.map(g => {
       if (g.id === showDepositModal.id) {
-        const nextSaved = g.savedAmount + depositAmount;
+        const nextSaved = g.savedAmount + numDeposit;
         return {
           ...g,
           savedAmount: nextSaved,
@@ -254,7 +259,7 @@ export const GoalsTracker: React.FC = () => {
 
     await persistGoals(updated);
     setShowDepositModal(null);
-    setDepositAmount(0);
+    setDepositAmount('');
   };
 
   const togglePauseGoal = async (g: SavingsGoal) => {
@@ -491,7 +496,7 @@ export const GoalsTracker: React.FC = () => {
                         type="button"
                         onClick={() => {
                           setShowDepositModal(g);
-                          setDepositAmount(0);
+                          setDepositAmount('');
                         }}
                         style={{ borderRadius: '9999px' }}
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-extrabold rounded-full shadow-xs active:scale-95 transition cursor-pointer"
@@ -542,8 +547,9 @@ export const GoalsTracker: React.FC = () => {
                   <label className="font-bold text-slate-700 block mb-1">Target Amount (₹)</label>
                   <input
                     type="number"
+                    placeholder="0"
                     value={targetAmount}
-                    onChange={e => setTargetAmount(Number(e.target.value))}
+                    onChange={e => setTargetAmount(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-amber-500"
                   />
                 </div>
@@ -552,8 +558,9 @@ export const GoalsTracker: React.FC = () => {
                   <label className="font-bold text-slate-700 block mb-1">Saved Already (₹)</label>
                   <input
                     type="number"
+                    placeholder="0"
                     value={savedAmount}
-                    onChange={e => setSavedAmount(Number(e.target.value))}
+                    onChange={e => setSavedAmount(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-amber-500"
                   />
                 </div>
@@ -665,8 +672,8 @@ export const GoalsTracker: React.FC = () => {
                 <input
                   type="number"
                   placeholder="0"
-                  value={depositAmount || ''}
-                  onChange={e => setDepositAmount(Number(e.target.value))}
+                  value={depositAmount}
+                  onChange={e => setDepositAmount(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-lg font-black text-slate-900 outline-none focus:border-amber-500"
                 />
               </div>
@@ -676,7 +683,10 @@ export const GoalsTracker: React.FC = () => {
                   <button
                     key={amt}
                     type="button"
-                    onClick={() => setDepositAmount(amt)}
+                    onClick={() => {
+                      const cur = parseFloat(depositAmount) || 0;
+                      setDepositAmount(String(cur + amt));
+                    }}
                     className="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 shrink-0 cursor-pointer"
                   >
                     +₹{amt.toLocaleString()}
@@ -697,7 +707,7 @@ export const GoalsTracker: React.FC = () => {
               <button
                 type="button"
                 onClick={handleDeposit}
-                disabled={depositAmount <= 0}
+                disabled={!depositAmount || parseFloat(depositAmount) <= 0}
                 style={{
                   minHeight: '44px',
                   whiteSpace: 'nowrap',

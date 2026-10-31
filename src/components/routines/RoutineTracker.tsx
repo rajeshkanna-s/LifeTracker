@@ -5,6 +5,7 @@ import type { Routine, RoutineEntry } from '../../types';
 import RoutineGrid from './RoutineGrid';
 import RoutineReports from './RoutineReports';
 import { Download, LayoutGrid, PieChart, Search, Filter, ChevronLeft, ChevronRight, ListChecks, Plus, Pencil, Trash2 } from 'lucide-react';
+import { formatLocalDate } from '../../utils/expenseUtils';
 
 const RoutineTracker: React.FC = () => {
   const { activePartnerId } = usePartner();
@@ -35,12 +36,13 @@ const RoutineTracker: React.FC = () => {
     // Calculate month boundaries for entries
     const year = baseDate.getFullYear();
     const month = baseDate.getMonth();
-    const startDate = new Date(year, month, 1).toISOString().split('T')[0];
-    const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+    const startDate = formatLocalDate(new Date(year, month, 1));
+    const endDate = formatLocalDate(new Date(year, month + 1, 0));
 
     const { data: eData } = await supabase
       .from('routine_entries')
       .select('*')
+      .eq('partner_id', activePartnerId)
       .gte('date', startDate)
       .lte('date', endDate);
       

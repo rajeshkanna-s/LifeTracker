@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatLocalDate } from '../../utils/expenseUtils';
 import { Dumbbell, Plus, Trash2, Pencil, Flame, Clock, Scale, Settings, ClipboardList, ExternalLink } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Workout, FitnessSettings } from '../../types';
@@ -21,7 +22,7 @@ const FitnessTracker: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({
-    date: new Date().toISOString().split('T')[0], type: 'Strength', title: '',
+    date: formatLocalDate(new Date()), type: 'Strength', title: '',
     duration_min: '45', calories_burned: '300', body_weight: '70.0',
     mood: '', exercises: '', notes: ''
   });
@@ -76,7 +77,7 @@ const FitnessTracker: React.FC = () => {
   };
 
   const resetForm = () => {
-    setForm({ date: new Date().toISOString().split('T')[0], type: 'Strength', title: '', duration_min: '45', calories_burned: '300', body_weight: '70.0', mood: '', exercises: '', notes: '' });
+    setForm({ date: formatLocalDate(new Date()), type: 'Strength', title: '', duration_min: '45', calories_burned: '300', body_weight: '70.0', mood: '', exercises: '', notes: '' });
     setEditId(null);
   };
 

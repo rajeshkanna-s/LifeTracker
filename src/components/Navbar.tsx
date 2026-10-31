@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Receipt,
+  Bell,
+  Moon,
+  Sun,
   CreditCard,
   Building2,
   CheckSquare,
@@ -25,6 +28,9 @@ import {
 } from 'lucide-react';
 import type { TabId } from '../types';
 import { usePartner } from '../context/PartnerContext';
+import { useTheme } from '../context/ThemeContext';
+import { fetchRemindersAndNotifications, type AppNotification } from '../utils/notificationService';
+import NotificationModal from './NotificationModal';
 import SecurityModal from './SecurityModal';
 
 interface NavbarProps {
@@ -60,6 +66,17 @@ const Navbar: React.FC<NavbarProps> = ({
   const { activePartner, activePartnerId, lockPartner } = usePartner();
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { theme, toggleTheme, isDark } = useTheme();
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchRemindersAndNotifications(activePartnerId).then(list => {
+      if (isMounted) setNotifications(list);
+    });
+    return () => { isMounted = false; };
+  }, [activePartnerId]);
 
   const isP1 = activePartnerId === 'partner_1';
   const partnerName = activePartner?.name || (isP1 ? 'Rajesh' : 'Mia');
@@ -142,6 +159,75 @@ const Navbar: React.FC<NavbarProps> = ({
               <span>{tab.label}</span>
             </button>
           ))}
+
+          {/* Alerts & Reminders Bell */}
+          <button
+            type="button"
+            onClick={() => setNotificationModalOpen(true)}
+            title="Alerts & Reminders (EMIs, Warranties, Insurance)"
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '34px',
+              height: '34px',
+              borderRadius: '10px',
+              border: '1px solid #e5e7eb',
+              background: '#fff',
+              color: notifications.length > 0 ? '#ef4444' : '#6b7280',
+              cursor: 'pointer',
+              marginLeft: '4px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Bell size={15} />
+            {notifications.length > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-4px',
+                  background: '#ef4444',
+                  color: '#fff',
+                  fontSize: '0.62rem',
+                  fontWeight: 900,
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid #fff'
+                }}
+              >
+                {notifications.length}
+              </span>
+            )}
+          </button>
+
+          {/* Dark Mode Toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '34px',
+              height: '34px',
+              borderRadius: '10px',
+              border: '1px solid #e5e7eb',
+              background: '#fff',
+              color: isDark ? '#f59e0b' : '#6b7280',
+              cursor: 'pointer',
+              marginLeft: '4px',
+              transition: 'all 0.2s'
+            }}
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
 
           {/* Quick Lock Button */}
           <button
@@ -243,6 +329,75 @@ const Navbar: React.FC<NavbarProps> = ({
             <span style={{ fontSize: '0.9rem' }}>{activePartner?.avatar || (isP1 ? '👤' : '👥')}</span>
             <span>{partnerName}</span>
             <KeyRound size={11} style={{ opacity: 0.75 }} />
+          </button>
+
+          {/* Mobile Alerts Bell */}
+          <button
+            type="button"
+            onClick={() => setNotificationModalOpen(true)}
+            aria-label="Alerts & Reminders"
+            style={{
+              position: 'relative',
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              border: '1px solid #e2e8f0',
+              background: '#f8fafc',
+              color: notifications.length > 0 ? '#ef4444' : '#64748b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              outline: 'none'
+            }}
+          >
+            <Bell size={15} />
+            {notifications.length > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-3px',
+                  right: '-3px',
+                  background: '#ef4444',
+                  color: '#fff',
+                  fontSize: '0.6rem',
+                  fontWeight: 900,
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1.5px solid #fff'
+                }}
+              >
+                {notifications.length}
+              </span>
+            )}
+          </button>
+
+          {/* Mobile Dark Mode Toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label="Toggle Dark Mode"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              border: '1px solid #e2e8f0',
+              background: '#f8fafc',
+              color: isDark ? '#f59e0b' : '#64748b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              outline: 'none'
+            }}
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
 
           {/* Quick Lock Button */}
@@ -581,6 +736,14 @@ const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
       </aside>
+
+      {/* Alerts & Reminders Modal */}
+      <NotificationModal
+        isOpen={notificationModalOpen}
+        onClose={() => setNotificationModalOpen(false)}
+        notifications={notifications}
+        onNavigateTab={onTabChange}
+      />
 
       {/* Profile & Security Modal */}
       <SecurityModal

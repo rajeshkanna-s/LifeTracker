@@ -345,8 +345,42 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ initialData, settings, expens
           </div>
 
           <div>
-            <label className="label-unified">Tags (Comma separated)</label>
-            <input placeholder="e.g. trip, office" value={form.tags} onChange={e => setForm({...form, tags: e.target.value})} className="input-unified" />
+            <div className="flex items-center justify-between mb-1">
+              <label className="label-unified !mb-0">Tags & Smart Filters</label>
+              <span className="text-[10px] text-slate-400 font-medium">Tap to toggle</span>
+            </div>
+            <input placeholder="e.g. #reimbursable, #tax-deductible" value={form.tags} onChange={e => setForm({...form, tags: e.target.value})} className="input-unified mb-2" />
+            
+            {/* Quick Tag Chips */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {['#reimbursable', '#tax-deductible', '#shared', '#personal', '#medical', '#business', '#recurring'].map(chip => {
+                const isSelected = form.tags.toLowerCase().includes(chip.toLowerCase());
+                return (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => {
+                      const currentTags = form.tags.split(',').map(t => t.trim()).filter(Boolean);
+                      let newTags: string[];
+                      if (isSelected) {
+                        newTags = currentTags.filter(t => t.toLowerCase() !== chip.toLowerCase());
+                      } else {
+                        newTags = [...currentTags, chip];
+                      }
+                      setForm({ ...form, tags: newTags.join(', ') });
+                    }}
+                    style={{ borderRadius: '9999px' }}
+                    className={`px-2.5 py-0.5 text-[11px] font-bold border transition cursor-pointer select-none active:scale-95 ${
+                      isSelected
+                        ? 'bg-purple-100 text-purple-800 border-purple-300 shadow-2xs font-extrabold'
+                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {chip}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div>

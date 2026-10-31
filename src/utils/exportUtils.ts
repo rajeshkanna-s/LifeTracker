@@ -264,3 +264,144 @@ export const exportJobsToPDF = (jobs: JobApplication[]) => {
   });
   doc.save(`jobs-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
 };
+
+
+// ── Auto-Generated Monthly Financial Statement PDF ──
+export interface MonthlyStatementData {
+  partnerName: string;
+  monthYearStr: string;
+  totalIncome: number;
+  totalExpense: number;
+  netSavings: number;
+  savingsRate: number;
+  categoryBreakdown: { category: string; amount: number; percentage: number }[];
+  topExpenses: Expense[];
+  goals: { name: string; targetAmount: number; savedAmount: number; deadline?: string }[];
+  currencySymbol: string;
+}
+
+export const exportMonthlyFinancialStatementPDF = (data: MonthlyStatementData) => {
+  const doc = new jsPDF();
+  const cur = getPDFCurrencySymbol(data.currencySymbol);
+  const money = (n: number) => `${cur} ${Number(n).toLocaleString()}`;
+
+  // 1. Header Banner
+  doc.setFillColor(15, 23, 42); // slate-900
+  doc.rect(0, 0, 210, 40, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text("MONTHLY FINANCIAL STATEMENT", 105, 18, { align: "center" });
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    `Profile: ${data.partnerName}  |  Period: ${data.monthYearStr}  |  Generated: ${format(new Date(), "dd MMM yyyy")}`,
+    105,
+    28,
+    { align: "center" }
+  );
+
+  // 2. Executive KPI Summary Cards
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(15, 23, 42);
+  doc.text("Financial Overview", 14, 52);
+
+  autoTable(doc, {
+    startY: 56,
+    theme: "grid",
+    styles: { fontSize: 9, cellPadding: 3.5, halign: "center" },
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: "bold" },
+    head: [["Total Income", "Total Expenses", "Net Savings", "Savings Rate"]],
+    body: [[
+      `+${money(data.totalIncome)}`,
+      money(data.totalExpense),
+      `${data.netSavings >= 0 ? '+' : ''}${money(data.netSavings)}`,
+      `${data.savingsRate}%`
+    ]],
+  });
+
+  // 3. Category Breakdown Table
+  let currentY = (doc as any).lastAutoTable?.finalY ?? 80;
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("Spending by Category", 14, currentY + 10);
+
+  autoTable(doc, {
+    startY: currentY + 14,
+    theme: "striped",
+    styles: { fontSize: 8.5, cellPadding: 2.5 },
+    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: "bold" },
+    head: [["#", "Category", "Amount Spent", "% of Total Spend"]],
+    body: data.categoryBreakdown.map((b, i) => [
+      (i + 1).toString(),
+      b.category,
+      money(b.amount),
+      `${b.percentage}%`
+    ]),
+  });
+
+  // 4. Top 5 Largest Expenses
+  currentY = (doc as any).lastAutoTable?.finalY ?? currentY + 40;
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("Top 5 Largest Transactions", 14, currentY + 10);
+
+  const top5 = data.topExpenses.slice(0, 5);
+  autoTable(doc, {
+    startY: currentY + 14,
+    theme: "striped",
+    styles: { fontSize: 8.5, cellPadding: 2.5 },
+    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: "bold" },
+    head: [["Date", "Description", "Category", "Platform", "Amount"]],
+    body: top5.map(e => [
+      e.date,
+      e.description || e.category || "-",
+      e.category,
+      e.platform || "UPI",
+      money(e.amount)
+    ]),
+  });
+
+  // 5. Active Goals Progress
+  if (data.goals && data.goals.length > 0) {
+    currentY = (doc as any).lastAutoTable?.finalY ?? currentY + 40;
+    if (currentY > 230) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("Savings Goals Progress", 14, currentY + 10);
+
+    autoTable(doc, {
+      startY: currentY + 14,
+      theme: "grid",
+      styles: { fontSize: 8.5, cellPadding: 2.5 },
+      headStyles: { fillColor: [245, 158, 11], textColor: [255, 255, 255], fontStyle: "bold" },
+      head: [["Goal Name", "Target Amount", "Saved Amount", "% Reached", "Target Date"]],
+      body: data.goals.map(g => [
+        g.name,
+        money(g.targetAmount),
+        money(g.savedAmount),
+        `${Math.min(100, Math.round((g.savedAmount / g.targetAmount) * 100))}%`,
+        g.deadline || "Ongoing"
+      ]),
+    });
+  }
+
+  // Footer Note
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(148, 163, 184);
+    doc.text(`Xpenser - Confidential Personal Finance Statement • Page ${i} of ${pageCount}`, 105, 290, { align: "center" });
+  }
+
+  doc.save(`Monthly-Statement-${data.partnerName}-${data.monthYearStr.replace(/\s+/g, '-')}.pdf`);
+};

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Shield, Heart, Activity, FileText, Calendar, Plus, Search, Trash2, Pencil, Download, ExternalLink, AlertCircle } from 'lucide-react';
 import type { Insurance, DebtSettings } from '../../types';
+import { formatLocalDate } from '../../utils/expenseUtils';
 
 interface DebtInsuranceProps {
   settings: DebtSettings;
@@ -125,7 +126,7 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
   };
 
   // Stat Calculations
-  const today = new Date().toISOString().split('T')[0];
+  const today = formatLocalDate(new Date());
 
   const stats = useMemo(() => {
     let activeCount = 0;
@@ -136,7 +137,7 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
 
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-    const thirtyDaysFromNowStr = thirtyDaysFromNow.toISOString().split('T')[0];
+    const thirtyDaysFromNowStr = formatLocalDate(thirtyDaysFromNow);
 
     insurances.forEach(p => {
       const isExpired = p.expireDate < today;
@@ -196,7 +197,7 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
     const isExpired = expireDate < today;
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-    const thirtyDaysFromNowStr = thirtyDaysFromNow.toISOString().split('T')[0];
+    const thirtyDaysFromNowStr = formatLocalDate(thirtyDaysFromNow);
     const isExpiringSoon = !isExpired && expireDate <= thirtyDaysFromNowStr;
 
     if (isExpired) {

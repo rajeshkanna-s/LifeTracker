@@ -18,6 +18,7 @@ import { supabase } from '../../lib/supabase';
 import type { WarrantyItem, ExpenseSettings } from '../../types';
 import { getDefaultExpenseSettings } from '../../data/constants';
 import { usePartner } from '../../context/PartnerContext';
+import { formatLocalDate } from '../../utils/expenseUtils';
 
 const DEFAULT_WARRANTIES: WarrantyItem[] = [
   {
@@ -60,9 +61,9 @@ export const WarrantiesTracker: React.FC = () => {
   const [productName, setProductName] = useState('');
   const [brand, setBrand] = useState('');
   const [store, setStore] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
+  const [purchaseDate, setPurchaseDate] = useState<string>(() => formatLocalDate(new Date()));
   const [durationMonths, setDurationMonths] = useState<number>(12);
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<string>('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -85,10 +86,12 @@ export const WarrantiesTracker: React.FC = () => {
       setSettingsId(setObj.id);
       const sJson = setObj.settings_json || {};
       setSettings({ ...defaults, ...sJson });
-      if (sJson.customWarranties && sJson.customWarranties.length > 0) {
+      if (Array.isArray(sJson.customWarranties)) {
         setWarranties(sJson.customWarranties);
-      } else {
+      } else if (activePartnerId === 'partner_1') {
         setWarranties(DEFAULT_WARRANTIES);
+      } else {
+        setWarranties([]);
       }
     } else {
       setSettings(defaults);
@@ -128,7 +131,7 @@ export const WarrantiesTracker: React.FC = () => {
   const computeExpiry = (pDate: string, months: number) => {
     const d = new Date(pDate);
     d.setMonth(d.getMonth() + months);
-    return d.toISOString().split('T')[0];
+    return formatLocalDate(d);
   };
 
   const warrantiesWithStatus = useMemo(() => {
@@ -161,10 +164,10 @@ export const WarrantiesTracker: React.FC = () => {
     setProductName('');
     setBrand('');
     setStore('');
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = formatLocalDate(new Date());
     setPurchaseDate(todayStr);
     setDurationMonths(months);
-    setPrice(0);
+    setPrice('');
     setInvoiceNumber('');
     setNotes('');
     setShowModal(true);
@@ -177,7 +180,7 @@ export const WarrantiesTracker: React.FC = () => {
     setStore(w.store || '');
     setPurchaseDate(w.purchaseDate);
     setDurationMonths(w.durationMonths);
-    setPrice(w.price || 0);
+    setPrice(w.price !== undefined && w.price !== 0 ? String(w.price) : '');
     setInvoiceNumber(w.invoiceNumber || '');
     setNotes(w.notes || '');
     setShowModal(true);
@@ -187,6 +190,7 @@ export const WarrantiesTracker: React.FC = () => {
     if (!productName.trim() || !purchaseDate) return;
 
     const expiryDate = computeExpiry(purchaseDate, durationMonths);
+    const numPrice = parseFloat(price) || 0;
 
     if (editingItem) {
       const updated = warranties.map(w =>
@@ -199,7 +203,7 @@ export const WarrantiesTracker: React.FC = () => {
               purchaseDate,
               durationMonths,
               expiryDate,
-              price,
+              price: numPrice,
               invoiceNumber,
               notes
             }
@@ -215,7 +219,7 @@ export const WarrantiesTracker: React.FC = () => {
         purchaseDate,
         durationMonths,
         expiryDate,
-        price,
+        price: numPrice,
         invoiceNumber,
         notes
       };
@@ -339,9 +343,12 @@ export const WarrantiesTracker: React.FC = () => {
       {/* ════════ Protected Products List ════════ */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <p
+            style={{ fontSize: '11px', margin: 0 }}
+            className="font-bold text-slate-400 uppercase tracking-wider"
+          >
             Protected Items ({warranties.length})
-          </h3>
+          </p>
         </div>
 
         {warrantiesWithStatus.map(w => {
@@ -548,9 +555,9 @@ export const WarrantiesTracker: React.FC = () => {
                   <label className="font-bold text-slate-700 block mb-1">Price (₹)</label>
                   <input
                     type="number"
-                    value={price || ''}
+                    value={price}
                     placeholder="0"
-                    onChange={e => setPrice(Number(e.target.value))}
+                    onChange={e => setPrice(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-emerald-500 focus:bg-white"
                   />
                 </div>

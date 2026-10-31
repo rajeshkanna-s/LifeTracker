@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { FileSpreadsheet, Filter, PieChart, TrendingUp, TrendingDown, Minus, Store, Edit2, Trash2, FileText, BarChart3, Trophy, Wallet, Layers, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { FileSpreadsheet, Filter, PieChart, TrendingUp, TrendingDown, Minus, Store, Edit2, Trash2, FileText, BarChart3, Trophy, Wallet, Layers, ArrowDownLeft, ArrowUpRight, Percent, Sparkles, Tag, Download } from 'lucide-react';
 import type { Expense, ExpenseSettings } from '../../types';
-import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, AreaChart, Area, CartesianGrid } from 'recharts';
+import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, AreaChart, Area, CartesianGrid, BarChart, Bar, Legend } from 'recharts';
 import {
   getCategoryBreakdown, getMonthStartString, getTodayString, getMonthTotal,
   getSummaryStats, getComparisonRange, getPeriodComparison, getTrendSeries,
   getDimensionBreakdown, getTopExpenses,
 } from '../../utils/expenseUtils';
-import { exportExpensesToPDF, exportExpensesToExcel } from '../../utils/exportUtils';
+import { exportExpensesToPDF, exportExpensesToExcel, exportMonthlyFinancialStatementPDF } from '../../utils/exportUtils';
+import { usePartner } from '../../context/PartnerContext';
 import { getFuelBadge } from '../../utils/fuelUtils';
 import { DEFAULT_CATEGORIES, DEFAULT_INCOME_CATEGORIES, ALL_PLATFORMS, INCOME_PLATFORMS, PAYMENT_METHODS, INCOME_CATEGORY_ICONS } from '../../data/constants';
 import { isExpense, isIncome } from '../../utils/expenseUtils';
@@ -41,9 +42,18 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
   });
   const [granularity, setGranularity] = useState<TimeGranularity>('day');
   const [dimension, setDimension] = useState<BreakdownDimension>('category');
+  const [selectedTag, setSelectedTag] = useState<string>('all');
+  const { activePartner, activePartnerId } = usePartner();
+  const partnerName = activePartner?.name || (activePartnerId === 'partner_1' ? 'Rajesh' : 'Mia');
 
   const cs = settings.currencySymbol;
-  const fmt = (n: number) => `${cs}${Number(n).toLocaleString()}`;
+  const fmt = (n: number) => {
+    const val = Number(n) || 0;
+    if (val < 0) {
+      return `-${cs}${Math.abs(val).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+    return `${cs}${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+  };
 
   const filteredExpenses = useMemo(() => {
     return expenses.filter(e => {
@@ -54,6 +64,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       if (filters.category !== 'all' && e.category !== filters.category) return false;
       if (filters.platform !== 'all' && e.platform !== filters.platform) return false;
       if (filters.paymentMethod !== 'all' && e.payment_method !== filters.paymentMethod) return false;
+      if (selectedTag !== 'all' && (!e.tags || !e.tags.toLowerCase().includes(selectedTag.toLowerCase()))) return false;
       return true;
     }).sort((a, b) => new Date(b.date + ' ' + (b.time || '00:00')).getTime() - new Date(a.date + ' ' + (a.time || '00:00')).getTime());
   }, [expenses, filters]);
@@ -93,6 +104,83 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
   const totalIncome = useMemo(() => filteredExpenses.filter(isIncome).reduce((s, e) => s + Number(e.amount), 0), [filteredExpenses]);
   const totalExpense = useMemo(() => filteredExpenses.filter(isExpense).reduce((s, e) => s + Number(e.amount), 0), [filteredExpenses]);
   const netCashFlow = totalIncome - totalExpense;
+  const savingsRate = totalIncome > 0 ? Math.max(0, Math.round((netCashFlow / totalIncome) * 100)) : 0;
+
+  // 6-Month Income vs Expense Bar Data
+  const monthlyBarData = useMemo(() => {
+    const list: { month: string; income: number; expense: number }[] = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const prefix = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleDateString('en-US', { month: 'short' });
+      let inc = 0;
+      let exp = 0;
+      for (const e of expenses) {
+        if (!e.date || !e.date.startsWith(prefix)) continue;
+        if (isIncome(e)) inc += Number(e.amount) || 0;
+        else exp += Number(e.amount) || 0;
+      }
+      list.push({ month: label, income: inc, expense: exp });
+    }
+    return list;
+  }, [expenses]);
+
+  // Month-over-Month Category Comparison
+  const monthOverMonthCategoryComparison = useMemo(() => {
+    const now = new Date();
+    const currPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevPrefix = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+
+    const currMap: Record<string, number> = {};
+    const prevMap: Record<string, number> = {};
+
+    for (const e of expenses) {
+      if (!e.date || isIncome(e)) continue;
+      const cat = e.category || 'Miscellaneous';
+      if (e.date.startsWith(currPrefix)) {
+        currMap[cat] = (currMap[cat] || 0) + Number(e.amount);
+      } else if (e.date.startsWith(prevPrefix)) {
+        prevMap[cat] = (prevMap[cat] || 0) + Number(e.amount);
+      }
+    }
+
+    const allCats = Array.from(new Set([...Object.keys(currMap), ...Object.keys(prevMap)]));
+    const comparisons = allCats.map(cat => {
+      const curr = currMap[cat] || 0;
+      const prev = prevMap[cat] || 0;
+      const diff = curr - prev;
+      return { category: cat, currentMonth: curr, previousMonth: prev, diff };
+    }).sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+    const topIncrease = comparisons.find(c => c.diff > 0);
+    const topDecrease = comparisons.find(c => c.diff < 0);
+
+    return { comparisons, topIncrease, topDecrease };
+  }, [expenses]);
+
+  // Export Full Monthly Financial Statement
+  const exportMonthlyStatement = () => {
+    try {
+      const currentMonthLabel = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      exportMonthlyFinancialStatementPDF({
+        partnerName,
+        monthYearStr: currentMonthLabel,
+        totalIncome,
+        totalExpense,
+        netSavings: netCashFlow,
+        savingsRate,
+        categoryBreakdown: catBreakdown,
+        topExpenses,
+        goals: (settings as any).customGoals || [],
+        currencySymbol: settings.currencySymbol
+      });
+    } catch (err) {
+      console.error('Error generating monthly statement PDF:', err);
+      window.alert('Failed to generate monthly statement. Please check console.');
+    }
+  };
 
   const allCategories = filters.type === 'income'
     ? DEFAULT_INCOME_CATEGORIES
@@ -141,9 +229,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
     <div className="space-y-4 pb-36">
       {/* Filters */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-        <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2 mb-3">
-          <Filter size={14} className="text-emerald-500" /> Filters
-        </h3>
+        <div className="flex items-center gap-1.5 mb-3">
+          <Filter size={14} className="text-emerald-500 shrink-0" />
+          <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+            Filters
+          </span>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           <div>
             <label className="label-unified">From</label>
@@ -183,24 +274,101 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             </select>
           </div>
         </div>
+
+        {/* Smart Tag Filters Bar */}
+        <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100 overflow-x-auto scrollbar-none">
+          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider shrink-0 flex items-center gap-1">
+            <Tag size={12} /> Tags:
+          </span>
+          {['all', '#reimbursable', '#tax-deductible', '#shared', '#personal', '#medical', '#recurring'].map(tag => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => setSelectedTag(tag)}
+              style={{ borderRadius: '9999px' }}
+              className={`px-3 py-1 text-xs font-bold transition cursor-pointer shrink-0 ${
+                selectedTag === tag
+                  ? 'bg-purple-600 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {tag === 'all' ? 'All Tags' : tag}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Summary + Comparison Row */}
+      {/* Summary Row */}
       {filters.type === 'all' ? (
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-2 sm:p-3 min-w-0">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-emerald-800 block leading-tight">Total Income</span>
-            <span className="text-xs sm:text-base lg:text-lg font-black text-emerald-700 block break-words leading-snug mt-0.5">+{fmt(totalIncome)}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {/* Income Card */}
+          <div className="bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">
+                Total Income
+              </span>
+              <div className="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-600">
+                <ArrowUpRight size={12} />
+              </div>
+            </div>
+            <p className="text-base sm:text-lg font-black text-emerald-700 dark:text-emerald-300 mt-1.5 break-words leading-tight">
+              +{fmt(totalIncome)}
+            </p>
           </div>
-          <div className="bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-100 rounded-xl p-2 sm:p-3 min-w-0">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-rose-800 block leading-tight">Total Expenses</span>
-            <span className="text-xs sm:text-base lg:text-lg font-black text-rose-700 block break-words leading-snug mt-0.5">{fmt(totalExpense)}</span>
+
+          {/* Expenses Card */}
+          <div className="bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/40 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-rose-800 dark:text-rose-300 uppercase tracking-wide">
+                Total Expenses
+              </span>
+              <div className="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center text-rose-600">
+                <ArrowDownLeft size={12} />
+              </div>
+            </div>
+            <p className="text-base sm:text-lg font-black text-rose-700 dark:text-rose-300 mt-1.5 break-words leading-tight">
+              {fmt(totalExpense)}
+            </p>
           </div>
-          <div className={`border rounded-xl p-2 sm:p-3 min-w-0 ${netCashFlow >= 0 ? 'bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 text-blue-900' : 'bg-gradient-to-br from-red-50 to-rose-50 border-red-100 text-red-900'}`}>
-            <span className="text-[10px] sm:text-[11px] font-semibold block opacity-80 leading-tight">Net Cash Flow</span>
-            <span className="text-xs sm:text-base lg:text-lg font-black block break-words leading-snug mt-0.5">
+
+          {/* Net Cash Flow Card */}
+          <div className={`border rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs ${
+            netCashFlow >= 0
+              ? 'bg-sky-50/70 dark:bg-sky-950/20 border-sky-200/60 dark:border-sky-800/40'
+              : 'bg-red-50/70 dark:bg-red-950/20 border-red-200/60 dark:border-red-800/40'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className={`text-[11px] font-bold uppercase tracking-wide ${
+                netCashFlow >= 0 ? 'text-sky-800 dark:text-sky-300' : 'text-red-800 dark:text-red-300'
+              }`}>
+                Net Cash Flow
+              </span>
+              <div className={`w-5 h-5 rounded-md flex items-center justify-center ${
+                netCashFlow >= 0 ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-600' : 'bg-red-100 dark:bg-red-900/40 text-red-600'
+              }`}>
+                <Wallet size={12} />
+              </div>
+            </div>
+            <p className={`text-base sm:text-lg font-black mt-1.5 break-words leading-tight ${
+              netCashFlow >= 0 ? 'text-sky-700 dark:text-sky-300' : 'text-red-700 dark:text-red-300'
+            }`}>
               {netCashFlow >= 0 ? '+' : ''}{fmt(netCashFlow)}
-            </span>
+            </p>
+          </div>
+
+          {/* Savings Rate Card */}
+          <div className="bg-purple-50/70 dark:bg-purple-950/20 border border-purple-200/60 dark:border-purple-800/40 rounded-2xl p-3 sm:p-3.5 min-w-0 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-purple-800 dark:text-purple-300 uppercase tracking-wide">
+                Savings Rate
+              </span>
+              <div className="w-5 h-5 rounded-md bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600">
+                <Percent size={12} />
+              </div>
+            </div>
+            <p className="text-base sm:text-lg font-black text-purple-700 dark:text-purple-300 mt-1.5 break-words leading-tight">
+              {savingsRate}%
+            </p>
           </div>
         </div>
       ) : (
@@ -225,12 +393,107 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </div>
       )}
 
-      {/* Export Buttons — Clean & prominent buttons with proper padding */}
+      {/* Month-over-Month Category Comparison Card */}
+      {monthOverMonthCategoryComparison.topIncrease && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-2xs">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <TrendingUp size={15} />
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                Month-over-Month Comparison
+              </h4>
+              <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium leading-tight mt-0.5">
+                Spending shifts compared to last month
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {monthOverMonthCategoryComparison.topIncrease && (
+              <div className="p-3 bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 rounded-xl">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                    Highest Increase
+                  </span>
+                  <span className="text-xs font-black text-rose-600 dark:text-rose-400">
+                    +{cs}{Math.abs(monthOverMonthCategoryComparison.topIncrease.diff).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                    {monthOverMonthCategoryComparison.topIncrease.category}
+                  </span>
+                  <span className="text-[10px] font-medium text-slate-400">
+                    vs last month
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {monthOverMonthCategoryComparison.topDecrease ? (
+              <div className="p-3 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 rounded-xl">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Highest Savings
+                  </span>
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    -{cs}{Math.abs(monthOverMonthCategoryComparison.topDecrease.diff).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                    {monthOverMonthCategoryComparison.topDecrease.category}
+                  </span>
+                  <span className="text-[10px] font-medium text-slate-400">
+                    vs last month
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl flex items-center justify-center text-xs text-slate-400 font-medium">
+                Keep tracking to unlock reduction insights!
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Auto-Generated Monthly Statement PDF Hero Card */}
+      <div className="bg-slate-900 dark:bg-slate-950 text-white rounded-2xl p-3.5 sm:p-4 shadow-md border border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0 text-indigo-400">
+              <FileText size={20} />
+            </div>
+            <div className="min-w-0">
+              <h4 className="text-xs sm:text-sm font-bold text-white leading-tight">
+                Monthly Financial Statement
+              </h4>
+              <p className="text-[11px] text-slate-300 font-medium leading-tight mt-0.5">
+                Complete income, expenses, category shares & goal summary
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={exportMonthlyStatement}
+            style={{ borderRadius: '12px' }}
+            className="w-full sm:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition shrink-0 shadow-sm"
+          >
+            <Download size={14} />
+            <span>Download Statement (PDF)</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Quick Export Data Buttons */}
       <div className="grid grid-cols-3 gap-2 w-full">
         <button
           onClick={exportCSV}
           style={{ borderRadius: '12px' }}
-          className="flex items-center justify-center gap-2 py-2 px-3 border border-slate-200/90 rounded-xl text-xs font-bold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700 shadow-2xs"
+          className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs"
         >
           <FileSpreadsheet size={15} className="text-emerald-600 shrink-0" />
           <span>CSV</span>
@@ -238,26 +501,29 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         <button
           onClick={exportExcel}
           style={{ borderRadius: '12px' }}
-          className="flex items-center justify-center gap-2 py-2 px-3 border border-slate-200/90 rounded-xl text-xs font-bold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700 shadow-2xs"
+          className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs"
         >
-          <FileSpreadsheet size={15} className="text-green-700 shrink-0" />
+          <FileSpreadsheet size={15} className="text-green-600 shrink-0" />
           <span>Excel</span>
         </button>
         <button
           onClick={exportPDF}
           style={{ borderRadius: '12px' }}
-          className="flex items-center justify-center gap-2 py-2 px-3 border border-slate-200/90 rounded-xl text-xs font-bold hover:bg-slate-50 transition active:scale-95 bg-white text-slate-700 shadow-2xs"
+          className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs"
         >
           <FileText size={15} className="text-red-500 shrink-0" />
-          <span>PDF</span>
+          <span>Raw PDF</span>
         </button>
       </div>
 
       {/* Summary Statistics */}
       <div className="bg-white border border-slate-200 rounded-xl p-4">
-        <h3 className="text-sm font-bold flex items-center gap-2 mb-3">
-          <BarChart3 size={16} className="text-indigo-500" /> Summary
-        </h3>
+        <div className="flex items-center gap-1.5 mb-3">
+          <BarChart3 size={15} className="text-indigo-500 shrink-0" />
+          <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+            Summary
+          </span>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {[
             { label: 'Total', value: fmt(stats.total) },
@@ -275,12 +541,41 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </div>
       </div>
 
+      {/* 6-Month Income vs Expense Bar Chart */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 min-w-0 shadow-2xs">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div className="flex items-center gap-1.5">
+            <BarChart3 size={15} className="text-indigo-600 shrink-0" />
+            <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-900">
+              6-Month Income vs Expense Trajectory
+            </span>
+          </div>
+          <span className="text-[11px] font-bold text-slate-400">Monthly Cashflow</span>
+        </div>
+        <div className="h-[210px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthlyBarData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fontWeight: 600 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip formatter={(value: any) => fmt(Number(value))} />
+              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+              <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="expense" name="Expense" fill="#f43f5e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* Spending Trend */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <TrendingUp size={16} className="text-emerald-500" /> Spending Trend
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <TrendingUp size={15} className="text-emerald-500 shrink-0" />
+            <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+              Spending Trend
+            </span>
+          </div>
           <div className="flex bg-slate-100 rounded-lg p-0.5">
             {(['day', 'week', 'month'] as TimeGranularity[]).map(g => (
               <button key={g} onClick={() => setGranularity(g)}
@@ -317,9 +612,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {catBreakdown.length > 0 && (
           <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
-            <h3 className="text-sm font-bold flex items-center gap-2 mb-4">
-              <PieChart size={16} className="text-purple-500" /> By Category
-            </h3>
+            <div className="flex items-center gap-1.5 mb-4">
+              <PieChart size={15} className="text-purple-500 shrink-0" />
+              <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+                By Category
+              </span>
+            </div>
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPie>
@@ -347,9 +645,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         {/* Breakdown by Dimension */}
         <div className="bg-white border border-slate-200 rounded-xl p-4 min-w-0">
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <h3 className="text-sm font-bold flex items-center gap-2">
-              <Layers size={16} className="text-blue-500" /> Breakdown
-            </h3>
+            <div className="flex items-center gap-1.5">
+              <Layers size={15} className="text-blue-500 shrink-0" />
+              <span style={{ fontSize: '11px', fontWeight: 700, margin: 0 }} className="text-slate-800">
+                Breakdown
+              </span>
+            </div>
             <select value={dimension} onChange={e => setDimension(e.target.value as BreakdownDimension)} className="input-unified !py-1 !text-xs max-w-[130px]">
               {(Object.keys(DIMENSION_LABELS) as BreakdownDimension[]).map(d => (
                 <option key={d} value={d}>{DIMENSION_LABELS[d]}</option>
@@ -378,9 +679,21 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
 
       {/* Budget vs Actual */}
       <div className="bg-white border border-slate-200 rounded-xl p-4">
-        <h3 className="text-sm font-bold flex items-center gap-2 mb-3">
-          <Wallet size={16} className="text-amber-500" /> Budget vs Actual (This Month)
-        </h3>
+        <div className="flex items-center gap-1.5 mb-3 min-w-0">
+          <Wallet size={14} className="text-amber-500 shrink-0" />
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              lineHeight: '1',
+              margin: 0
+            }}
+            className="text-slate-700 dark:text-slate-200"
+          >
+            Budget vs Actual (This Month)
+          </span>
+        </div>
         {(settings.monthlyBudget > 0 || settings.categoryBudgets.length > 0) ? (
           <div className="space-y-3">
             {settings.monthlyBudget > 0 && (() => {
@@ -428,9 +741,12 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
 
       {/* Top Expenses */}
       <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
-        <h3 className="text-sm font-black text-slate-900 flex items-center gap-2 mb-3">
-          <Trophy size={16} className="text-yellow-500 shrink-0" /> Top Expenses
-        </h3>
+        <div className="flex items-center gap-1.5 mb-3">
+          <Trophy size={15} className="text-yellow-500 shrink-0" />
+          <span style={{ fontSize: '11px', fontWeight: 800, margin: 0 }} className="text-slate-900">
+            Top Expenses
+          </span>
+        </div>
         {topExpenses.length === 0 ? (
           <div className="text-center py-6 text-slate-400 text-sm">No qualifying expenses.</div>
         ) : (
@@ -483,9 +799,9 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
               <Store size={16} />
             </div>
-            <h3 className="text-sm font-black text-slate-900 leading-none">
+            <span style={{ fontSize: '12px', fontWeight: 800, margin: 0, lineHeight: 1 }} className="text-slate-900">
               Expense History
-            </h3>
+            </span>
             <span className="px-2 py-0.5 text-xs font-black bg-blue-50 text-blue-700 border border-blue-200/70 rounded-full leading-none">
               {filteredExpenses.length}
             </span>

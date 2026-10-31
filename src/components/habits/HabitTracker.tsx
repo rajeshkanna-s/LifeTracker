@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatLocalDate } from '../../utils/expenseUtils';
 import { CheckSquare, Plus, Trash2, Check, ChevronLeft, ChevronRight, Settings, Target, TrendingUp, Calendar, Flame } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Habit, HabitEntry, HabitSettings } from '../../types';
@@ -17,7 +18,7 @@ const getWeekDates = (baseDate: Date): string[] => {
   return Array.from({ length: 7 }, (_, i) => {
     const date = new Date(monday);
     date.setDate(monday.getDate() + i);
-    return date.toISOString().split('T')[0];
+    return formatLocalDate(date);
   });
 };
 
@@ -144,7 +145,7 @@ const HabitTracker: React.FC = () => {
   const nextWeek = () => { const d = new Date(baseDate); d.setDate(d.getDate() + 7); setBaseDate(d); };
   const goToday = () => setBaseDate(new Date());
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = formatLocalDate(new Date());
   const totalCompleted = entries.filter(e => e.completed).length;
   const todayCompleted = entries.filter(e => e.completed && e.date === today).length;
   const totalStreaks = habits.length > 0 ? Math.round((totalCompleted / (habits.length * 7)) * 100) : 0;

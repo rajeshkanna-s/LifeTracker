@@ -51,13 +51,13 @@ export const AccountsTracker: React.FC = () => {
   // Add / Edit Form State
   const [formName, setFormName] = useState('');
   const [formType, setFormType] = useState<AccountItem['type']>('checking');
-  const [formBalance, setFormBalance] = useState<number>(0);
+  const [formBalance, setFormBalance] = useState<string>('');
   const [formNotes, setFormNotes] = useState('');
 
   // Transfer Form State
   const [transferFrom, setTransferFrom] = useState('');
   const [transferTo, setTransferTo] = useState('');
-  const [transferAmount, setTransferAmount] = useState<number>(0);
+  const [transferAmount, setTransferAmount] = useState<string>('');
 
   useEffect(() => {
     fetchAccounts();
@@ -78,10 +78,12 @@ export const AccountsTracker: React.FC = () => {
       setSettingsId(setObj.id);
       const sJson = setObj.settings_json || {};
       setSettings({ ...defaults, ...sJson });
-      if (sJson.customAccounts && sJson.customAccounts.length > 0) {
+      if (Array.isArray(sJson.customAccounts)) {
         setAccounts(sJson.customAccounts);
-      } else {
+      } else if (activePartnerId === 'partner_1') {
         setAccounts(DEFAULT_ACCOUNTS);
+      } else {
+        setAccounts([]);
       }
     } else {
       setSettings(defaults);
@@ -126,7 +128,7 @@ export const AccountsTracker: React.FC = () => {
     setEditingAccount(null);
     setFormName('');
     setFormType('checking');
-    setFormBalance(0);
+    setFormBalance('');
     setFormNotes('');
     setShowAddModal(true);
   };
@@ -135,18 +137,20 @@ export const AccountsTracker: React.FC = () => {
     setEditingAccount(acc);
     setFormName(acc.name);
     setFormType(acc.type);
-    setFormBalance(acc.balance);
+    setFormBalance(acc.balance !== undefined ? String(acc.balance) : '');
     setFormNotes(acc.notes || '');
     setShowAddModal(true);
   };
 
   const handleSaveAccount = async () => {
     if (!formName.trim()) return;
+    const numBalance = formBalance === '' ? 0 : Number(formBalance);
+    if (isNaN(numBalance)) return;
 
     if (editingAccount) {
       const updated = accounts.map(a =>
         a.id === editingAccount.id
-          ? { ...a, name: formName.trim(), type: formType, balance: formBalance, notes: formNotes }
+          ? { ...a, name: formName.trim(), type: formType, balance: numBalance, notes: formNotes }
           : a
       );
       await persistAccounts(updated);
@@ -155,7 +159,7 @@ export const AccountsTracker: React.FC = () => {
         id: `acc-${Date.now()}`,
         name: formName.trim(),
         type: formType,
-        balance: formBalance,
+        balance: numBalance,
         notes: formNotes,
         updated_at: new Date().toISOString()
       };
@@ -172,17 +176,18 @@ export const AccountsTracker: React.FC = () => {
   };
 
   const handleExecuteTransfer = async () => {
-    if (!transferFrom || !transferTo || transferFrom === transferTo || transferAmount <= 0) return;
+    const amt = parseFloat(transferAmount) || 0;
+    if (!transferFrom || !transferTo || transferFrom === transferTo || amt <= 0) return;
 
     const updated = accounts.map(a => {
-      if (a.id === transferFrom) return { ...a, balance: a.balance - transferAmount };
-      if (a.id === transferTo) return { ...a, balance: a.balance + transferAmount };
+      if (a.id === transferFrom) return { ...a, balance: a.balance - amt };
+      if (a.id === transferTo) return { ...a, balance: a.balance + amt };
       return a;
     });
 
     await persistAccounts(updated);
     setShowTransferModal(false);
-    setTransferAmount(0);
+    setTransferAmount('');
   };
 
   if (loading) {
@@ -241,9 +246,12 @@ export const AccountsTracker: React.FC = () => {
 
       {/* ════════ Accounts List ════════ */}
       <div className="space-y-2">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
+        <p
+          style={{ fontSize: '11px', margin: 0 }}
+          className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-1"
+        >
           Wallets & Bank Accounts
-        </h3>
+        </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {accounts.map(acc => {
@@ -349,8 +357,9 @@ export const AccountsTracker: React.FC = () => {
                 <label className="font-bold text-slate-700 block mb-1">Current Balance (₹)</label>
                 <input
                   type="number"
+                  placeholder="0"
                   value={formBalance}
-                  onChange={e => setFormBalance(Number(e.target.value))}
+                  onChange={e => setFormBalance(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-sky-500"
                 />
               </div>
@@ -447,8 +456,8 @@ export const AccountsTracker: React.FC = () => {
                 <input
                   type="number"
                   placeholder="0"
-                  value={transferAmount || ''}
-                  onChange={e => setTransferAmount(Number(e.target.value))}
+                  value={transferAmount}
+                  onChange={e => setTransferAmount(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-sky-500"
                 />
               </div>
@@ -466,7 +475,7 @@ export const AccountsTracker: React.FC = () => {
               <button
                 type="button"
                 onClick={handleExecuteTransfer}
-                disabled={transferAmount <= 0 || transferFrom === transferTo}
+                disabled={!transferAmount || parseFloat(transferAmount) <= 0 || transferFrom === transferTo}
                 style={{
                   minHeight: '44px',
                   whiteSpace: 'nowrap',

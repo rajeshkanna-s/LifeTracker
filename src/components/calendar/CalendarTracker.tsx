@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Expense, TabId, ExpenseSettings } from '../../types';
-import { normalizeTransaction, isIncome } from '../../utils/expenseUtils';
+import { normalizeTransaction, isIncome, formatLocalDate } from '../../utils/expenseUtils';
 import { CATEGORY_EMOJIS, INCOME_CATEGORY_ICONS, getDefaultExpenseSettings } from '../../data/constants';
 import { usePartner } from '../../context/PartnerContext';
 import ExpenseForm from '../expenses/ExpenseForm';
@@ -34,7 +34,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   const { activePartnerId } = usePartner();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDateStr, setSelectedDateStr] = useState<string>(() => {
-    return new Date().toISOString().split('T')[0];
+    return formatLocalDate(new Date());
   });
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -95,7 +95,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   const month = currentDate.getMonth(); // 0-indexed
 
   const monthLabel = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const todayStr = useMemo(() => formatLocalDate(new Date()), []);
 
   // Filtered transactions by typeFilter
   const filteredExpenses = useMemo(() => {
@@ -275,7 +275,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   const handleGoToday = () => {
     const now = new Date();
     setCurrentDate(now);
-    setSelectedDateStr(now.toISOString().split('T')[0]);
+    setSelectedDateStr(formatLocalDate(now));
   };
 
   // Add / Edit Transaction Handlers
@@ -455,12 +455,12 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
             <button
               type="button"
               onClick={() => setShowHolidayModal(true)}
-              aria-label="Open Indian Govt Holidays & Real Calendar"
-              title="Real Calendar with Indian Govt Holidays for all years"
+              aria-label="Open Indian Govt Holidays & Calendar"
+              title="Calendar with Indian Govt Holidays for all years"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 hover:from-orange-600 hover:to-emerald-700 text-white rounded-full text-xs font-black shadow-xs active:scale-95 transition cursor-pointer shrink-0"
             >
               <CalendarIcon size={14} strokeWidth={2.4} />
-              <span className="hidden sm:inline">Real Calendar</span>
+              <span className="hidden sm:inline">Calendar</span>
               <span>🇮🇳</span>
             </button>
           </div>
@@ -658,13 +658,13 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
             {/* Header: Date + Action */}
             <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
-                  <h3 className="text-base font-black text-slate-900 truncate">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
                     {formattedSelectedDate}
                   </h3>
                   {selectedDateStr === todayStr && (
-                    <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full shrink-0 leading-none">
                       Today
                     </span>
                   )}
@@ -704,9 +704,15 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                   <button
                     type="button"
                     onClick={handleOpenAdd}
-                    className="mt-2 text-xs font-bold text-emerald-700 hover:text-emerald-800 underline cursor-pointer"
+                    style={{
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                      boxShadow: '0 2px 8px rgba(5, 150, 105, 0.28)'
+                    }}
+                    className="mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-bold text-xs active:scale-95 transition cursor-pointer"
                   >
-                    + Add an expense or income
+                    <Plus size={14} strokeWidth={2.5} />
+                    <span>Add Expense or Income</span>
                   </button>
                 </div>
               ) : (

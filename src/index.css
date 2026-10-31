@@ -36,6 +36,19 @@ html { width: 100%; overflow-x: clip; text-size-adjust: 100%; }
 body { font-family: var(--font-family); background: var(--bg-body); color: var(--text-primary); min-height: 100vh; width: 100%; overflow-x: clip; -webkit-font-smoothing: antialiased; }
 #root { min-height: 100vh; }
 button, input, select, textarea { font: inherit; }
+h1:not(.modal-title):not(.modal-header *),
+h2:not(.modal-title):not(.modal-header *),
+h3:not(.modal-title):not(.modal-header *),
+h4:not(.modal-title):not(.modal-header *),
+h5:not(.modal-title):not(.modal-header *),
+h6:not(.modal-title):not(.modal-header *) {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin-top: 0;
+  margin-bottom: 0;
+}
 
 /* ── Universal Premium Button Feel & Rounded Corners (No sharp rectangles) ── */
 button {
@@ -1538,4 +1551,88 @@ main {
   box-shadow: 0 2px 6px rgba(5, 150, 105, 0.45);
   cursor: pointer;
   transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Dark Mode System (Night-Time Comfort & Contrast)
+   ═══════════════════════════════════════════════════════════════ */
+html.dark,
+body.dark-mode {
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark main {
+  background-color: #0b0f19 !important;
+}
+
+.dark .mobile-app-header {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-bottom-color: rgba(51, 65, 85, 0.8) !important;
+}
+
+.dark .mobile-app-header span:first-child {
+  color: #f8fafc !important;
+}
+
+.dark .mobile-app-header button {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.dark .bg-white {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: #0f172a !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+.dark .border-slate-200,
+.dark .border-slate-200\/90,
+.dark .border-slate-200\/80,
+.dark .border-slate-200\/60,
+.dark .border-slate-100 {
+  border-color: #334155 !important;
+}
+
+.dark .card-dark,
+.dark .modal-box {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+.dark .input-unified,
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark select,
+.dark textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.dark .app-drawer {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
 }

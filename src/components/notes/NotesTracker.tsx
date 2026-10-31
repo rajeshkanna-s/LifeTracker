@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StickyNote, Plus, Trash2, Pencil, Pin, PinOff, Search, Clock, X, Save, ChevronRight, BookOpen, FileText, Star, StarOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePartner } from '../../context/PartnerContext';
+import { formatLocalDate } from '../../utils/expenseUtils';
 
 interface DailyNote {
   id: string;
@@ -45,7 +46,7 @@ const NotesTracker: React.FC = () => {
 
   const [form, setForm] = useState({
     title: '', content: '', mood: '', tags: '',
-    date: new Date().toISOString().split('T')[0],
+    date: formatLocalDate(new Date()),
   });
 
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -63,7 +64,7 @@ const NotesTracker: React.FC = () => {
   };
 
   const resetForm = () => {
-    setForm({ title: '', content: '', mood: '', tags: '', date: new Date().toISOString().split('T')[0] });
+    setForm({ title: '', content: '', mood: '', tags: '', date: formatLocalDate(new Date()) });
     setEditId(null);
   };
 
@@ -95,7 +96,7 @@ const NotesTracker: React.FC = () => {
     const payload = {
       title: '',
       content: quickNote.trim(),
-      date: new Date().toISOString().split('T')[0],
+      date: formatLocalDate(new Date()),
       updated_at: new Date().toISOString(),
     };
     await supabase.from('daily_notes').insert(payload);

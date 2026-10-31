@@ -3,6 +3,7 @@ import { DEFAULT_INCOME_CATEGORIES } from '../data/constants';
 import { format, parseISO, startOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 
 export const getTodayString = () => format(new Date(), 'yyyy-MM-dd');
+export const formatLocalDate = (d: Date): string => format(d, 'yyyy-MM-dd');
 export const getCurrentTimeString = () => format(new Date(), 'HH:mm');
 export const getMonthStartString = () => format(startOfMonth(new Date()), 'yyyy-MM-dd');
 export const getWeekStartString = () => format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');

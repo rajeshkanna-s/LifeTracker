@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PartnerProvider, usePartner } from './context/PartnerContext';
+import { ThemeProvider } from './context/ThemeContext';
 import PartnerGateway from './components/PartnerGateway';
 import Navbar from './components/Navbar';
 import ExpenseTracker from './components/expenses/ExpenseTracker';
@@ -122,9 +123,11 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <PartnerProvider>
-      <AppContent />
-    </PartnerProvider>
+    <ThemeProvider>
+      <PartnerProvider>
+        <AppContent />
+      </PartnerProvider>
+    </ThemeProvider>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatLocalDate } from '../../utils/expenseUtils';
 import { Building2, Plus, Search, Pencil, Trash2, Briefcase, Calendar, Users, XCircle, Settings } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { JobApplication, JobSettings } from '../../types';
@@ -23,7 +24,7 @@ const JobTracker: React.FC = () => {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('All Status');
   const [form, setForm] = useState({
-    company: '', role: '', applied_date: new Date().toISOString().split('T')[0],
+    company: '', role: '', applied_date: formatLocalDate(new Date()),
     source: '', status: 'Applied', job_type: '', first_call_date: '', first_call_info: '',
     interview_date: '', interview_time: '', interview_mode: '', offer_amount: '', notes: ''
   });
@@ -78,7 +79,7 @@ const JobTracker: React.FC = () => {
   };
 
   const resetForm = () => {
-    setForm({ company: '', role: '', applied_date: new Date().toISOString().split('T')[0], source: '', status: 'Applied', job_type: '', first_call_date: '', first_call_info: '', interview_date: '', interview_time: '', interview_mode: '', offer_amount: '', notes: '' });
+    setForm({ company: '', role: '', applied_date: formatLocalDate(new Date()), source: '', status: 'Applied', job_type: '', first_call_date: '', first_call_info: '', interview_date: '', interview_time: '', interview_mode: '', offer_amount: '', notes: '' });
     setEditId(null);
   };
 

@@ -35,7 +35,7 @@ const RoutineGrid: React.FC<RoutineGridProps> = ({
   const monthlyRoutines = routines.filter(r => r.frequency === 'monthly');
   const yearlyRoutines = routines.filter(r => r.frequency === 'yearly');
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
 
   const renderRow = (routine: Routine, bgClass: string, textClass: string) => {
     return (

@@ -3,8 +3,11 @@ import { Sparkles, Target, ArrowUpRight, ArrowDownLeft, Wallet, Search, Lightbul
 import type { Expense, ExpenseSettings, QuickAddTemplate } from '../../types';
 import { usePartner } from '../../context/PartnerContext';
 import { CATEGORY_EMOJIS, INCOME_CATEGORY_ICONS } from '../../data/constants';
-import { getTodayTotal, getMonthTotal, getWeekTotal, getYearTotal, getNoSpendDays, getTodayString, getCurrentTimeString, getWeekStartString, getWeekEndString, getMonthExpenseTotal, getMonthIncomeTotal, getTodayExpenseTotal, getTodayIncomeTotal, getWeekExpenseTotal, getWeekIncomeTotal, isExpense, isIncome } from '../../utils/expenseUtils';
+import { formatLocalDate, getTodayTotal, getMonthTotal, getWeekTotal, getYearTotal, getNoSpendDays, getTodayString, getCurrentTimeString, getWeekStartString, getWeekEndString, getMonthExpenseTotal, getMonthIncomeTotal, getTodayExpenseTotal, getTodayIncomeTotal, getWeekExpenseTotal, getWeekIncomeTotal, isExpense, isIncome } from '../../utils/expenseUtils';
 import { getFuelBadge, isFuelCategory } from '../../utils/fuelUtils';
+import { NoSpendChallengeModal } from './NoSpendChallengeModal';
+import { SharedShoppingListModal } from './SharedShoppingListModal';
+import { RecurringBillsModal } from './RecurringBillsModal';
 
 interface ExpenseHomeProps {
   expenses: Expense[];
@@ -35,12 +38,45 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
   const [dayNote, setDayNote] = useState('');
   const [editingNote, setEditingNote] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showNoSpendModal, setShowNoSpendModal] = useState(false);
+  const [showShoppingListModal, setShowShoppingListModal] = useState(false);
+  const [showRecurringModal, setShowRecurringModal] = useState(false);
+
+  // Expiring Warranties (Only before 1 month: <= 30 days and >= today)
+  const expiringWarranties = useMemo(() => {
+    const warranties = (settings as any).customWarranties || [];
+    const today = new Date();
+    const todayStr = formatLocalDate(today);
+    const thirtyDaysLater = new Date();
+    thirtyDaysLater.setDate(today.getDate() + 30);
+    const thirtyDaysStr = formatLocalDate(thirtyDaysLater);
+
+    return warranties.map((w: any) => {
+      if (!w.purchaseDate || !w.durationMonths) return null;
+      const pDate = new Date(w.purchaseDate);
+      pDate.setMonth(pDate.getMonth() + Number(w.durationMonths));
+      const expStr = formatLocalDate(pDate);
+      const diffDays = Math.max(0, Math.ceil((pDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+      return { ...w, expiryDate: expStr, diffDays };
+    }).filter((w: any) => w && w.expiryDate >= todayStr && w.expiryDate <= thirtyDaysStr);
+  }, [settings]);
+
+  // Active Goals for Progress Bar Widget
+  const activeGoals = useMemo(() => {
+    const goals = (settings as any).customGoals || [];
+    return goals.filter((g: any) => g.status !== 'reached' && g.savedAmount < g.targetAmount).slice(0, 3);
+  }, [settings]);
+
+  // Recurring Bills due soon
+  const dueRecurringBills = useMemo(() => {
+    const rbs = (settings as any).recurringBills || [];
+    const currentDay = new Date().getDate();
+    return rbs.filter((b: any) => Math.abs(b.dueDay - currentDay) <= 3);
+  }, [settings]);
   const [filterCat, setFilterCat] = useState('');
   const [txTypeFilter, setTxTypeFilter] = useState<'all' | 'expense' | 'income'>('all');
   const [slide, setSlide] = useState(0);
   const [justAdded, setJustAdded] = useState<string | null>(null);
-  const [quickPrompt, setQuickPrompt] = useState<QuickAddTemplate | null>(null);
-  const [promptAmount, setPromptAmount] = useState('');
   const trackRef = useRef<HTMLDivElement>(null);
 
   // Touch and drag swipe state for Quick Add carousel
@@ -149,20 +185,6 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
       notes: '',
       created_at: new Date().toISOString()
     });
-  };
-
-  const confirmQuickAdd = async () => {
-    const amount = Number(promptAmount);
-    if (!quickPrompt || !promptAmount.trim() || isNaN(amount) || amount <= 0) return;
-    const t = quickPrompt;
-    setQuickPrompt(null);
-    await onAddExpense({
-      amount, category: t.category, platform: t.platform,
-      payment_method: 'UPI', date: getTodayString(), time: getCurrentTimeString(),
-      description: t.name, person: 'Me', tags: '', notes: ''
-    });
-    setJustAdded(t.id);
-    setTimeout(() => setJustAdded(null), 1200);
   };
 
   // Build Quick Add items: saved templates + auto-derived from every transaction.
@@ -387,14 +409,185 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
         ))}
       </div>
 
+      {/* Expiring Warranties Banner — Only displays within 1 month (<= 30 days) */}
+      {expiringWarranties.length > 0 && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/60 rounded-2xl p-3.5 shadow-xs">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⚠️</span>
+              <div>
+                <h4 className="text-xs font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wide">
+                  Warranty Expiring Soon
+                </h4>
+                <p className="text-[11px] text-amber-700 dark:text-amber-400">
+                  {expiringWarranties.length} item{expiringWarranties.length > 1 ? 's' : ''} expiring within 30 days
+                </p>
+              </div>
+            </div>
+            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+              Expiring Soon
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            {expiringWarranties.map((w: any, idx: number) => (
+              <div key={idx} className="flex items-center justify-between bg-white dark:bg-slate-900/60 p-2 rounded-xl border border-amber-200 dark:border-amber-900/40 text-xs">
+                <div className="flex items-center gap-2 truncate">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">{w.productName}</span>
+                  {w.brand && <span className="text-[10px] text-slate-400">({w.brand})</span>}
+                </div>
+                <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 shrink-0 ml-2">
+                  Expires in {w.diffDays} day{w.diffDays === 1 ? '' : 's'} ({w.expiryDate})
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Active Goals Progress Bars */}
+      {activeGoals.length > 0 && (
+        <div className="card-dark">
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Target size={13} className="text-violet-600 dark:text-violet-400 shrink-0" />
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  lineHeight: '1',
+                  margin: 0
+                }}
+                className="text-slate-500 dark:text-slate-400"
+              >
+                Active Goals Progress
+              </span>
+            </div>
+            <span
+              style={{ fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap', lineHeight: '1' }}
+              className="text-violet-600 dark:text-violet-400 shrink-0 bg-violet-50 dark:bg-violet-900/30 px-2 py-1 rounded-full border border-violet-200/50 dark:border-violet-800/40"
+            >
+              {activeGoals.length} Active
+            </span>
+          </div>
+          <div className="space-y-2">
+            {activeGoals.map((g: any, i: number) => {
+              const pct = Math.min(100, Math.round(((g.savedAmount || 0) / (g.targetAmount || 1)) * 100));
+              return (
+                <div key={i} className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/60">
+                  <div className="flex items-center justify-between text-xs font-semibold mb-1 min-w-0">
+                    <span className="text-slate-800 dark:text-slate-200 truncate">{g.name}</span>
+                    <span className="text-violet-600 dark:text-violet-400 font-bold ml-2 shrink-0 whitespace-nowrap text-[11px]">
+                      {settings.currencySymbol}{(g.savedAmount || 0).toLocaleString()} / {settings.currencySymbol}{(g.targetAmount || 0).toLocaleString()} ({pct}%)
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${pct}%`,
+                        background: pct >= 100 ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, #f59e0b, #d97706)'
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Quick Power Tools — No-Spend Streak, Shared List, Recurring Bills */}
+      <div className="grid grid-cols-3 gap-2">
+        <button
+          type="button"
+          onClick={() => setShowNoSpendModal(true)}
+          style={{
+            padding: '10px 8px',
+            borderRadius: '14px',
+            border: '1px solid #e2e8f0',
+            background: 'linear-gradient(180deg, #ffffff, #f8fafc)',
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            transition: 'all 0.15s ease'
+          }}
+          className="hover:border-violet-300 active:scale-95 text-slate-800 dark:text-slate-200 dark:bg-slate-800 dark:border-slate-700"
+        >
+          <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 text-sm">
+            🎯
+          </div>
+          <span className="text-[11px] font-bold leading-tight">No-Spend</span>
+          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400">Streak & Badges</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowShoppingListModal(true)}
+          style={{
+            padding: '10px 8px',
+            borderRadius: '14px',
+            border: '1px solid #e2e8f0',
+            background: 'linear-gradient(180deg, #ffffff, #f8fafc)',
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            transition: 'all 0.15s ease'
+          }}
+          className="hover:border-violet-300 active:scale-95 text-slate-800 dark:text-slate-200 dark:bg-slate-800 dark:border-slate-700"
+        >
+          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 text-sm">
+            🛒
+          </div>
+          <span className="text-[11px] font-bold leading-tight">Shared List</span>
+          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400">Rajesh & Mia</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowRecurringModal(true)}
+          style={{
+            padding: '10px 8px',
+            borderRadius: '14px',
+            border: '1px solid #e2e8f0',
+            background: 'linear-gradient(180deg, #ffffff, #f8fafc)',
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            transition: 'all 0.15s ease'
+          }}
+          className="hover:border-violet-300 active:scale-95 text-slate-800 dark:text-slate-200 dark:bg-slate-800 dark:border-slate-700"
+        >
+          <div className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center text-violet-600 text-sm">
+            🔄
+          </div>
+          <span className="text-[11px] font-bold leading-tight">Recurring</span>
+          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400">Bills & Dues</span>
+        </button>
+      </div>
+
       {/* Quick Add — Mobile Swipeable Carousel */}
       <div className="card-dark overflow-hidden">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
             <Sparkles size={16} className="text-amber-500 shrink-0" />
-            <h3 className="font-bold text-sm text-slate-900 whitespace-nowrap">
+            <span style={{ fontSize: '12px', fontWeight: 700, margin: 0 }} className="text-slate-900 dark:text-slate-100 whitespace-nowrap">
               Quick Add
-            </h3>
+            </span>
             <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded-full border border-violet-100 shrink-0">
               {quickItems.length}
             </span>
@@ -513,7 +706,9 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
       <div className="card-dark !p-0">
         <div className="flex items-center justify-between p-3 pb-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-sm text-slate-900">Recently</h3>
+            <span style={{ fontSize: '12px', fontWeight: 700, margin: 0 }} className="text-slate-900 dark:text-slate-100">
+              Recently
+            </span>
             <span className="text-[10px] font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-100">
               This Week
             </span>
@@ -721,72 +916,45 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
           <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">{dayNote}</p>
         )}
       </div>
-      {/* Quick Add — Amount Confirm Prompt */}
-      {quickPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setQuickPrompt(null)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-5" onClick={e => e.stopPropagation()}>
-            <div className="text-center">
-              <div className="text-3xl mb-1">{quickPrompt.icon}</div>
-              <h4 className="text-sm font-bold text-slate-900">{quickPrompt.name}</h4>
-              <p className="text-[11px] text-slate-400 mt-0.5">{quickPrompt.category}</p>
-            </div>
-            <div className="mt-4">
-              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Amount</label>
-                          <button
-                type="button"
-                onClick={() => setQuickPrompt(null)}
-                style={{
-                  flex: 1,
-                  minHeight: '44px',
-                  padding: '10px 16px',
-                  borderRadius: '12px',
-                  background: '#f8fafc',
-                  border: '1.5px solid #cbd5e1',
-                  color: '#475569',
-                  fontSize: '0.86rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-                  transition: 'all 0.15s ease'
-                }}
-                onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
-                onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={confirmQuickAdd}
-                disabled={!promptAmount.trim() || isNaN(Number(promptAmount)) || Number(promptAmount) <= 0}
-                style={{
-                  flex: 1,
-                  minHeight: '44px',
-                  padding: '10px 16px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  background: '#7c3aed',
-                  color: '#ffffff',
-                  fontSize: '0.86rem',
-                  fontWeight: 700,
-                  cursor: (!promptAmount.trim() || isNaN(Number(promptAmount)) || Number(promptAmount) <= 0) ? 'not-allowed' : 'pointer',
-                  opacity: (!promptAmount.trim() || isNaN(Number(promptAmount)) || Number(promptAmount) <= 0) ? 0.5 : 1,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)',
-                  transition: 'all 0.15s ease'
-                }}
-                onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
-                onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
+
+      {/* No Spend Challenge Modal */}
+      {showNoSpendModal && (
+        <NoSpendChallengeModal
+          isOpen={showNoSpendModal}
+          onClose={() => setShowNoSpendModal(false)}
+          expenses={expenses}
+          settings={settings}
+          onUpdateSettings={async (patch) => {
+            onSettingsChange({ ...settings, ...patch });
+          }}
+        />
+      )}
+
+      {/* Shared Shopping List Modal */}
+      {showShoppingListModal && (
+        <SharedShoppingListModal
+          isOpen={showShoppingListModal}
+          onClose={() => setShowShoppingListModal(false)}
+          onAddExpense={async (exp) => {
+            await onAddExpense(exp);
+          }}
+        />
+      )}
+
+      {/* Recurring Bills Modal */}
+      {showRecurringModal && (
+        <RecurringBillsModal
+          isOpen={showRecurringModal}
+          onClose={() => setShowRecurringModal(false)}
+          settings={settings}
+          expenses={expenses}
+          onUpdateSettings={async (patch) => {
+            onSettingsChange({ ...settings, ...patch });
+          }}
+          onAddExpense={async (exp) => {
+            await onAddExpense(exp);
+          }}
+        />
       )}
     </div>
   );
