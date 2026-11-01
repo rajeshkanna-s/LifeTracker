@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Wallet,
   Calendar as CalendarIcon,
-  Clock,
   Pencil,
   Trash2,
   List,
-  Grid,
-  Filter,
-  Check
+  LayoutGrid,
+  Sparkles
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Expense, TabId, ExpenseSettings } from '../../types';
@@ -42,7 +37,39 @@ const getCategoryIcon = (exp: Expense): string => {
   return '📦';
 };
 
-export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab }) => {
+/** Compact INR formatter for calendar day cells (e.g. 800 -> "800", 1200 -> "1.2k", 52087 -> "52k", 150000 -> "1.5L") */
+const formatCompactCellAmount = (val: number): string => {
+  const abs = Math.abs(val);
+  if (abs >= 10000000) {
+    return `${(abs / 10000000).toFixed(1).replace(/\.0$/, '')}Cr`;
+  }
+  if (abs >= 100000) {
+    return `${(abs / 100000).toFixed(1).replace(/\.0$/, '')}L`;
+  }
+  if (abs >= 10000) {
+    return `${Math.round(abs / 1000)}k`;
+  }
+  if (abs >= 1000) {
+    return `${(abs / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return `${Math.round(abs)}`;
+};
+
+/** Crisp SVG Indian Tricolor Flag (never renders as broken "IN" letters on Windows) */
+const TricolorFlagIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-2.5' }) => (
+  <svg
+    viewBox="0 0 24 16"
+    className={`${className} rounded-[2px] shadow-2xs shrink-0 overflow-hidden border border-black/10`}
+    aria-hidden="true"
+  >
+    <rect width="24" height="5.33" y="0" fill="#FF9933" />
+    <rect width="24" height="5.34" y="5.33" fill="#FFFFFF" />
+    <rect width="24" height="5.33" y="10.67" fill="#138808" />
+    <circle cx="12" cy="8" r="2" fill="none" stroke="#000080" strokeWidth="1.1" />
+  </svg>
+);
+
+export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
   const { activePartnerId } = usePartner();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDateStr, setSelectedDateStr] = useState<string>(() => {
@@ -58,12 +85,15 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   // Type filter: 'all' | 'expense' | 'income'
   const [typeFilter, setTypeFilter] = useState<'all' | 'expense' | 'income'>('all');
 
-  // Modal state for Add/Edit transaction
+  // Modal state for Add/Edit transaction & Holidays
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [showHolidayModal, setShowHolidayModal] = useState(false);
 
-  // Fetch all transactions for active partner
+  // Touch swipe tracking for native mobile month navigation
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+
   useEffect(() => {
     fetchExpenses();
   }, [activePartnerId]);
@@ -83,7 +113,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
       setExpenses([]);
     }
 
-    // Settings for currency
     const { data: setObj } = await supabase
       .from('expense_settings')
       .select('*')
@@ -105,9 +134,12 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   // Calendar Month Info
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth(); // 0-indexed
+  const monthPrefix = `${year}-${(month + 1).toString().padStart(2, '0')}`;
 
-  const monthLabel = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const monthLabelFull = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const monthLabelShort = currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const todayStr = useMemo(() => formatLocalDate(new Date()), []);
+  const isViewingTodayMonth = todayStr.startsWith(monthPrefix);
 
   // Filtered transactions by typeFilter
   const filteredExpenses = useMemo(() => {
@@ -149,7 +181,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const daysInMonth = lastDayOfMonth.getDate();
 
-    // Monday is 0 in ISO week: (firstDay.getDay() + 6) % 7
     const startPadding = (firstDayOfMonth.getDay() + 6) % 7;
 
     const days: {
@@ -157,6 +188,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
       dayNumber: number;
       isCurrentMonth: boolean;
       isToday: boolean;
+      isWeekend: boolean;
     }[] = [];
 
     // Previous month padding
@@ -167,11 +199,13 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
       const mStr = (prevDate.getMonth() + 1).toString().padStart(2, '0');
       const dStr = dNum.toString().padStart(2, '0');
       const dateStr = `${prevDate.getFullYear()}-${mStr}-${dStr}`;
+      const colIdx = days.length % 7;
       days.push({
         dateStr,
         dayNumber: dNum,
         isCurrentMonth: false,
         isToday: dateStr === todayStr,
+        isWeekend: colIdx === 5 || colIdx === 6,
       });
     }
 
@@ -180,15 +214,17 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
       const mStr = (month + 1).toString().padStart(2, '0');
       const dStr = i.toString().padStart(2, '0');
       const dateStr = `${year}-${mStr}-${dStr}`;
+      const colIdx = days.length % 7;
       days.push({
         dateStr,
         dayNumber: i,
         isCurrentMonth: true,
         isToday: dateStr === todayStr,
+        isWeekend: colIdx === 5 || colIdx === 6,
       });
     }
 
-    // Next month padding (make complete weeks, multiple of 7)
+    // Next month padding
     const totalCells = Math.ceil(days.length / 7) * 7;
     const remaining = totalCells - days.length;
     for (let i = 1; i <= remaining; i++) {
@@ -196,11 +232,13 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
       const mStr = (nextDate.getMonth() + 1).toString().padStart(2, '0');
       const dStr = i.toString().padStart(2, '0');
       const dateStr = `${nextDate.getFullYear()}-${mStr}-${dStr}`;
+      const colIdx = days.length % 7;
       days.push({
         dateStr,
         dayNumber: i,
         isCurrentMonth: false,
         isToday: dateStr === todayStr,
+        isWeekend: colIdx === 5 || colIdx === 6,
       });
     }
 
@@ -209,25 +247,31 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
 
   // Month Financial Totals
   const monthStats = useMemo(() => {
-    const mPrefix = `${year}-${(month + 1).toString().padStart(2, '0')}`;
     let mIncome = 0;
     let mExpense = 0;
-    let daysWithSpending = 0;
+    const spendingDays = new Set<string>();
+    let monthFilteredCount = 0;
 
     for (const exp of expenses) {
-      if (!exp.date || !exp.date.startsWith(mPrefix)) continue;
+      if (!exp.date || !exp.date.startsWith(monthPrefix)) continue;
       if (isIncome(exp)) {
         mIncome += Number(exp.amount) || 0;
       } else {
         mExpense += Number(exp.amount) || 0;
-        daysWithSpending += 1;
+        spendingDays.add(exp.date);
+      }
+    }
+
+    for (const exp of filteredExpenses) {
+      if (exp.date && exp.date.startsWith(monthPrefix)) {
+        monthFilteredCount += 1;
       }
     }
 
     const net = mIncome - mExpense;
-    const avgDaily = daysWithSpending > 0 ? Math.round(mExpense / daysWithSpending) : 0;
-    return { mIncome, mExpense, net, avgDaily };
-  }, [expenses, year, month]);
+    const avgDaily = spendingDays.size > 0 ? Math.round(mExpense / spendingDays.size) : 0;
+    return { mIncome, mExpense, net, avgDaily, monthFilteredCount };
+  }, [expenses, filteredExpenses, monthPrefix]);
 
   // Selected Day Items
   const selectedDayExpenses = useMemo(() => {
@@ -246,17 +290,14 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
 
   // Agenda View Grouped Transactions (Current Month)
   const monthAgendaGroups = useMemo(() => {
-    const mPrefix = `${year}-${(month + 1).toString().padStart(2, '0')}`;
-    const monthList = filteredExpenses.filter(e => e.date && e.date.startsWith(mPrefix));
+    const monthList = filteredExpenses.filter(e => e.date && e.date.startsWith(monthPrefix));
 
-    // Group by date
     const groups: Record<string, Expense[]> = {};
     for (const e of monthList) {
       if (!groups[e.date]) groups[e.date] = [];
       groups[e.date].push(e);
     }
 
-    // Sort dates descending
     const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
     return sortedDates.map(dStr => {
       const items = groups[dStr];
@@ -273,7 +314,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
         income: dayInc,
       };
     });
-  }, [filteredExpenses, year, month]);
+  }, [filteredExpenses, monthPrefix]);
 
   // Navigation helpers
   const handlePrevMonth = () => {
@@ -288,6 +329,40 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
     const now = new Date();
     setCurrentDate(now);
     setSelectedDateStr(formatLocalDate(now));
+  };
+
+  const handleSelectCell = (cellDateStr: string, isCurrentMonth: boolean) => {
+    setSelectedDateStr(cellDateStr);
+    if (!isCurrentMonth) {
+      const parts = cellDateStr.split('-');
+      if (parts.length === 3) {
+        setCurrentDate(new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1));
+      }
+    }
+  };
+
+  // Touch swipe handlers for mobile month swiping
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartYRef.current;
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    // Horizontal swipe threshold (55px) and ensure horizontal intent
+    if (Math.abs(deltaX) > 55 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+      if (deltaX < 0) {
+        handleNextMonth();
+      } else {
+        handlePrevMonth();
+      }
+    }
   };
 
   // Add / Edit Transaction Handlers
@@ -330,7 +405,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
     const { type: _type, ...dbFields } = data;
 
     if (editingExpense) {
-      // Update existing
       const payload = {
         ...dbFields,
         tags,
@@ -350,7 +424,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
         setExpenses(prev => prev.map(e => (e.id === editingExpense.id ? normalizeTransaction(updated) : e)));
       }
     } else {
-      // Create new
       const payload = {
         ...dbFields,
         tags,
@@ -377,205 +450,210 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
   }
 
   const selectedDateObj = new Date(selectedDateStr + 'T00:00:00');
-  const formattedSelectedDate = selectedDateObj.toLocaleDateString('en-US', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  const selectedDayNum = selectedDateObj.getDate().toString().padStart(2, '0');
+  const selectedShortMonth = selectedDateObj.toLocaleDateString('en-US', { month: 'short' });
+  const selectedWeekdayFull = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' });
+  const selectedMonthYear = selectedDateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const selectedHoliday = findIndianHoliday(selectedDateStr);
+  const isSelectedToday = selectedDateStr === todayStr;
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-36">
-      {/* ════════ Top Month Header & Controls ════════ */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xs space-y-3">
-        {/* Month Selector & Controls */}
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shadow-2xs shrink-0 border border-emerald-100 dark:border-emerald-800/60">
-              <CalendarIcon size={19} strokeWidth={2.2} />
-            </div>
-            <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none truncate">
-                {monthLabel}
-              </h2>
-              <p className="text-[11px] text-slate-400 font-semibold mt-0.5 truncate">
-                Expense & Cashflow Calendar
-              </p>
-            </div>
+    <div className="space-y-3 max-w-4xl mx-auto pb-32">
+      {/* ════════ Native App Top Control & Cashflow Card ════════ */}
+      <div className="bg-white border border-slate-200/80 rounded-3xl p-3 sm:p-4 shadow-xs space-y-2.5">
+        {/* Row 1: Integrated Month Navigator + Quick Actions */}
+        <div className="flex items-center justify-between gap-1.5">
+          {/* Month Stepper */}
+          <div className="flex items-center gap-1 min-w-0">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              aria-label="Previous month"
+              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 flex items-center justify-center active:scale-90 transition cursor-pointer shrink-0"
+            >
+              <ChevronLeft size={17} strokeWidth={2.4} />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGoToday}
+              title="Tap to jump to Today"
+              className="px-2 py-1 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left min-w-0"
+            >
+              <span className="text-[15px] sm:text-lg font-black text-slate-900 tracking-tight leading-none block truncate sm:hidden">
+                {monthLabelShort}
+              </span>
+              <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none hidden sm:block truncate">
+                {monthLabelFull}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              aria-label="Next month"
+              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 flex items-center justify-center active:scale-90 transition cursor-pointer shrink-0"
+            >
+              <ChevronRight size={17} strokeWidth={2.4} />
+            </button>
+
+            {(!isViewingTodayMonth || !isSelectedToday) && (
+              <button
+                type="button"
+                onClick={handleGoToday}
+                className="ml-0.5 px-2.5 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 text-[11px] font-extrabold transition active:scale-95 cursor-pointer shrink-0"
+              >
+                Today
+              </button>
+            )}
           </div>
 
+          {/* Right Action Pills: Holidays + View Switcher */}
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* View Mode Toggle: Grid vs Agenda */}
-            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200/60 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => setShowHolidayModal(true)}
+              aria-label="Open Holidays Calendar"
+              title="2020–2035 Indian Govt Holidays"
+              className="flex items-center gap-1.5 h-8 px-2.5 sm:px-3 bg-amber-50 hover:bg-amber-100/80 text-slate-800 border border-amber-200/90 rounded-xl text-[11px] font-extrabold shadow-2xs active:scale-95 transition cursor-pointer shrink-0"
+            >
+              <TricolorFlagIcon />
+              <span>Holidays</span>
+            </button>
+
+            {/* Compact Segmented View Toggle */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/70 h-8">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                  }`}
-                title="Month Grid View"
+                className={`flex items-center gap-1 h-7 px-2 sm:px-2.5 text-[11px] font-extrabold rounded-[10px] transition cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-emerald-700 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="Calendar Grid"
+                aria-label="Calendar Grid"
               >
-                <Grid size={13} />
-                <span>Grid</span>
+                <LayoutGrid size={13} strokeWidth={2.3} />
+                <span className="hidden sm:inline">Grid</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('agenda')}
-                className={`flex items-center gap-1 px-3 py-1 text-xs font-extrabold rounded-full transition cursor-pointer ${viewMode === 'agenda'
-                    ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                  }`}
-                title="Agenda List View"
+                className={`flex items-center gap-1 h-7 px-2 sm:px-2.5 text-[11px] font-extrabold rounded-[10px] transition cursor-pointer ${
+                  viewMode === 'agenda'
+                    ? 'bg-white text-emerald-700 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="Timeline List"
+                aria-label="Timeline List"
               >
-                <List size={13} />
-                <span>List</span>
+                <List size={14} strokeWidth={2.3} />
+                <span className="hidden sm:inline">List</span>
               </button>
             </div>
+          </div>
+        </div>
 
-            {/* Navigation Arrows */}
-            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200/60 dark:border-slate-700">
-              <button
-                type="button"
-                onClick={handlePrevMonth}
-                aria-label="Previous month"
-                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 active:scale-90 transition cursor-pointer"
-              >
-                <ChevronLeft size={15} />
-              </button>
-              <button
-                type="button"
-                onClick={handleGoToday}
-                className="px-2.5 py-0.5 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition active:scale-95 cursor-pointer"
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                onClick={handleNextMonth}
-                aria-label="Next month"
-                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 active:scale-90 transition cursor-pointer"
-              >
-                <ChevronRight size={15} />
-              </button>
-            </div>
+        {/* Row 2: Compact 4-Column App Cashflow Strip */}
+        <div className="grid grid-cols-4 divide-x divide-slate-200/75 bg-slate-50/90 border border-slate-200/70 rounded-2xl py-2 px-1">
+          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
+            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 truncate">
+              Income
+            </p>
+            <p className="text-[11px] sm:text-sm font-black text-emerald-700 tabular-nums tracking-tight truncate mt-0.5">
+              +₹{monthStats.mIncome.toLocaleString('en-IN')}
+            </p>
+          </div>
 
-            {/* Real Calendar & Indian Govt Holidays Button (Top Right Corner) */}
-            <button
-              type="button"
-              onClick={() => setShowHolidayModal(true)}
-              aria-label="Open Indian Govt Holidays & Calendar"
-              title="Calendar with Indian Govt Holidays for all years"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 hover:from-orange-600 hover:to-emerald-700 text-white rounded-full text-xs font-black shadow-xs active:scale-95 transition cursor-pointer shrink-0"
+          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
+            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-rose-500 truncate">
+              Spent
+            </p>
+            <p className="text-[11px] sm:text-sm font-black text-rose-600 tabular-nums tracking-tight truncate mt-0.5">
+              ₹{monthStats.mExpense.toLocaleString('en-IN')}
+            </p>
+          </div>
+
+          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
+            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 truncate">
+              Net Flow
+            </p>
+            <p
+              className={`text-[11px] sm:text-sm font-black tabular-nums tracking-tight truncate mt-0.5 ${
+                monthStats.net >= 0 ? 'text-emerald-600' : 'text-rose-600'
+              }`}
             >
-              <CalendarIcon size={14} strokeWidth={2.4} />
-              <span className="hidden sm:inline">Calendar</span>
-              <span>🇮🇳</span>
-            </button>
+              {monthStats.net >= 0 ? '+' : '-'}₹{Math.abs(monthStats.net).toLocaleString('en-IN')}
+            </p>
+          </div>
+
+          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
+            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 truncate">
+              Avg/Day
+            </p>
+            <p className="text-[11px] sm:text-sm font-black text-slate-800 tabular-nums tracking-tight truncate mt-0.5">
+              ₹{monthStats.avgDaily.toLocaleString('en-IN')}
+            </p>
           </div>
         </div>
 
-        {/* ════════ Streamlined Monthly Cashflow Banner ════════ */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <div className="bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/60 rounded-xl p-2.5 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <ArrowUpRight size={14} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider truncate">Income</p>
-              <p className="text-xs sm:text-sm font-black text-emerald-900 dark:text-emerald-300 truncate">
-                +₹{monthStats.mIncome.toLocaleString('en-IN')}
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-rose-50/70 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-800/60 rounded-xl p-2.5 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <ArrowDownLeft size={14} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] text-rose-700 dark:text-rose-400 font-bold uppercase tracking-wider truncate">Expenses</p>
-              <p className="text-xs sm:text-sm font-black text-rose-900 dark:text-rose-300 truncate">
-                ₹{monthStats.mExpense.toLocaleString('en-IN')}
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-2.5 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <Wallet size={14} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Net Cashflow</p>
-              <p className={`text-xs sm:text-sm font-black truncate ${monthStats.net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                {monthStats.net >= 0 ? '+' : ''}₹{monthStats.net.toLocaleString('en-IN')}
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-2.5 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <Clock size={14} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Daily Avg</p>
-              <p className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-200 truncate">
-                ₹{monthStats.avgDaily.toLocaleString('en-IN')}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* ════════ Native App Segmented Control Filter ════════ */}
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-full gap-1 border border-slate-200/60 dark:border-slate-700">
+        {/* Row 3: Sleek Native Segmented Filter */}
+        <div className="flex items-center bg-slate-100/90 p-1 rounded-xl gap-1 border border-slate-200/60">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${typeFilter === 'all'
-                ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-              }`}
+            className={`flex-1 py-1 text-[11px] sm:text-xs font-extrabold rounded-lg transition cursor-pointer text-center ${
+              typeFilter === 'all'
+                ? 'bg-slate-900 text-white shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
             All
           </button>
           <button
             type="button"
             onClick={() => setTypeFilter('expense')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${typeFilter === 'expense'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-              }`}
+            className={`flex-1 py-1 text-[11px] sm:text-xs font-extrabold rounded-lg transition cursor-pointer text-center ${
+              typeFilter === 'expense'
+                ? 'bg-rose-600 text-white shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
             Expenses
           </button>
           <button
             type="button"
             onClick={() => setTypeFilter('income')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition cursor-pointer text-center ${typeFilter === 'income'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-              }`}
+            className={`flex-1 py-1 text-[11px] sm:text-xs font-extrabold rounded-lg transition cursor-pointer text-center ${
+              typeFilter === 'income'
+                ? 'bg-emerald-600 text-white shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
             Income
           </button>
         </div>
       </div>
 
-      {/* ════════ VIEW 1: MONTH GRID VIEW ════════ */}
+      {/* ════════ VIEW 1: NATIVE APP MONTH GRID ════════ */}
       {viewMode === 'grid' && (
         <>
-          {/* Modern Mobile App Calendar Grid Card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs">
+          <div
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            className="bg-white border border-slate-200/80 rounded-3xl p-2.5 sm:p-4 shadow-xs select-none"
+          >
             {/* Weekdays Header */}
-            <div className="grid grid-cols-7 gap-1 text-center py-1.5 px-0.5 mb-2 border-b border-slate-100 dark:border-slate-800">
+            <div className="grid grid-cols-7 gap-1 text-center pb-2 mb-1.5 border-b border-slate-100">
               {DAYS_HEADER.map((d, idx) => {
                 const isWeekend = idx === 5 || idx === 6;
                 return (
                   <div
                     key={d}
-                    className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${isWeekend ? 'text-amber-500 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'
-                      }`}
+                    className={`text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider ${
+                      isWeekend ? 'text-amber-600' : 'text-slate-400'
+                    }`}
                   >
                     {d}
                   </div>
@@ -583,170 +661,257 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
               })}
             </div>
 
-            {/* Calendar Cells Grid (Compact, Seamless & App-Styled) */}
+            {/* Interactive Day Tiles with Micro Cashflow Amounts */}
             <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
               {calendarDays.map(cell => {
                 const isSelected = cell.dateStr === selectedDateStr;
                 const data = dateDataMap[cell.dateStr];
-                const hasExpense = data && data.expenseTotal > 0;
-                const hasIncome = data && data.incomeTotal > 0;
+                const hasExpense = !!(data && data.expenseTotal > 0);
+                const hasIncome = !!(data && data.incomeTotal > 0);
+                const hasActivity = hasExpense || hasIncome;
                 const cellHoliday = findIndianHoliday(cell.dateStr);
 
                 return (
                   <button
                     key={cell.dateStr}
                     type="button"
-                    onClick={() => setSelectedDateStr(cell.dateStr)}
+                    onClick={() => handleSelectCell(cell.dateStr, cell.isCurrentMonth)}
                     title={cellHoliday ? `${cellHoliday.name} • ${cell.dateStr}` : cell.dateStr}
-                    className={`relative flex flex-col items-center justify-center h-12 sm:h-14 rounded-2xl transition-all duration-150 cursor-pointer active:scale-95 ${!cell.isCurrentMonth
-                        ? 'opacity-25 hover:opacity-40'
+                    className={`relative flex flex-col items-center justify-between min-h-[54px] sm:min-h-[66px] py-1.5 px-0.5 rounded-2xl transition-all duration-150 cursor-pointer active:scale-95 ${
+                      !cell.isCurrentMonth
+                        ? 'opacity-30 hover:opacity-55 bg-transparent'
                         : isSelected
-                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 font-black scale-102 z-10'
-                          : cell.isToday
-                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black'
-                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100'
-                      }`}
+                        ? 'bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/25 z-10'
+                        : cell.isToday
+                        ? 'bg-emerald-50/90 text-emerald-900 border-2 border-emerald-500 shadow-2xs'
+                        : cellHoliday
+                        ? 'bg-amber-50/70 hover:bg-amber-50 text-slate-900 border border-amber-200/80'
+                        : hasActivity
+                        ? 'bg-slate-50/90 hover:bg-slate-100/80 text-slate-900 border border-slate-200/70'
+                        : 'bg-white hover:bg-slate-50 text-slate-700 border border-transparent'
+                    }`}
                   >
+                    {/* Holiday Corner Dot */}
+                    {cellHoliday && (
+                      <span
+                        className={`absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full ${
+                          isSelected ? 'bg-amber-300' : 'bg-orange-500'
+                        }`}
+                      />
+                    )}
+
                     {/* Day Number */}
                     <span
-                      className={`text-xs sm:text-sm font-black transition-colors leading-none ${isSelected
-                          ? 'text-white'
+                      className={`text-xs sm:text-sm leading-none tabular-nums ${
+                        isSelected
+                          ? 'font-black text-white'
                           : cell.isToday
-                            ? 'text-emerald-800'
-                            : cell.isCurrentMonth
-                              ? 'text-slate-800'
-                              : 'text-slate-400'
-                        }`}
+                          ? 'font-black text-emerald-700'
+                          : hasActivity || cellHoliday
+                          ? 'font-extrabold text-slate-900'
+                          : cell.isWeekend
+                          ? 'font-bold text-slate-600'
+                          : 'font-semibold text-slate-700'
+                      }`}
                     >
                       {cell.dayNumber}
                     </span>
 
-                    {/* Financial & Holiday Indicator Dots */}
-                    <div className="flex items-center justify-center gap-1 h-2 mt-1">
-                      {cellHoliday && (
+                    {/* Micro Cashflow Preview Inside Tile */}
+                    <div className="flex flex-col items-center justify-end gap-0.5 w-full min-h-[20px] leading-none">
+                      {hasIncome && (
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-300' : 'bg-orange-500'
-                            }`}
-                          title={`Holiday: ${cellHoliday.name}`}
-                        />
+                          className={`text-[8.5px] sm:text-[10px] font-extrabold tabular-nums tracking-tight leading-none truncate max-w-full px-0.5 ${
+                            isSelected ? 'text-emerald-100' : 'text-emerald-600'
+                          }`}
+                        >
+                          +{formatCompactCellAmount(data.incomeTotal)}
+                        </span>
                       )}
                       {hasExpense && (
                         <span
-                          className={`w-1.5 h-1.5 rounded-full transition-colors ${isSelected ? 'bg-white' : 'bg-rose-500'
-                            }`}
-                          title={`Expense: -₹${Math.round(data.expenseTotal).toLocaleString('en-IN')}`}
-                        />
+                          className={`text-[8.5px] sm:text-[10px] font-extrabold tabular-nums tracking-tight leading-none truncate max-w-full px-0.5 ${
+                            isSelected ? 'text-white' : 'text-rose-600'
+                          }`}
+                        >
+                          -{formatCompactCellAmount(data.expenseTotal)}
+                        </span>
                       )}
-                      {hasIncome && (
+                      {!hasIncome && !hasExpense && cellHoliday && (
                         <span
-                          className={`w-1.5 h-1.5 rounded-full transition-colors ${isSelected ? 'bg-emerald-200' : 'bg-emerald-500'
-                            }`}
-                          title={`Income: +₹${Math.round(data.incomeTotal).toLocaleString('en-IN')}`}
-                        />
-                      )}
-                      {!hasExpense && !hasIncome && !cellHoliday && (
-                        <span className="w-1.5 h-1.5 opacity-0" />
+                          className={`text-[8px] font-bold truncate max-w-[92%] leading-none ${
+                            isSelected ? 'text-amber-200' : 'text-orange-600'
+                          }`}
+                        >
+                          Holiday
+                        </span>
                       )}
                     </div>
                   </button>
                 );
               })}
             </div>
+
+            {/* Subtle Legend Footer */}
+            <div className="flex items-center justify-between gap-2 pt-2.5 mt-2 border-t border-slate-100 px-1 text-[10px] font-bold text-slate-400">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  Income
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                  Spent
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                  Holiday
+                </span>
+              </div>
+              <span className="sm:hidden text-[9.5px] text-slate-400 font-semibold">
+                Swipe ↔ month
+              </span>
+            </div>
           </div>
 
-          {/* ════════ Selected Day Inspector (Sleek Horizontal List) ════════ */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
-            {/* Header: Date + Action */}
-            <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
-                    {formattedSelectedDate}
-                  </h3>
-                  {selectedDateStr === todayStr && (
-                    <span className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded-full shrink-0 leading-none">
-                      Today
-                    </span>
-                  )}
+          {/* ════════ Native App Selected Day Agenda Sheet ════════ */}
+          <div className="bg-white border border-slate-200/80 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-3">
+            {/* Day Sheet Header */}
+            <div className="flex items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3 min-w-0">
+                {/* Calendar Leaf Badge */}
+                <div
+                  className={`w-11 h-11 rounded-2xl flex flex-col items-center justify-center shrink-0 leading-none border ${
+                    isSelectedToday
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                      : 'bg-slate-50 text-slate-800 border-slate-200/90'
+                  }`}
+                >
+                  <span
+                    className={`text-[9px] font-extrabold uppercase tracking-wider ${
+                      isSelectedToday ? 'text-emerald-100' : 'text-slate-400'
+                    }`}
+                  >
+                    {selectedShortMonth}
+                  </span>
+                  <span className="text-[15px] font-black tabular-nums mt-0.5">
+                    {selectedDayNum}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
-                  Spent: <span className="text-rose-600 dark:text-rose-400 font-bold">₹{selectedDayTotals.spent.toLocaleString('en-IN')}</span> • Income: <span className="text-emerald-600 dark:text-emerald-400 font-bold">₹{selectedDayTotals.income.toLocaleString('en-IN')}</span>
-                </p>
-                {selectedHoliday && (
-                  <p className="text-[11px] font-extrabold text-orange-800 dark:text-orange-200 mt-1 flex items-center gap-1.5 bg-orange-50 dark:bg-orange-950/40 px-2 py-0.5 rounded-lg border border-orange-200 dark:border-orange-800 w-fit">
-                    <span>🎉 {selectedHoliday.name}</span>
-                    <span className="text-[10px] text-orange-600 dark:text-orange-400 font-bold">({selectedHoliday.type})</span>
-                  </p>
-                )}
+
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h3 className="text-sm sm:text-base font-black text-slate-900 leading-tight truncate">
+                      {selectedWeekdayFull}
+                    </h3>
+                    <span className="text-xs font-semibold text-slate-400 hidden sm:inline">
+                      • {selectedMonthYear}
+                    </span>
+                    {isSelectedToday && (
+                      <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full leading-none">
+                        Today
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Daily Summary Chips */}
+                  <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                    {selectedDayTotals.spent > 0 && (
+                      <span className="inline-flex items-center text-[11px] font-extrabold text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-lg tabular-nums leading-none">
+                        Spent ₹{selectedDayTotals.spent.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                    {selectedDayTotals.income > 0 && (
+                      <span className="inline-flex items-center text-[11px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg tabular-nums leading-none">
+                        +₹{selectedDayTotals.income.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                    {selectedDayTotals.spent === 0 && selectedDayTotals.income === 0 && (
+                      <span className="text-[11px] font-semibold text-slate-400">
+                        No transactions logged
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* Clean App Add Button */}
+              {/* Primary Add Button */}
               <button
                 type="button"
                 onClick={handleOpenAdd}
-                style={{
-                  background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.28)'
-                }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-white font-extrabold text-xs rounded-full active:scale-95 transition cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-2xl shadow-sm shadow-emerald-600/20 active:scale-95 transition cursor-pointer shrink-0"
               >
-                <Plus size={15} strokeWidth={2.5} />
+                <Plus size={15} strokeWidth={2.6} />
                 <span>Add</span>
               </button>
             </div>
 
-            {/* Transactions List */}
-            <div className="space-y-1.5">
-              {selectedDayExpenses.length === 0 ? (
-                <div className="text-center py-8 bg-slate-50/70 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">No transactions on this date.</p>
-                  <button
-                    type="button"
-                    onClick={handleOpenAdd}
-                    style={{
-                      borderRadius: '12px',
-                      background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-                      boxShadow: '0 2px 8px rgba(5, 150, 105, 0.28)'
-                    }}
-                    className="mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-bold text-xs active:scale-95 transition cursor-pointer"
-                  >
-                    <Plus size={14} strokeWidth={2.5} />
-                    <span>Add Expense or Income</span>
-                  </button>
+            {/* Holiday Banner if applicable */}
+            {selectedHoliday && (
+              <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-amber-50/90 border border-amber-200/80">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Sparkles size={14} className="text-amber-600 shrink-0" />
+                  <p className="text-xs font-extrabold text-amber-950 truncate">
+                    {selectedHoliday.name}
+                  </p>
                 </div>
-              ) : (
-                selectedDayExpenses.map((exp) => {
+                <span className="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white text-amber-700 border border-amber-200/70 shrink-0">
+                  {selectedHoliday.type === 'National Holiday' ? 'National' : 'Gazetted'}
+                </span>
+              </div>
+            )}
+
+            {/* Selected Day Transactions List */}
+            {selectedDayExpenses.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 px-4 bg-slate-50/70 rounded-2xl border border-dashed border-slate-200 text-center">
+                <div className="w-9 h-9 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center text-slate-400 mb-2 shadow-2xs">
+                  <CalendarIcon size={16} />
+                </div>
+                <p className="text-xs font-bold text-slate-600">
+                  Nothing recorded for {selectedShortMonth} {selectedDateObj.getDate()}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleOpenAdd}
+                  className="mt-2.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 font-extrabold text-xs active:scale-95 transition cursor-pointer shadow-2xs"
+                >
+                  <Plus size={13} strokeWidth={2.5} />
+                  <span>Add Expense or Income</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {selectedDayExpenses.map(exp => {
                   const isInc = isIncome(exp);
                   const icon = getCategoryIcon(exp);
 
                   return (
                     <div
                       key={exp.id}
-                      className="flex items-center justify-between gap-3 p-3 bg-white dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700/60 rounded-2xl transition border border-slate-200/80 dark:border-slate-700/80 shadow-2xs"
+                      className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50/60 hover:bg-slate-50 rounded-2xl transition border border-slate-200/75"
                     >
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                         <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 border select-none ${
+                          className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg shrink-0 border select-none ${
                             isInc
-                              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200/80 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 shadow-2xs'
-                              : 'bg-slate-100/90 dark:bg-slate-800 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 shadow-2xs'
+                              ? 'bg-emerald-50 border-emerald-200/80'
+                              : 'bg-white border-slate-200/80 shadow-2xs'
                           }`}
                         >
                           {icon}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate leading-snug">
+                            <p className="text-xs sm:text-sm font-extrabold text-slate-900 truncate leading-snug">
                               {exp.description || exp.category}
                             </p>
                             {isInc && (
-                              <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
+                              <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-100/80 text-emerald-800 px-1.5 py-0.5 rounded-md leading-none shrink-0">
                                 Income
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
+                          <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium truncate mt-0.5">
                             <span>{exp.category}</span>
                             {exp.platform && <span>• {exp.platform}</span>}
                             {exp.payment_method && <span>• {exp.payment_method}</span>}
@@ -755,10 +920,11 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <span
-                          className={`text-xs sm:text-sm font-black whitespace-nowrap ${isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'
-                            }`}
+                          className={`text-xs sm:text-sm font-black tabular-nums whitespace-nowrap ${
+                            isInc ? 'text-emerald-600' : 'text-slate-900'
+                          }`}
                         >
                           {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
                         </span>
@@ -767,7 +933,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(exp)}
-                            className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200/80 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-200 transition active:scale-90 cursor-pointer shadow-2xs"
+                            className="w-7 h-7 rounded-xl bg-white hover:bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-600 transition active:scale-90 cursor-pointer shadow-2xs"
                             title="Edit transaction"
                             aria-label="Edit transaction"
                           >
@@ -776,7 +942,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                           <button
                             type="button"
                             onClick={() => handleDeleteExpense(exp.id)}
-                            className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200/70 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
+                            className="w-7 h-7 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/70 flex items-center justify-center text-rose-600 transition active:scale-90 cursor-pointer"
                             title="Delete transaction"
                             aria-label="Delete transaction"
                           >
@@ -786,46 +952,51 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                       </div>
                     </div>
                   );
-                })
-              )}
-            </div>
+                })}
+              </div>
+            )}
           </div>
         </>
       )}
 
-      {/* ════════ VIEW 2: AGENDA TIMELINE LIST ════════ */}
+      {/* ════════ VIEW 2: NATIVE TIMELINE LIST ════════ */}
       {viewMode === 'agenda' && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <span>Transactions Timeline ({monthLabel})</span>
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 truncate">
+                {monthLabelFull} Timeline
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Chronological breakdown of all daily expenses and income
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                {monthStats.monthFilteredCount} {monthStats.monthFilteredCount === 1 ? 'transaction' : 'transactions'} this month
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200/70 dark:border-slate-700">
-                {filteredExpenses.length} transactions
-              </span>
-            </div>
+            <button
+              type="button"
+              onClick={handleOpenAdd}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-2xl shadow-sm shadow-emerald-600/20 active:scale-95 transition cursor-pointer shrink-0"
+            >
+              <Plus size={15} strokeWidth={2.6} />
+              <span>Add</span>
+            </button>
           </div>
 
           {monthAgendaGroups.length === 0 ? (
-            <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">No transactions recorded for this month.</p>
+            <div className="text-center py-10 bg-slate-50/70 rounded-2xl border border-dashed border-slate-200">
+              <p className="text-xs sm:text-sm text-slate-500 font-semibold">
+                No transactions recorded in {monthLabelFull}.
+              </p>
               <button
                 type="button"
                 onClick={handleOpenAdd}
-                className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition cursor-pointer shadow-xs active:scale-95"
+                className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold hover:bg-emerald-700 transition cursor-pointer shadow-xs active:scale-95"
               >
                 <Plus size={14} strokeWidth={2.5} />
                 <span>Add Transaction</span>
               </button>
             </div>
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-4">
               {monthAgendaGroups.map(group => {
                 const dateObj = new Date(group.dateStr + 'T00:00:00');
                 const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
@@ -834,38 +1005,35 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
 
                 return (
                   <div key={group.dateStr} className="space-y-2">
-                    {/* Day Group Header */}
-                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                    {/* Sticky-style Day Group Pill Bar */}
+                    <div className="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/75">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100">
-                          {weekday}, {dayMonth}
+                        <span className="text-xs font-black text-slate-900">
+                          {dayMonth} • {weekday}
                         </span>
                         {isGroupToday && (
-                          <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full font-extrabold border border-emerald-200 dark:border-emerald-800/60">
+                          <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-extrabold leading-none">
                             Today
                           </span>
                         )}
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 hidden sm:inline">
-                          ({group.items.length} {group.items.length === 1 ? 'item' : 'items'})
-                        </span>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {group.spent > 0 && (
-                          <span className="inline-flex items-center text-[11px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-md border border-rose-100 dark:border-rose-900/40">
+                          <span className="inline-flex items-center text-[11px] font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 tabular-nums">
                             -₹{group.spent.toLocaleString('en-IN')}
                           </span>
                         )}
                         {group.income > 0 && (
-                          <span className="inline-flex items-center text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-900/40">
+                          <span className="inline-flex items-center text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 tabular-nums">
                             +₹{group.income.toLocaleString('en-IN')}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Day Items Card */}
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800/80 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
+                    {/* Day Items */}
+                    <div className="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-white">
                       {group.items.map(exp => {
                         const isInc = isIncome(exp);
                         const icon = getCategoryIcon(exp);
@@ -873,31 +1041,30 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                         return (
                           <div
                             key={exp.id}
-                            className="p-3 sm:p-3.5 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors"
+                            className="p-2.5 sm:p-3.5 bg-white flex items-center justify-between gap-2.5 hover:bg-slate-50/70 transition-colors"
                           >
-                            {/* Left: Icon & Description */}
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                               <div
-                                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 border select-none ${
+                                className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg shrink-0 border select-none ${
                                   isInc
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200/80 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 shadow-2xs'
-                                    : 'bg-slate-100/90 dark:bg-slate-800 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 shadow-2xs'
+                                    ? 'bg-emerald-50 border-emerald-200/80'
+                                    : 'bg-slate-50 border-slate-200/80'
                                 }`}
                               >
                                 {icon}
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate leading-snug">
+                                  <p className="text-xs sm:text-sm font-extrabold text-slate-900 truncate leading-snug">
                                     {exp.description || exp.category}
                                   </p>
                                   {isInc && (
-                                    <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
+                                    <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-100/80 text-emerald-800 px-1.5 py-0.5 rounded-md leading-none shrink-0">
                                       Income
                                     </span>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
+                                <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium truncate mt-0.5">
                                   <span>{exp.category}</span>
                                   {exp.platform && <span>• {exp.platform}</span>}
                                   {exp.payment_method && <span>• {exp.payment_method}</span>}
@@ -906,11 +1073,10 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                               </div>
                             </div>
 
-                            {/* Right: Amount & Actions */}
-                            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
                               <span
-                                className={`text-xs sm:text-sm font-black whitespace-nowrap ${
-                                  isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'
+                                className={`text-xs sm:text-sm font-black tabular-nums whitespace-nowrap ${
+                                  isInc ? 'text-emerald-600' : 'text-slate-900'
                                 }`}
                               >
                                 {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
@@ -919,7 +1085,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEdit(exp)}
-                                  className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
+                                  className="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition active:scale-95 cursor-pointer"
                                   title="Edit transaction"
                                   aria-label="Edit transaction"
                                 >
@@ -928,7 +1094,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteExpense(exp.id)}
-                                  className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-500 dark:text-rose-400 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
+                                  className="w-7 h-7 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 flex items-center justify-center transition active:scale-95 cursor-pointer"
                                   title="Delete transaction"
                                   aria-label="Delete transaction"
                                 >
@@ -961,7 +1127,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = ({ onNavigateTab 
         />
       )}
 
-      {/* ════════ Real Calendar & Indian Govt Holidays Modal ════════ */}
+      {/* ════════ Indian Govt Holidays Modal ════════ */}
       <IndianCalendarModal
         isOpen={showHolidayModal}
         onClose={() => setShowHolidayModal(false)}

@@ -6,7 +6,6 @@ import {
   X,
   Calendar as CalendarIcon,
   Flag,
-  Sparkles,
   ArrowRight
 } from 'lucide-react';
 import {
@@ -30,6 +29,19 @@ const MONTH_NAMES = [
 
 const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+const TricolorBadgeIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-2.5' }) => (
+  <svg
+    viewBox="0 0 24 16"
+    className={`${className} rounded-[2px] shadow-2xs shrink-0 overflow-hidden`}
+    aria-hidden="true"
+  >
+    <rect width="24" height="5.33" y="0" fill="#FF9933" />
+    <rect width="24" height="5.34" y="5.33" fill="#FFFFFF" />
+    <rect width="24" height="5.33" y="10.67" fill="#138808" />
+    <circle cx="12" cy="8" r="2" fill="none" stroke="#000080" strokeWidth="1.1" />
+  </svg>
+);
 
 export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
   isOpen,
@@ -169,28 +181,29 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800"
+        className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200/80"
         onClick={e => e.stopPropagation()}
       >
         {/* ════════ Header ════════ */}
-        <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-sky-700 p-4 text-white flex items-center justify-between shrink-0">
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 px-4 py-3.5 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <CalendarIcon size={18} className="text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <h3 className="text-base font-extrabold text-white leading-tight">Calendar</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white leading-none">
-                  🇮🇳 Holidays
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white leading-none">
+                  <TricolorBadgeIcon />
+                  <span>Holidays</span>
                 </span>
               </div>
-              <p className="text-[11px] text-white/80 font-medium leading-tight mt-0.5">
-                All years (2020–2035) with Gazetted & National Holidays
+              <p className="text-[11px] text-white/85 font-medium leading-tight mt-0.5">
+                2020–2035 Gazetted & National Holidays
               </p>
             </div>
           </div>
@@ -206,27 +219,27 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
         </div>
 
         {/* ════════ Body (Scrollable) ════════ */}
-        <div className="p-3.5 sm:p-4 overflow-y-auto flex-1 space-y-3">
+        <div className="p-3.5 sm:p-4 overflow-y-auto flex-1 space-y-3 bg-white">
           {/* Navigation Bar (Month & Year) */}
           <div className="flex items-center justify-between gap-2">
             {/* Month Stepper */}
-            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80">
               <button
                 type="button"
                 onClick={handlePrevMonth}
                 title="Previous Month"
-                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 shadow-2xs transition active:scale-90 cursor-pointer"
+                className="w-7 h-7 rounded-lg bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition active:scale-90 cursor-pointer"
               >
                 <ChevronLeft size={14} />
               </button>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-100 px-3 text-center min-w-[84px]">
+              <span className="text-xs font-extrabold text-slate-800 px-3 text-center min-w-[88px]">
                 {MONTH_NAMES[viewMonth]}
               </span>
               <button
                 type="button"
                 onClick={handleNextMonth}
                 title="Next Month"
-                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 shadow-2xs transition active:scale-90 cursor-pointer"
+                className="w-7 h-7 rounded-lg bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition active:scale-90 cursor-pointer"
               >
                 <ChevronRight size={14} />
               </button>
@@ -237,7 +250,7 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
               <select
                 value={viewYear}
                 onChange={e => setViewYear(Number(e.target.value))}
-                className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 px-2.5 py-1.5 rounded-xl outline-none cursor-pointer"
+                className="bg-slate-100 border border-slate-200/80 text-xs font-extrabold text-slate-800 px-2.5 py-1.5 rounded-xl outline-none cursor-pointer"
               >
                 {availableYears.map(y => (
                   <option key={y} value={y}>{y}</option>
@@ -247,7 +260,7 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
               <button
                 type="button"
                 onClick={handleGoToday}
-                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer"
+                className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-extrabold transition active:scale-95 cursor-pointer"
               >
                 Today
               </button>
@@ -264,7 +277,7 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                 className={`px-2.5 py-1 text-[11px] font-bold rounded-lg shrink-0 transition active:scale-95 cursor-pointer ${
                   viewMonth === idx
                     ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 {m}
@@ -273,14 +286,14 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
           </div>
 
           {/* ════════ Calendar Grid ════════ */}
-          <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-2xl p-2 sm:p-2.5">
+          <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-2 sm:p-2.5">
             {/* Weekday Labels */}
             <div className="grid grid-cols-7 gap-1 text-center mb-1">
               {DAY_LABELS.map((d, i) => (
                 <span
                   key={d}
-                  className={`text-[10px] sm:text-[11px] font-bold uppercase py-1 ${
-                    i === 5 || i === 6 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'
+                  className={`text-[10px] sm:text-[11px] font-extrabold uppercase py-1 ${
+                    i === 5 || i === 6 ? 'text-amber-600' : 'text-slate-400'
                   }`}
                 >
                   {d}
@@ -304,16 +317,16 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                     title={cell.holiday ? `${cell.holiday.name} (${cell.holiday.type})` : cell.dateStr}
                     className={`aspect-square p-1 rounded-xl flex flex-col items-center justify-center transition cursor-pointer select-none relative ${
                       isSelected
-                        ? 'bg-emerald-600 text-white font-black shadow-sm ring-2 ring-emerald-400'
+                        ? 'bg-emerald-600 text-white font-black shadow-sm ring-2 ring-emerald-300'
                         : isToday
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-extrabold border-2 border-emerald-500 shadow-2xs'
+                        ? 'bg-emerald-50 text-emerald-800 font-extrabold border-2 border-emerald-500 shadow-2xs'
                         : cell.isCurrentMonth
                         ? hasHoliday
                           ? isNational
-                            ? 'bg-orange-100/80 dark:bg-orange-950/50 text-orange-950 dark:text-orange-200 font-extrabold border border-orange-300 dark:border-orange-800'
-                            : 'bg-emerald-100/70 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 font-bold border border-emerald-300 dark:border-emerald-800'
-                          : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold border border-slate-200 dark:border-slate-700/80 shadow-2xs'
-                        : 'bg-transparent text-slate-400 dark:text-slate-600 font-normal border-transparent'
+                            ? 'bg-orange-50 text-orange-900 font-extrabold border border-orange-300'
+                            : 'bg-emerald-50/80 text-emerald-900 font-bold border border-emerald-300'
+                          : 'bg-white text-slate-800 hover:bg-slate-100 font-semibold border border-slate-200/70 shadow-2xs'
+                        : 'bg-transparent text-slate-300 font-medium border-transparent'
                     }`}
                   >
                     <span className="text-xs leading-none">{cell.dayNum}</span>
@@ -325,7 +338,7 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                           isSelected
                             ? 'bg-amber-300'
                             : isNational
-                            ? 'bg-orange-600 animate-pulse'
+                            ? 'bg-orange-500'
                             : 'bg-emerald-600'
                         }`}
                       />
@@ -338,10 +351,10 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
 
           {/* Selected Date Inspector Card */}
           {selectedDateStr && (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-2xs">
+            <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3 flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block leading-tight">Selected Date</span>
-                <p className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 mt-0.5 truncate leading-tight">
+                <p className="text-xs sm:text-sm font-black text-slate-900 mt-0.5 truncate leading-tight">
                   {new Date(selectedDateStr + 'T00:00:00').toLocaleDateString('en-US', {
                     weekday: 'short',
                     day: 'numeric',
@@ -350,9 +363,9 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                   })}
                 </p>
                 {selectedHoliday && (
-                  <p className="text-[11px] font-bold text-orange-600 dark:text-orange-400 mt-1 flex items-center gap-1 truncate">
+                  <p className="text-[11px] font-bold text-orange-600 mt-1 flex items-center gap-1 truncate">
                     <span>🎉 {selectedHoliday.name}</span>
-                    <span className="text-[10px] text-slate-400">({selectedHoliday.type})</span>
+                    <span className="text-[10px] text-slate-500">({selectedHoliday.type})</span>
                   </p>
                 )}
               </div>
@@ -361,10 +374,9 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                 <button
                   type="button"
                   onClick={() => handleApplyDate(selectedDateStr)}
-                  style={{ borderRadius: '12px' }}
-                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0 transition active:scale-95 cursor-pointer shadow-xs flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl shrink-0 transition active:scale-95 cursor-pointer shadow-xs flex items-center gap-1.5"
                 >
-                  <span>View in Tracker</span>
+                  <span>Open Day</span>
                   <ArrowRight size={13} />
                 </button>
               )}
@@ -374,18 +386,18 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
           {/* Holidays List */}
           <div className="space-y-2">
             <div className="flex items-center justify-between px-0.5">
-              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <h4 className="text-xs font-extrabold text-slate-700 flex items-center gap-1.5">
                 <Flag size={13} className="text-orange-500 shrink-0" />
                 <span>Holidays in {MONTH_NAMES[viewMonth]} {viewYear}</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 bg-orange-100 dark:bg-orange-950 text-orange-800 dark:text-orange-300 rounded-full">
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded-full leading-none">
                   {monthHolidays.length}
                 </span>
               </h4>
             </div>
 
             {monthHolidays.length === 0 ? (
-              <div className="text-center py-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 text-xs">
-                No Gazetted Government Holidays in {MONTH_NAMES[viewMonth]} {viewYear}
+              <div className="text-center py-4 bg-slate-50 rounded-xl border border-slate-200/80 text-slate-400 text-xs font-medium">
+                No Gazetted Holidays in {MONTH_NAMES[viewMonth]} {viewYear}
               </div>
             ) : (
               <div className="space-y-1.5">
@@ -401,16 +413,16 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                       onClick={() => setSelectedDateStr(h.date)}
                       className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-between gap-2.5 ${
                         selectedDateStr === h.date
-                          ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 shadow-2xs'
-                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? 'bg-emerald-50/70 border-emerald-300 shadow-2xs'
+                          : 'bg-white border-slate-200/80 hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
                           className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center shrink-0 leading-none ${
                             isNational
-                              ? 'bg-orange-100 dark:bg-orange-950 text-orange-900 dark:text-orange-200 font-black border border-orange-200 dark:border-orange-800'
-                              : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-200 font-extrabold border border-emerald-200 dark:border-emerald-800'
+                              ? 'bg-orange-100 text-orange-900 font-black border border-orange-200'
+                              : 'bg-emerald-100 text-emerald-900 font-extrabold border border-emerald-200'
                           }`}
                         >
                           <span className="text-[13px]">{dayNum}</span>
@@ -418,20 +430,20 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                         </div>
 
                         <div className="min-w-0">
-                          <h5 className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate leading-snug">
+                          <h5 className="text-xs font-bold text-slate-800 truncate leading-snug">
                             {h.name}
                           </h5>
-                          <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                          <p className="text-[10px] text-slate-500 truncate mt-0.5">
                             {h.description}
                           </p>
                         </div>
                       </div>
 
                       <span
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wide ${
+                        className={`text-[9px] font-extrabold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wide ${
                           isNational
-                            ? 'bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300'
-                            : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-emerald-100 text-emerald-800'
                         }`}
                       >
                         {isNational ? 'National' : 'Gazetted'}
@@ -445,16 +457,15 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
         </div>
 
         {/* ════════ Footer ════════ */}
-        <div className="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+        <div className="px-4 py-3 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between shrink-0">
+          <span className="text-[11px] text-slate-500 font-medium">
             Tap any date to check holidays
           </span>
 
           <button
             type="button"
             onClick={onClose}
-            style={{ borderRadius: '12px' }}
-            className="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer"
+            className="px-4 py-1.5 bg-slate-200/80 hover:bg-slate-300/80 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer"
           >
             Close
           </button>
