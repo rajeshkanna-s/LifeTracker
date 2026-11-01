@@ -59,11 +59,20 @@ export interface AccountItem {
   updated_at?: string;
 }
 
+export interface BudgetSpendEntry {
+  id: string;
+  amount: number;
+  date: string;
+  note?: string;
+}
+
 export interface BudgetPlan {
   id: string;
   name: string;
   amount: number;
   period: 'monthly' | 'weekly' | 'yearly';
+  spent?: number;
+  spendHistory?: BudgetSpendEntry[];
   categories?: string[];
   accounts?: string[];
   currency?: string;
