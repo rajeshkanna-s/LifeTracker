@@ -1,8 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StickyNote, Plus, Trash2, Pencil, Pin, PinOff, Search, Clock, X, Save, ChevronRight, BookOpen, FileText, Star, StarOff } from 'lucide-react';
+import {
+  StickyNote,
+  Plus,
+  Trash2,
+  Pencil,
+  Pin,
+  PinOff,
+  Search,
+  Clock,
+  X,
+  Save,
+  ChevronRight,
+  BookOpen,
+  FileText,
+  Star,
+  StarOff,
+  CalendarCheck,
+  ListTodo
+} from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePartner } from '../../context/PartnerContext';
 import { formatLocalDate } from '../../utils/expenseUtils';
+import TodosView from './TodosView';
 
 interface DailyNote {
   id: string;
@@ -35,6 +54,9 @@ const NOTE_COLORS = [
 
 const NotesTracker: React.FC = () => {
   const { activePartnerId } = usePartner();
+  const [mainTab, setMainTab] = useState<'notes' | 'todos'>(() => {
+    return (localStorage.getItem('xpenser_notes_maintab') as 'notes' | 'todos') || 'todos';
+  });
   const [notes, setNotes] = useState<DailyNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
@@ -52,6 +74,11 @@ const NotesTracker: React.FC = () => {
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { fetchNotes(); }, [activePartnerId]);
+
+  const handleTabChange = (tab: 'notes' | 'todos') => {
+    setMainTab(tab);
+    localStorage.setItem('xpenser_notes_maintab', tab);
+  };
 
   const fetchNotes = async () => {
     setLoading(true);
@@ -152,192 +179,225 @@ const NotesTracker: React.FC = () => {
     return NOTE_COLORS[Math.abs(hash) % NOTE_COLORS.length];
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center py-20">
-      <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
-
   return (
-    <div className="pb-24">
-      <div className="notes-app">
-        {/* ── Sidebar ── */}
-        <div className="notes-sidebar">
-          <button type="button" title="New Note" aria-label="New Note" onClick={() => openEditor()} className="notes-sidebar-btn notes-new-btn">
-            <div className="notes-sidebar-icon"><Plus size={18} /></div>
-            <span>New</span>
+    <div className="space-y-4 max-w-3xl mx-auto pb-28">
+      {/* ── Top View Switcher (Notes vs To-dos) ── */}
+      <div className="flex items-center justify-center">
+        <div className="bg-slate-100/90 p-1 rounded-2xl border border-slate-200 inline-flex items-center gap-1 shadow-xs">
+          <button
+            type="button"
+            onClick={() => handleTabChange('notes')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+              mainTab === 'notes'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <FileText size={15} />
+            <span>Notes</span>
           </button>
-          <button type="button" title="Recent Notes" aria-label="Recent Notes" onClick={() => setSidebarView('recent')} className={`notes-sidebar-btn ${sidebarView === 'recent' ? 'active' : ''}`}>
-            <div className="notes-sidebar-icon"><Clock size={18} /></div>
-            <span>Recent</span>
+          <button
+            type="button"
+            onClick={() => handleTabChange('todos')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+              mainTab === 'todos'
+                ? 'bg-amber-500 text-white shadow-xs'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <CalendarCheck size={15} />
+            <span>To-dos</span>
           </button>
-          <button type="button" title="Pinned Notes" aria-label="Pinned Notes" onClick={() => setSidebarView('pinned')} className={`notes-sidebar-btn ${sidebarView === 'pinned' ? 'active' : ''}`}>
-            <div className="notes-sidebar-icon"><Pin size={18} /></div>
-            <span>Pinned</span>
-          </button>
-          <button type="button" title="All Notes" aria-label="All Notes" onClick={() => setSidebarView('all')} className={`notes-sidebar-btn ${sidebarView === 'all' ? 'active' : ''}`}>
-            <div className="notes-sidebar-icon"><BookOpen size={18} /></div>
-            <span>All</span>
-          </button>
-        </div>
-
-        {/* ── Main Content ── */}
-        <div className="notes-main">
-          {/* Search Bar */}
-          <div className="notes-search-bar">
-            <Search size={15} className="notes-search-icon" />
-            <input
-              className="notes-search-input"
-              placeholder="Search all notes..."
-              value={search} onChange={e => setSearch(e.target.value)}
-            />
-            {search && (
-              <button type="button" aria-label="Clear search" onClick={() => setSearch('')} className="notes-search-clear inline-flex items-center justify-center"><X size={14} /></button>
-            )}
-            <div className="notes-count">{filtered.length} notes</div>
-          </div>
-
-          {/* Quick Add Bar */}
-          <div className="notes-quick-add">
-            <form onSubmit={handleQuickSave} className="notes-quick-form">
-              <input
-                type="text"
-                className="notes-quick-input"
-                placeholder="Write a quick note..."
-                value={quickNote}
-                onChange={(e) => setQuickNote(e.target.value)}
-              />
-              <button type="submit" disabled={!quickNote.trim()} className="notes-quick-btn inline-flex items-center justify-center">
-                <Plus size={16} /> <span>Add</span>
-              </button>
-            </form>
-          </div>
-
-          {/* Notes List */}
-          {filtered.length === 0 ? (
-            <div className="notes-empty">
-              <div className="notes-empty-icon">📝</div>
-              <h4>No notes found</h4>
-              <p>{search ? 'Try a different search term' : 'Tap "New" to create your first note'}</p>
-              {!search && (
-                <button type="button" onClick={() => openEditor()} className="notes-empty-btn inline-flex items-center justify-center">
-                  <Plus size={16} /> Create Note
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="notes-list">
-              {filtered.map((note) => {
-                const color = getColor(note.title || note.content || 'Note');
-                const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
-                const isActive = selectedNote?.id === note.id;
-
-                return (
-                  <div
-                    key={note.id}
-                    className={`notes-row ${isActive ? 'active' : ''} ${note.is_pinned ? 'pinned' : ''}`}
-                    onClick={() => setSelectedNote(isActive ? null : note)}
-                  >
-                    {/* Note Icon */}
-                    <div className="notes-row-icon" style={{ background: `${color}15`, color }}>
-                      <FileText size={20} />
-                    </div>
-
-                    {/* Note Info */}
-                    <div className="notes-row-info">
-                      <div className="notes-row-title">
-                        {note.mood && <span className="notes-row-mood">{note.mood}</span>}
-                        {note.title ? note.title : (note.content.length > 60 ? note.content.slice(0, 60) + '...' : note.content)}
-                      </div>
-                      {note.title && (
-                        <div className="notes-row-subtitle">
-                          {note.content.length > 60 ? note.content.slice(0, 60) + '...' : note.content || 'No content'}
-                        </div>
-                      )}
-                      {tags.length > 0 && (
-                        <div className="notes-row-tags">
-                          {tags.slice(0, 3).map(t => <span key={t} className="notes-tag inline-flex items-center justify-center">#{t}</span>)}
-                          {tags.length > 3 && <span className="notes-tag-more inline-flex items-center justify-center">+{tags.length - 3}</span>}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right side: date + actions */}
-                    <div className="notes-row-right">
-                      <span className="notes-row-date">{formatDate(note.updated_at)}</span>
-                      <div className="notes-row-actions">
-                        <button
-                          type="button"
-                          onClick={(e) => togglePin(note, e)}
-                          className={`notes-action-btn inline-flex items-center justify-center ${note.is_pinned ? 'pinned' : ''}`}
-                          title={note.is_pinned ? 'Unpin' : 'Pin'}
-                          aria-label={note.is_pinned ? 'Unpin note' : 'Pin note'}
-                        >
-                          {note.is_pinned ? <PinOff size={13} /> : <Pin size={13} />}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); openEditor(note); }}
-                          className="notes-action-btn inline-flex items-center justify-center"
-                          title="Edit"
-                          aria-label="Edit note"
-                        >
-                          <Pencil size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => handleDelete(note.id, e)}
-                          className="notes-action-btn delete inline-flex items-center justify-center"
-                          title="Delete"
-                          aria-label="Delete note"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Expanded Note Preview */}
-          {selectedNote && (
-            <div className="notes-preview">
-              <div className="notes-preview-header">
-                <div>
-                  {selectedNote.title && (
-                    <h3 className="notes-preview-title">
-                      {selectedNote.mood && <span>{selectedNote.mood} </span>}
-                      {selectedNote.title}
-                    </h3>
-                  )}
-                  <p className="notes-preview-meta">
-                    {new Date(selectedNote.date).toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
-                    {selectedNote.mood && ` · ${selectedNote.mood}`}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => openEditor(selectedNote)} className="notes-preview-edit inline-flex items-center justify-center">
-                    <Pencil size={14} /> Edit
-                  </button>
-                  <button type="button" aria-label="Close preview" onClick={() => setSelectedNote(null)} className="notes-preview-close inline-flex items-center justify-center"><X size={16} /></button>
-                </div>
-              </div>
-              <div className="notes-preview-body">
-                <p className="whitespace-pre-wrap">{selectedNote.content}</p>
-              </div>
-              {selectedNote.tags && (
-                <div className="notes-preview-tags">
-                  {selectedNote.tags.split(',').map(t => t.trim()).filter(Boolean).map(t => (
-                    <span key={t} className="notes-tag inline-flex items-center justify-center">#{t}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
+
+      {/* ── Main View (To-dos or Notes) ── */}
+      {mainTab === 'todos' ? (
+        <TodosView />
+      ) : loading ? (
+        <div className="bg-white rounded-3xl border border-slate-200 p-16 flex items-center justify-center shadow-xs">
+          <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="notes-app bg-white border border-slate-200 shadow-xs">
+          {/* ── Sidebar ── */}
+          <div className="notes-sidebar">
+            <button type="button" title="New Note" aria-label="New Note" onClick={() => openEditor()} className="notes-sidebar-btn notes-new-btn">
+              <div className="notes-sidebar-icon"><Plus size={18} /></div>
+              <span>New</span>
+            </button>
+            <button type="button" title="Recent Notes" aria-label="Recent Notes" onClick={() => setSidebarView('recent')} className={`notes-sidebar-btn ${sidebarView === 'recent' ? 'active' : ''}`}>
+              <div className="notes-sidebar-icon"><Clock size={18} /></div>
+              <span>Recent</span>
+            </button>
+            <button type="button" title="Pinned Notes" aria-label="Pinned Notes" onClick={() => setSidebarView('pinned')} className={`notes-sidebar-btn ${sidebarView === 'pinned' ? 'active' : ''}`}>
+              <div className="notes-sidebar-icon"><Pin size={18} /></div>
+              <span>Pinned</span>
+            </button>
+            <button type="button" title="All Notes" aria-label="All Notes" onClick={() => setSidebarView('all')} className={`notes-sidebar-btn ${sidebarView === 'all' ? 'active' : ''}`}>
+              <div className="notes-sidebar-icon"><BookOpen size={18} /></div>
+              <span>All</span>
+            </button>
+          </div>
+
+          {/* ── Main Content ── */}
+          <div className="notes-main">
+            {/* Search Bar */}
+            <div className="notes-search-bar">
+              <Search size={15} className="notes-search-icon" />
+              <input
+                className="notes-search-input"
+                placeholder="Search all notes..."
+                value={search} onChange={e => setSearch(e.target.value)}
+              />
+              {search && (
+                <button type="button" aria-label="Clear search" onClick={() => setSearch('')} className="notes-search-clear inline-flex items-center justify-center"><X size={14} /></button>
+              )}
+              <div className="notes-count">{filtered.length} notes</div>
+            </div>
+
+            {/* Quick Add Bar */}
+            <div className="notes-quick-add">
+              <form onSubmit={handleQuickSave} className="notes-quick-form">
+                <input
+                  type="text"
+                  className="notes-quick-input"
+                  placeholder="Write a quick note..."
+                  value={quickNote}
+                  onChange={(e) => setQuickNote(e.target.value)}
+                />
+                <button type="submit" disabled={!quickNote.trim()} className="notes-quick-btn inline-flex items-center justify-center">
+                  <Plus size={16} /> <span>Add</span>
+                </button>
+              </form>
+            </div>
+
+            {/* Notes List */}
+            {filtered.length === 0 ? (
+              <div className="notes-empty">
+                <div className="notes-empty-icon">📝</div>
+                <h4>No notes found</h4>
+                <p>{search ? 'Try a different search term' : 'Tap "New" to create your first note'}</p>
+                {!search && (
+                  <button type="button" onClick={() => openEditor()} className="notes-empty-btn inline-flex items-center justify-center">
+                    <Plus size={16} /> Create Note
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="notes-list">
+                {filtered.map((note) => {
+                  const color = getColor(note.title || note.content || 'Note');
+                  const tags = note.tags ? note.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+                  const isActive = selectedNote?.id === note.id;
+
+                  return (
+                    <div
+                      key={note.id}
+                      className={`notes-row ${isActive ? 'active' : ''} ${note.is_pinned ? 'pinned' : ''}`}
+                      onClick={() => setSelectedNote(isActive ? null : note)}
+                    >
+                      {/* Note Icon */}
+                      <div className="notes-row-icon" style={{ background: `${color}15`, color }}>
+                        <FileText size={20} />
+                      </div>
+
+                      {/* Note Info */}
+                      <div className="notes-row-info">
+                        <div className="notes-row-title">
+                          {note.mood && <span className="notes-row-mood">{note.mood}</span>}
+                          {note.title ? note.title : (note.content.length > 60 ? note.content.slice(0, 60) + '...' : note.content)}
+                        </div>
+                        {note.title && (
+                          <div className="notes-row-subtitle">
+                            {note.content.length > 60 ? note.content.slice(0, 60) + '...' : note.content || 'No content'}
+                          </div>
+                        )}
+                        {tags.length > 0 && (
+                          <div className="notes-row-tags">
+                            {tags.slice(0, 3).map(t => <span key={t} className="notes-tag inline-flex items-center justify-center">#{t}</span>)}
+                            {tags.length > 3 && <span className="notes-tag-more inline-flex items-center justify-center">+{tags.length - 3}</span>}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right side: date + actions */}
+                      <div className="notes-row-right">
+                        <span className="notes-row-date">{formatDate(note.updated_at)}</span>
+                        <div className="notes-row-actions">
+                          <button
+                            type="button"
+                            onClick={(e) => togglePin(note, e)}
+                            className={`notes-action-btn inline-flex items-center justify-center ${note.is_pinned ? 'pinned' : ''}`}
+                            title={note.is_pinned ? 'Unpin' : 'Pin'}
+                            aria-label={note.is_pinned ? 'Unpin note' : 'Pin note'}
+                          >
+                            {note.is_pinned ? <PinOff size={13} /> : <Pin size={13} />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); openEditor(note); }}
+                            className="notes-action-btn inline-flex items-center justify-center"
+                            title="Edit"
+                            aria-label="Edit note"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDelete(note.id, e)}
+                            className="notes-action-btn delete inline-flex items-center justify-center"
+                            title="Delete"
+                            aria-label="Delete note"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Expanded Note Preview */}
+            {selectedNote && (
+              <div className="notes-preview">
+                <div className="notes-preview-header">
+                  <div>
+                    {selectedNote.title && (
+                      <h3 className="notes-preview-title">
+                        {selectedNote.mood && <span>{selectedNote.mood} </span>}
+                        {selectedNote.title}
+                      </h3>
+                    )}
+                    <p className="notes-preview-meta">
+                      {new Date(selectedNote.date).toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+                      {selectedNote.mood && ` · ${selectedNote.mood}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => openEditor(selectedNote)} className="notes-preview-edit inline-flex items-center justify-center">
+                      <Pencil size={14} /> Edit
+                    </button>
+                    <button type="button" aria-label="Close preview" onClick={() => setSelectedNote(null)} className="notes-preview-close inline-flex items-center justify-center"><X size={16} /></button>
+                  </div>
+                </div>
+                <div className="notes-preview-body">
+                  <p className="whitespace-pre-wrap">{selectedNote.content}</p>
+                </div>
+                {selectedNote.tags && (
+                  <div className="notes-preview-tags">
+                    {selectedNote.tags.split(',').map(t => t.trim()).filter(Boolean).map(t => (
+                      <span key={t} className="notes-tag inline-flex items-center justify-center">#{t}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Editor Modal ── */}
       {showEditor && (
@@ -401,6 +461,40 @@ const NotesTracker: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* ── Bottom App-style Navigation (Exact Match to Reference Screenshot) ── */}
+      <div className="fixed bottom-3 left-0 right-0 z-30 flex justify-center pointer-events-none px-4 pb-[env(safe-area-inset-bottom,0px)]">
+        <nav
+          aria-label="Notes view switcher"
+          className="pointer-events-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-xl px-2 py-1.5 flex items-center justify-center gap-1 sm:gap-2 w-full max-w-[280px]"
+        >
+          <button
+            type="button"
+            onClick={() => handleTabChange('notes')}
+            className={`flex-1 flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all cursor-pointer ${
+              mainTab === 'notes'
+                ? 'bg-amber-500 text-white font-extrabold shadow-xs'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-semibold'
+            }`}
+          >
+            <FileText size={18} strokeWidth={mainTab === 'notes' ? 2.5 : 2} />
+            <span className="text-[11px] leading-tight mt-0.5">Notes</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange('todos')}
+            className={`flex-1 flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all cursor-pointer ${
+              mainTab === 'todos'
+                ? 'bg-amber-500 text-white font-extrabold shadow-xs'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-semibold'
+            }`}
+          >
+            <CalendarCheck size={18} strokeWidth={mainTab === 'todos' ? 2.5 : 2} />
+            <span className="text-[11px] leading-tight mt-0.5">To-dos</span>
+          </button>
+        </nav>
+      </div>
     </div>
   );
 };
