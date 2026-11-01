@@ -14,8 +14,6 @@ import {
   ChevronDown,
   Volume2,
   Sparkles,
-  Database,
-  Copy,
   X
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -38,8 +36,6 @@ export const RemindersTracker: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingReminder, setEditingReminder] = useState<ReminderItem | null>(null);
   const [notificationPerm, setNotificationPerm] = useState<NotificationPermission>('default');
-  const [showSqlSetup, setShowSqlSetup] = useState(false);
-  const [copiedSql, setCopiedSql] = useState(false);
   const [repeatDropdownOpen, setRepeatDropdownOpen] = useState(false);
 
   // Form State matching Google Keep reference screenshots
@@ -399,35 +395,6 @@ export const RemindersTracker: React.FC = () => {
   const upcomingCount = partnerReminders.filter(r => !r.is_completed && r.reminder_date > todayStr).length;
   const completedCount = partnerReminders.filter(r => r.is_completed).length;
 
-  const sqlCode = `-- SQL to create dedicated 'reminders' table in Supabase
-CREATE TABLE IF NOT EXISTS public.reminders (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  partner_id TEXT NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
-  reminder_date DATE NOT NULL,
-  reminder_time TIME NOT NULL,
-  repeat_type TEXT DEFAULT 'none',
-  is_completed BOOLEAN DEFAULT FALSE,
-  notification_sent BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Enable RLS and grant read/write access
-ALTER TABLE public.reminders ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow full access to reminders" 
-ON public.reminders 
-FOR ALL 
-USING (true) 
-WITH CHECK (true);`;
-
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(sqlCode);
-    setCopiedSql(true);
-    setTimeout(() => setCopiedSql(false), 2000);
-  };
-
   return (
     <div className="space-y-4 max-w-4xl mx-auto pb-28">
       {/* ── Hero Card (White Background, Crisp Contrast) ── */}
@@ -528,43 +495,7 @@ WITH CHECK (true);`;
             </button>
           ))}
         </div>
-
-        {/* Database setup indicator */}
-        <button
-          type="button"
-          onClick={() => setShowSqlSetup(!showSqlSetup)}
-          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 font-semibold cursor-pointer"
-        >
-          <Database size={13} className="text-emerald-500" />
-          <span>DB Status: Connected</span>
-          <ChevronDown size={13} className={showSqlSetup ? 'rotate-180 transition' : 'transition'} />
-        </button>
       </div>
-
-      {/* ── Expandable Supabase SQL Query Guide ── */}
-      {showSqlSetup && (
-        <div className="bg-slate-900 text-slate-100 rounded-2xl p-4 text-xs font-mono border border-slate-800 shadow-xl space-y-2 animate-fadeIn">
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-amber-400 flex items-center gap-1.5">
-              <Database size={14} /> Optional: Supabase SQL Setup Query
-            </span>
-            <button
-              type="button"
-              onClick={handleCopySql}
-              className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-sans font-bold cursor-pointer"
-            >
-              <Copy size={12} />
-              <span>{copiedSql ? 'Copied!' : 'Copy SQL'}</span>
-            </button>
-          </div>
-          <p className="text-[11px] text-slate-400 font-sans">
-            Your reminders are already stored in Supabase! If you also want a dedicated table named <code className="text-amber-300">reminders</code>, paste this into your Supabase SQL Editor.
-          </p>
-          <pre className="bg-slate-950 p-3 rounded-xl overflow-x-auto text-[11px] text-emerald-400 leading-relaxed">
-            {sqlCode}
-          </pre>
-        </div>
-      )}
 
       {/* ── Reminders List ── */}
       {loading ? (
