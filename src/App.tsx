@@ -22,11 +22,86 @@ import type { TabId } from './types';
 import { usePWA } from './utils/usePWA';
 import { InstallModal } from './components/InstallModal';
 import { AppInstallBanner } from './components/AppInstallBanner';
+import { playReminderChime, sendBrowserNotification } from './utils/notificationService';
+import { formatLocalDate } from './utils/expenseUtils';
 
 const AppContent: React.FC = () => {
   const { isUnlocked, activePartnerId } = usePartner();
   const [activeTab, setActiveTab] = useState<TabId>('expenses');
   const [tabHistory, setTabHistory] = useState<TabId[]>(['expenses']);
+
+  // Universal background reminder engine: checks due reminders every 12 seconds
+  // across all pages and pushes notifications to the mobile top bar and audio chime
+  useEffect(() => {
+    if (!isUnlocked) return;
+
+    const checkGlobalReminders = async () => {
+      try {
+        const storageKey = `xpenser_reminders_${activePartnerId}`;
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return;
+
+        const list = JSON.parse(raw);
+        if (!Array.isArray(list)) return;
+
+        const now = new Date();
+        const todayStr = formatLocalDate(now);
+        const currentHours = String(now.getHours()).padStart(2, '0');
+        const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+        const currentTimeStr = `${currentHours}:${currentMinutes}`;
+
+        let changed = false;
+        const updated = list.map((item: any) => {
+          if (
+            item &&
+            item.partner_id === activePartnerId &&
+            !item.is_completed &&
+            !item.notification_sent &&
+            (item.reminder_date < todayStr || (item.reminder_date === todayStr && item.reminder_time <= currentTimeStr))
+          ) {
+            changed = true;
+            playReminderChime();
+            sendBrowserNotification(
+              `⏰ Remainder: ${item.title}`,
+              item.description || `Scheduled for ${item.reminder_time}`
+            );
+
+            if (item.repeat_type && item.repeat_type !== 'none') {
+              const d = new Date(item.reminder_date);
+              if (item.repeat_type === 'daily') d.setDate(d.getDate() + 1);
+              else if (item.repeat_type === 'weekly') d.setDate(d.getDate() + 7);
+              else if (item.repeat_type === 'monthly') d.setMonth(d.getMonth() + 1);
+              else if (item.repeat_type === 'yearly') d.setFullYear(d.getFullYear() + 1);
+              return {
+                ...item,
+                reminder_date: formatLocalDate(d),
+                notification_sent: false,
+                updated_at: new Date().toISOString()
+              };
+            }
+
+            return {
+              ...item,
+              notification_sent: true,
+              updated_at: new Date().toISOString()
+            };
+          }
+          return item;
+        });
+
+        if (changed) {
+          localStorage.setItem(storageKey, JSON.stringify(updated));
+          window.dispatchEvent(new CustomEvent('xpenser-reminders-updated'));
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    const interval = setInterval(checkGlobalReminders, 10000);
+    checkGlobalReminders();
+    return () => clearInterval(interval);
+  }, [activePartnerId, isUnlocked]);
 
   const {
     isInstallable,

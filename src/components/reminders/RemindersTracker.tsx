@@ -70,6 +70,24 @@ export const RemindersTracker: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleOutside);
   }, [repeatDropdownOpen]);
 
+  // Listen for global reminder updates (e.g. from app-level background ticker)
+  useEffect(() => {
+    const handleGlobalUpdate = () => {
+      const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            setReminders(parsed.filter(r => r && r.partner_id === activePartnerId));
+          }
+        } catch {}
+      }
+    };
+    window.addEventListener('xpenser-reminders-updated', handleGlobalUpdate);
+    return () => window.removeEventListener('xpenser-reminders-updated', handleGlobalUpdate);
+  }, [activePartnerId]);
+
   // Real-time ticker to trigger notifications at exact date & time
   useEffect(() => {
     const checkSchedule = () => {
@@ -81,14 +99,16 @@ export const RemindersTracker: React.FC = () => {
 
       let hasTriggered = false;
       const updated = reminders.map(item => {
-        if (
+        // Trigger if due right now or overdue on today/past date without notification having fired yet
+        const isDue = (
           !item.is_completed &&
           !item.notification_sent &&
-          item.reminder_date === todayStr &&
-          item.reminder_time === currentTimeStr
-        ) {
+          (item.reminder_date < todayStr || (item.reminder_date === todayStr && item.reminder_time <= currentTimeStr))
+        );
+
+        if (isDue) {
           hasTriggered = true;
-          // Trigger audio chime & browser notification
+          // Trigger audio chime & browser notification (Android status bar via ServiceWorker)
           playReminderChime();
           sendBrowserNotification(
             `⏰ Remainder: ${item.title}`,
@@ -120,7 +140,8 @@ export const RemindersTracker: React.FC = () => {
       }
     };
 
-    const timer = setInterval(checkSchedule, 10000); // Check every 10 seconds
+    const timer = setInterval(checkSchedule, 8000); // Check every 8 seconds
+    checkSchedule(); // Immediate evaluation
     return () => clearInterval(timer);
   }, [reminders]);
 
@@ -323,19 +344,22 @@ export const RemindersTracker: React.FC = () => {
     const granted = await requestNotificationPermission();
     if (granted) {
       setNotificationPerm('granted');
-      sendBrowserNotification('Notifications Enabled! 🎉', 'You will receive reminders right on time.');
       playReminderChime();
+      await sendBrowserNotification('Notifications Enabled! 🎉', 'You will receive reminders right in your mobile top bar.');
     } else {
       setNotificationPerm('denied');
     }
   };
 
-  const handleTestAlert = () => {
+  const handleTestAlert = async () => {
     playReminderChime();
-    sendBrowserNotification(
-      '⏰ Test Remainder',
-      'Sound and notification alert works perfectly!'
+    const sent = await sendBrowserNotification(
+      '⏰ Remainder: Test Alert',
+      'Mobile top bar & sound alert are working perfectly!'
     );
+    if (!sent && notificationPerm !== 'granted') {
+      await handleRequestPermission();
+    }
   };
 
   const formatDisplayDate = (dStr: string) => {
@@ -667,15 +691,15 @@ WITH CHECK (true);`;
 
       {/* ══════════════════════════════════════════════════════════════
           CHOOSE A DATE AND TIME MODAL
-          (Exact 1:1 Match to Uploaded Google Keep Reference Screenshots!)
+          (Centered Dialog with Scroll & In-Flow Repeat Accordion)
           ══════════════════════════════════════════════════════════════ */}
       {showModal && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn"
+          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn"
           onClick={() => setShowModal(false)}
         >
           <div
-            className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200/90 p-5 sm:p-6 animate-slideUp text-slate-900"
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-5 sm:p-6 text-slate-900 animate-slideUp"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Title */}
@@ -770,46 +794,49 @@ WITH CHECK (true);`;
                 </div>
               </div>
 
-              {/* 3. Repeat Dropdown (Exact Match to Screenshot 2!) */}
-              <div className="border-b border-slate-200 pb-2 relative" ref={repeatMenuRef}>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+              {/* 3. Repeat Dropdown (Inline Expandable so never cut off on any screen!) */}
+              <div className="border-b border-slate-200 pb-3" ref={repeatMenuRef}>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                   Repeat
                 </label>
                 <button
                   type="button"
                   onClick={() => setRepeatDropdownOpen(!repeatDropdownOpen)}
-                  className="w-full flex items-center justify-between text-left text-sm font-semibold text-slate-800 cursor-pointer py-1"
+                  className="w-full flex items-center justify-between text-left text-sm font-semibold text-slate-800 cursor-pointer py-2 px-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition"
                 >
-                  <span>{repeatLabels[repeatVal]}</span>
+                  <span className="font-medium text-slate-800">{repeatLabels[repeatVal]}</span>
                   <ChevronDown
                     size={16}
-                    className={`text-slate-400 transition-transform ${
-                      repeatDropdownOpen ? 'rotate-180' : ''
+                    className={`text-slate-400 transition-transform duration-200 ${
+                      repeatDropdownOpen ? 'rotate-180 text-amber-500' : ''
                     }`}
                   />
                 </button>
 
-                {/* Dropdown Options Popup */}
+                {/* Dropdown Options Popup (In-flow accordion - 100% visible on all mobile screens!) */}
                 {repeatDropdownOpen && (
-                  <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl py-1.5 z-40 animate-fadeIn">
-                    {(['none', 'daily', 'weekly', 'monthly', 'yearly'] as RepeatType[]).map(opt => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => {
-                          setRepeatVal(opt);
-                          setRepeatDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 text-xs font-semibold flex items-center justify-between transition cursor-pointer ${
-                          repeatVal === opt
-                            ? 'bg-amber-50 text-amber-700 font-extrabold'
-                            : 'text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        <span>{repeatLabels[opt]}</span>
-                        {repeatVal === opt && <Check size={14} className="text-amber-600" />}
-                      </button>
-                    ))}
+                  <div className="mt-2 bg-slate-50/90 border border-slate-200 rounded-2xl p-1.5 space-y-1 shadow-inner animate-fadeIn">
+                    {(['none', 'daily', 'weekly', 'monthly', 'yearly'] as RepeatType[]).map(opt => {
+                      const isSelected = repeatVal === opt;
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => {
+                            setRepeatVal(opt);
+                            setRepeatDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition cursor-pointer ${
+                            isSelected
+                              ? 'bg-amber-500 text-white font-extrabold shadow-xs'
+                              : 'text-slate-700 hover:bg-slate-200/60'
+                          }`}
+                        >
+                          <span>{repeatLabels[opt]}</span>
+                          {isSelected && <Check size={14} strokeWidth={2.5} className="text-white" />}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>

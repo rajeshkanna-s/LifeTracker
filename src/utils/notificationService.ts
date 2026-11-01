@@ -57,17 +57,69 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
   return false;
 };
 
-export const sendBrowserNotification = (title: string, body: string, icon = '/pwa-192x192.png') => {
+export const sendBrowserNotification = async (
+  title: string,
+  body: string,
+  icon = '/pwa-192x192.png'
+): Promise<boolean> => {
   try {
-    if ('Notification' in window && Notification.permission === 'granted') {
+    if (!('Notification' in window)) {
+      console.warn('Notifications not supported in this browser window.');
+      return false;
+    }
+
+    // Ensure permission is granted; if 'default', request it
+    let perm = Notification.permission;
+    if (perm !== 'granted') {
+      perm = await Notification.requestPermission();
+    }
+    if (perm !== 'granted') {
+      console.warn('Notification permission was not granted:', perm);
+      return false;
+    }
+
+    // 1. Mobile Android / PWA standard: MUST use ServiceWorkerRegistration.showNotification()
+    // In mobile Android Chrome, `new Notification()` throws an Illegal Constructor error.
+    // ServiceWorker showNotification is the ONLY API that triggers Android top bar / status bar notifications!
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration && typeof registration.showNotification === 'function') {
+          await registration.showNotification(title, {
+            body,
+            icon,
+            badge: icon,
+            vibrate: [250, 100, 250, 100, 250],
+            tag: 'xpenser-rem-' + Date.now(),
+            renotify: true,
+            requireInteraction: true,
+            silent: false,
+            data: { url: window.location.href }
+          } as NotificationOptions);
+          return true;
+        }
+      } catch (swErr) {
+        console.warn('ServiceWorker showNotification failed, trying window.Notification fallback:', swErr);
+      }
+    }
+
+    // 2. Desktop Browser fallback
+    try {
       new Notification(title, {
         body,
         icon,
         badge: icon,
-      });
+        vibrate: [250, 100, 250]
+      } as NotificationOptions);
+      return true;
+    } catch (desktopErr) {
+      console.warn('Desktop Notification constructor error:', desktopErr);
     }
-  } catch {
-    // ignore
+
+    return false;
+  } catch (err) {
+    console.warn('sendBrowserNotification caught exception:', err);
+    return false;
   }
 };
 
