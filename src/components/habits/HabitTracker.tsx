@@ -159,16 +159,35 @@ const HabitTracker: React.FC = () => {
   const allCategories = [...CATEGORIES, ...(settings.customCategories || [])];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Sub-tabs */}
       <div className="module-subtabs">
-        <button onClick={() => setActiveTab('home')} className={`module-subtab ${activeTab === 'home' ? 'active-habit' : ''}`}>
+        <button
+          type="button"
+          title="Dashboard"
+          aria-label="Dashboard"
+          onClick={() => setActiveTab('home')}
+          className={`module-subtab ${activeTab === 'home' ? 'active-habit' : ''}`}
+        >
           <CheckSquare size={16} /> <span className="label-text">Dashboard</span>
         </button>
-        <button onClick={() => setShowModal(true)} className="module-subtab" style={{ color: '#10b981' }}>
+        <button
+          type="button"
+          title="Add Habit"
+          aria-label="Add Habit"
+          onClick={() => setShowModal(true)}
+          className="module-subtab"
+          style={{ color: '#059669' }}
+        >
           <Plus size={16} /> <span className="label-text">Add Habit</span>
         </button>
-        <button onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-habit' : ''}`}>
+        <button
+          type="button"
+          title="Settings"
+          aria-label="Settings"
+          onClick={() => setActiveTab('settings')}
+          className={`module-subtab ${activeTab === 'settings' ? 'active-habit' : ''}`}
+        >
           <Settings size={16} /> <span className="label-text">Settings</span>
         </button>
       </div>
@@ -179,15 +198,15 @@ const HabitTracker: React.FC = () => {
             {/* Summary Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Active Habits', value: habits.length, icon: '🎯', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
-                { label: 'Done Today', value: `${todayCompleted}/${habits.length}`, icon: '✅', gradient: 'linear-gradient(135deg, #6366f1, #818cf8)' },
-                { label: 'This Week', value: totalCompleted, icon: '📊', gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
-                { label: 'Completion', value: `${totalStreaks}%`, icon: '🔥', gradient: 'linear-gradient(135deg, #ef4444, #f87171)' },
+                { label: 'Active Habits', value: habits.length, icon: '🎯', gradient: 'linear-gradient(135deg, #059669, #10b981)' },
+                { label: 'Done Today', value: `${todayCompleted}/${habits.length}`, icon: '✅', gradient: 'linear-gradient(135deg, #4f46e5, #6366f1)' },
+                { label: 'This Week', value: totalCompleted, icon: '📊', gradient: 'linear-gradient(135deg, #d97706, #ea580c)' },
+                { label: 'Completion', value: `${totalStreaks}%`, icon: '🔥', gradient: 'linear-gradient(135deg, #dc2626, #ef4444)' },
               ].map(s => (
                 <div key={s.label} className="rounded-2xl p-4 shadow-md text-white" style={{ background: s.gradient }}>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-base">{s.icon}</div>
-                    <span className="text-xs font-semibold text-white/80">{s.label}</span>
+                    <div className="w-8 h-8 bg-white/20 rounded-lg inline-flex items-center justify-center text-base shrink-0">{s.icon}</div>
+                    <span className="text-xs font-semibold text-white/90">{s.label}</span>
                   </div>
                   <p className="text-2xl font-bold">{s.value}</p>
                 </div>
@@ -196,81 +215,107 @@ const HabitTracker: React.FC = () => {
 
             {/* Week Navigation */}
             <div className="card-dark">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center justify-between sm:justify-start gap-2">
-                  <button className="btn-action" onClick={prevWeek}><ChevronLeft size={16} /></button>
+                  <button type="button" aria-label="Previous week" title="Previous week" className="btn-action inline-flex items-center justify-center" onClick={prevWeek}><ChevronLeft size={16} /></button>
                   <span className="text-sm font-bold text-slate-800 text-center flex-1 sm:flex-none">
                     {new Date(weekDates[0]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} — {new Date(weekDates[6]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </span>
-                  <button className="btn-action" onClick={nextWeek}><ChevronRight size={16} /></button>
+                  <button type="button" aria-label="Next week" title="Next week" className="btn-action inline-flex items-center justify-center" onClick={nextWeek}><ChevronRight size={16} /></button>
                 </div>
-                <button onClick={goToday} className="w-full sm:w-auto text-xs text-emerald-600 font-bold hover:text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200 transition">Today</button>
+                <button type="button" onClick={goToday} className="w-full sm:w-auto inline-flex items-center justify-center text-xs text-emerald-700 font-bold hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-2 rounded-lg border border-emerald-200 transition">Today</button>
               </div>
             </div>
 
             {/* Habit Grid */}
             <div className="card-dark !p-0 overflow-x-auto">
-              <div className="min-w-[600px]">
-                {/* Week Header */}
-                <div className="grid gap-1 p-3 pb-0" style={{ gridTemplateColumns: '1fr repeat(7, 44px) 44px' }}>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider self-end pb-1">Habit</span>
-                  {weekDates.map((d, i) => {
-                    const isToday = d === today;
-                    return (
-                      <div key={d} className={`text-center rounded-lg py-1 ${isToday ? 'bg-emerald-50 border border-emerald-200' : ''}`}>
-                        <p className={`text-[10px] font-bold ${isToday ? 'text-emerald-600' : 'text-slate-400'}`}>{DAYS[i]}</p>
-                        <p className={`text-xs font-bold ${isToday ? 'text-emerald-700' : 'text-slate-600'}`}>{new Date(d).getDate()}</p>
-                      </div>
-                    );
-                  })}
-                  <span className="text-[10px] font-bold text-slate-400 text-center self-end pb-1">🗑</span>
-                </div>
-
-                {habits.length === 0 ? (
-                  <div className="text-center py-10 px-4">
-                    <div className="text-4xl mb-3 opacity-40">✅</div>
-                    <h4 className="text-sm font-bold text-slate-800">No habits yet</h4>
-                    <p className="text-xs text-slate-400 mt-1">Create your first habit to start tracking</p>
-                  </div>
-                ) : (
-                  <div className="px-3 pb-3">
-                    {habits.map(habit => {
+              <table className="w-full min-w-[520px] border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100">
+                    <th className="sticky left-0 bg-white z-10 text-left pl-3 pr-2 pt-3 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider min-w-[130px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] sm:shadow-none">
+                      Habit
+                    </th>
+                    {weekDates.map((d, i) => {
+                      const isToday = d === today;
+                      return (
+                        <th key={d} className="p-1.5 pt-3 pb-2 w-[44px] text-center font-normal">
+                          <div className={`rounded-lg py-1 ${isToday ? 'bg-emerald-50 border border-emerald-200' : ''}`}>
+                            <p className={`text-[10px] font-bold ${isToday ? 'text-emerald-600' : 'text-slate-500'}`}>{DAYS[i]}</p>
+                            <p className={`text-xs font-bold ${isToday ? 'text-emerald-700' : 'text-slate-700'}`}>{new Date(d).getDate()}</p>
+                          </div>
+                        </th>
+                      );
+                    })}
+                    <th className="pr-3 pl-1 pt-3 pb-2 w-[44px] text-center">
+                      <span className="inline-flex items-center justify-center text-slate-400" aria-label="Delete column">
+                        <Trash2 size={14} />
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {habits.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="text-center py-10 px-4">
+                        <div className="text-4xl mb-3 opacity-40">✅</div>
+                        <h4 className="text-sm font-bold text-slate-800">No habits yet</h4>
+                        <p className="text-xs text-slate-500 mt-1">Create your first habit to start tracking</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    habits.map(habit => {
                       const progress = getWeekProgress(habit.id);
                       return (
-                        <div key={habit.id} className="grid gap-1 py-2 border-t border-slate-100 items-center" style={{ gridTemplateColumns: '1fr repeat(7, 44px) 44px' }}>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-sm">{CATEGORY_EMOJI[habit.category] || '✨'}</span>
-                            <div className="min-w-0">
-                              <p className="text-xs font-bold text-slate-800 truncate">{habit.name}</p>
-                              <p className="text-[10px] text-slate-400">{progress}/7</p>
+                        <tr key={habit.id} className="border-t border-slate-100 hover:bg-slate-50/60 transition">
+                          <td className="sticky left-0 bg-white z-10 pl-3 pr-2 py-2.5 min-w-[130px] max-w-[160px] sm:max-w-[240px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] sm:shadow-none">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-sm shrink-0">{CATEGORY_EMOJI[habit.category] || '✨'}</span>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-slate-800 truncate" title={habit.name}>{habit.name}</p>
+                                <p className="text-[10px] text-slate-500">{progress}/7</p>
+                              </div>
                             </div>
-                          </div>
+                          </td>
                           {weekDates.map(date => {
                             const checked = isChecked(habit.id, date);
                             return (
-                              <div key={date} className="flex justify-center">
-                                <button
-                                  onClick={() => toggleEntry(habit.id, date)}
-                                  className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center transition-all active:scale-90 ${
-                                    checked
-                                      ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-200'
-                                      : 'border-slate-200 hover:border-emerald-300 text-slate-300'
-                                  }`}
-                                >
-                                  {checked && <Check size={16} strokeWidth={3} />}
-                                </button>
-                              </div>
+                              <td key={date} className="p-1 py-2 text-center align-middle">
+                                <div className="flex justify-center">
+                                  <button
+                                    type="button"
+                                    aria-label={`Mark ${habit.name} for ${date}`}
+                                    onClick={() => toggleEntry(habit.id, date)}
+                                    className={`w-9 h-9 rounded-xl border-2 inline-flex items-center justify-center transition-all active:scale-90 ${
+                                      checked
+                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm shadow-emerald-200'
+                                        : 'border-slate-300 bg-white hover:border-emerald-400 text-slate-300'
+                                    }`}
+                                  >
+                                    {checked && <Check size={16} strokeWidth={3} />}
+                                  </button>
+                                </div>
+                              </td>
                             );
                           })}
-                          <div className="flex justify-center">
-                            <button className="btn-action danger" style={{ width: 28, height: 28 }} onClick={() => handleDeleteHabit(habit.id)}><Trash2 size={12} /></button>
-                          </div>
-                        </div>
+                          <td className="pr-3 pl-1 py-2 text-center align-middle">
+                            <div className="flex justify-center">
+                              <button
+                                type="button"
+                                title="Delete habit"
+                                aria-label={`Delete ${habit.name}`}
+                                className="btn-action danger inline-flex items-center justify-center !w-8 !h-8"
+                                onClick={() => handleDeleteHabit(habit.id)}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
                       );
-                    })}
-                  </div>
-                )}
-              </div>
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -282,7 +327,10 @@ const HabitTracker: React.FC = () => {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h3>Add New Habit</h3><button className="modal-close" onClick={() => setShowModal(false)}>✕</button></div>
+            <div className="modal-header">
+              <h3>Add New Habit</h3>
+              <button type="button" aria-label="Close modal" className="modal-close inline-flex items-center justify-center" onClick={() => setShowModal(false)}>✕</button>
+            </div>
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-group full"><label className="form-label">Habit Name</label><input className="form-control-custom" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
@@ -290,7 +338,10 @@ const HabitTracker: React.FC = () => {
                 <div className="form-group"><label className="form-label">Category</label><select className="form-control-custom" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>{allCategories.map(c => <option key={c}>{c}</option>)}</select></div>
               </div>
             </div>
-            <div className="modal-footer"><button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button><button className="btn-submit green" onClick={handleAddHabit}>Add</button></div>
+            <div className="modal-footer">
+              <button type="button" className="btn-cancel inline-flex items-center justify-center" onClick={() => setShowModal(false)}>Cancel</button>
+              <button type="button" className="btn-submit green inline-flex items-center justify-center" onClick={handleAddHabit}>Add</button>
+            </div>
           </div>
         </div>
       )}

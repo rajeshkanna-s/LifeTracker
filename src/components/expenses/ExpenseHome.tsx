@@ -253,7 +253,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
   const categories = [...new Set(expenses.map(e => e.category))];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Greeting & Quick Action */}
       <div className="flex items-center justify-between">
         <div>
@@ -395,7 +395,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
             <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate w-full">
               {s.noSymbol ? s.value : `${settings.currencySymbol}${s.value.toLocaleString()}`}
             </p>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5 truncate w-full">{s.label}</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5 truncate w-full">{s.label}</p>
           </div>
         ))}
       </div>
@@ -495,56 +495,56 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
         <button
           type="button"
           onClick={() => setShowNoSpendModal(true)}
-          className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 hover:border-violet-300 dark:hover:border-violet-500 shadow-2xs active:scale-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+          className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 hover:border-violet-300 dark:hover:border-violet-500 shadow-2xs active:scale-95 transition-all flex flex-col items-center justify-center text-center min-w-0 gap-1 cursor-pointer"
         >
-          <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-300 text-sm">
+          <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-300 text-sm shrink-0">
             🎯
           </div>
-          <span className="text-[11px] font-bold leading-tight">No-Spend</span>
-          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400">Streak & Badges</span>
+          <span className="text-[11px] font-bold leading-tight truncate w-full">No-Spend</span>
+          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400 truncate w-full">Streak & Badges</span>
         </button>
 
         <button
           type="button"
           onClick={() => setShowShoppingListModal(true)}
-          className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 hover:border-violet-300 dark:hover:border-violet-500 shadow-2xs active:scale-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+          className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 hover:border-violet-300 dark:hover:border-violet-500 shadow-2xs active:scale-95 transition-all flex flex-col items-center justify-center text-center min-w-0 gap-1 cursor-pointer"
         >
-          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-300 text-sm">
+          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-300 text-sm shrink-0">
             🛒
           </div>
-          <span className="text-[11px] font-bold leading-tight">Shared List</span>
-          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400">Rajesh & Mia</span>
+          <span className="text-[11px] font-bold leading-tight truncate w-full">Shared List</span>
+          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400 truncate w-full">Rajesh & Mia</span>
         </button>
 
         <button
           type="button"
           onClick={() => setShowRecurringModal(true)}
-          className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 hover:border-violet-300 dark:hover:border-violet-500 shadow-2xs active:scale-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+          className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 hover:border-violet-300 dark:hover:border-violet-500 shadow-2xs active:scale-95 transition-all flex flex-col items-center justify-center text-center min-w-0 gap-1 cursor-pointer"
         >
-          <div className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center text-violet-600 dark:text-violet-300 text-sm">
+          <div className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center text-violet-600 dark:text-violet-300 text-sm shrink-0">
             🔄
           </div>
-          <span className="text-[11px] font-bold leading-tight">Recurring</span>
-          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400">Bills & Dues</span>
+          <span className="text-[11px] font-bold leading-tight truncate w-full">Recurring</span>
+          <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400 truncate w-full">Bills & Dues</span>
         </button>
       </div>
 
       {/* Quick Add — Mobile Swipeable Carousel */}
       <div className="card-dark overflow-hidden">
-        <div className="flex items-center justify-between mb-2.5">
-          <div className="flex items-center gap-1.5">
+        <div className="flex items-center justify-between gap-2 mb-2.5">
+          <div className="flex items-center gap-1.5 min-w-0">
             <Sparkles size={16} className="text-amber-500 shrink-0" />
             <span style={{ fontSize: '12px', fontWeight: 700, margin: 0 }} className="text-slate-900 dark:text-slate-100 whitespace-nowrap">
               Quick Add
             </span>
-            <span className="text-[10px] font-bold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 px-1.5 py-0.5 rounded-full border border-violet-100 dark:border-violet-800/50 shrink-0">
+            <span className="inline-flex items-center justify-center leading-none text-[10px] font-bold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 px-1.5 py-0.5 rounded-full border border-violet-100 dark:border-violet-800/50 shrink-0">
               {quickItems.length}
             </span>
           </div>
           <button
             type="button"
             onClick={() => onNavigate('settings')}
-            className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-bold px-2 py-1 rounded-md hover:bg-violet-50 dark:hover:bg-violet-950/40 transition active:scale-95 whitespace-nowrap cursor-pointer"
+            className="inline-flex items-center justify-center leading-none text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-bold px-2.5 py-1.5 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-950/40 transition active:scale-95 whitespace-nowrap cursor-pointer shrink-0"
           >
             Customize
           </button>
@@ -653,40 +653,46 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
 
       {/* Recent Transactions */}
       <div className="card-dark !p-0">
-        <div className="flex items-center justify-between p-3 pb-0">
-          <div className="flex items-center gap-2">
-            <span style={{ fontSize: '12px', fontWeight: 700, margin: 0 }} className="text-slate-900 dark:text-slate-100">
+        <div className="flex items-center justify-between gap-2 p-3 pb-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <span style={{ fontSize: '12px', fontWeight: 700, margin: 0 }} className="text-slate-900 dark:text-slate-100 whitespace-nowrap">
               Recently
             </span>
-            <span className="text-[10px] font-semibold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 px-2 py-0.5 rounded-full border border-violet-100 dark:border-violet-800/50">
+            <span className="inline-flex items-center justify-center leading-none text-[10px] font-semibold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 px-2 py-0.5 rounded-full border border-violet-100 dark:border-violet-800/50 shrink-0">
               This Week
             </span>
-            <span className="px-2 py-0.5 text-xs font-black bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/50 rounded-full leading-none">
+            <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/50 rounded-full leading-none shrink-0">
               {recentExpenses.length}
             </span>
           </div>
-          <button onClick={() => onNavigate('reports')} className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-semibold transition cursor-pointer">See all</button>
+          <button
+            type="button"
+            onClick={() => onNavigate('reports')}
+            className="inline-flex items-center justify-center leading-none text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-semibold px-2.5 py-1.5 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-950/40 transition cursor-pointer shrink-0 whitespace-nowrap"
+          >
+            See all
+          </button>
         </div>
         {/* Type Toggle: All / Expense / Income */}
         <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl mx-3 mt-2 border border-slate-200/60 dark:border-slate-700/60">
           <button
             type="button"
             onClick={() => setTxTypeFilter('all')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${txTypeFilter === 'all' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
+            className={`flex-1 inline-flex items-center justify-center leading-none py-2 text-xs font-bold rounded-lg transition cursor-pointer ${txTypeFilter === 'all' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           >
             All
           </button>
           <button
             type="button"
             onClick={() => setTxTypeFilter('expense')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${txTypeFilter === 'expense' ? 'bg-rose-500 text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
+            className={`flex-1 inline-flex items-center justify-center leading-none py-2 text-xs font-bold rounded-lg transition cursor-pointer ${txTypeFilter === 'expense' ? 'bg-rose-500 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           >
             Expenses
           </button>
           <button
             type="button"
             onClick={() => setTxTypeFilter('income')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${txTypeFilter === 'income' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
+            className={`flex-1 inline-flex items-center justify-center leading-none py-2 text-xs font-bold rounded-lg transition cursor-pointer ${txTypeFilter === 'income' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           >
             Income
           </button>
@@ -739,20 +745,20 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                           {exp.description || exp.category}
                         </p>
                         {isInc && (
-                          <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
+                          <span className="inline-flex items-center justify-center leading-none text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
                             Income
                           </span>
                         )}
                         {fuelBadge?.mileage && (
                           <span
-                            className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0"
+                            className="inline-flex items-center justify-center leading-none gap-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0"
                             title={`Mileage: ${fuelBadge.mileage} km/l${fuelBadge.distance ? ` · Dist: ${fuelBadge.distance} km` : ''}`}
                           >
                             ⛽ {fuelBadge.mileage} km/l
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-medium truncate mt-0.5">
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                         {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                         {exp.payment_method ? ` • ${exp.payment_method}` : ''}
                         {exp.description && exp.category ? ` • ${exp.category}` : ''}
@@ -770,7 +776,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                         onClick={() => onEdit?.(exp)}
                         title="Edit expense"
                         aria-label="Edit expense"
-                        className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
+                        className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 inline-flex items-center justify-center leading-none shrink-0 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
                       >
                         <Edit2 size={12} strokeWidth={2.2} />
                       </button>
@@ -783,7 +789,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                         }}
                         title="Delete expense"
                         aria-label="Delete expense"
-                        className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
+                        className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 inline-flex items-center justify-center leading-none shrink-0 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
                       >
                         <Trash2 size={12} strokeWidth={2.2} />
                       </button>
@@ -803,7 +809,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
             <Lightbulb size={14} className="text-amber-500" /> Today's Note
           </h4>
           {!editingNote && dayNote && (
-            <button onClick={() => setEditingNote(true)} className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-semibold cursor-pointer">Edit</button>
+            <button type="button" onClick={() => setEditingNote(true)} className="inline-flex items-center justify-center leading-none text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-semibold px-2 py-1 rounded-md hover:bg-violet-50 transition cursor-pointer">Edit</button>
           )}
         </div>
         {editingNote || !dayNote ? (
@@ -820,7 +826,7 @@ const ExpenseHome: React.FC<ExpenseHomeProps> = ({ expenses, settings, onAddExpe
                 <button
                   type="button"
                   onClick={() => setEditingNote(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+                  className="inline-flex items-center justify-center leading-none px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
                 >
                   Cancel
                 </button>

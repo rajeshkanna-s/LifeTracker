@@ -109,39 +109,38 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
         inset: 0,
         zIndex: 9999,
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
-        padding: '1rem',
+        background: 'linear-gradient(145deg, #f8f7f4 0%, #eef2ff 50%, #f5f3ff 100%)',
+        padding: '24px 16px',
         boxSizing: 'border-box',
         overflowY: 'auto',
         WebkitOverflowScrolling: 'touch'
       }}
     >
-      {/* Decorative ambient backdrop lights */}
+      {/* Decorative soft Light-Mode ambient backdrop lights */}
       <div
         style={{
-          position: 'absolute',
+          position: 'fixed',
           top: '-10%',
           right: '-5%',
-          width: '360px',
-          height: '360px',
+          width: '340px',
+          height: '340px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.25), transparent 70%)',
-          filter: 'blur(60px)',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.10), transparent 70%)',
+          filter: 'blur(50px)',
           pointerEvents: 'none'
         }}
       />
       <div
         style={{
-          position: 'absolute',
+          position: 'fixed',
           bottom: '-10%',
           left: '-5%',
-          width: '380px',
-          height: '380px',
+          width: '360px',
+          height: '360px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(14,165,233,0.2), transparent 70%)',
-          filter: 'blur(60px)',
+          background: 'radial-gradient(circle, rgba(14,165,233,0.09), transparent 70%)',
+          filter: 'blur(50px)',
           pointerEvents: 'none'
         }}
       />
@@ -149,26 +148,25 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
       <div
         style={{
           position: 'relative',
+          margin: 'auto',
           width: '100%',
           maxWidth: '420px',
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(30px)',
-          WebkitBackdropFilter: 'blur(30px)',
+          background: '#ffffff',
           borderRadius: '28px',
-          border: '1px solid rgba(255, 255, 255, 0.9)',
-          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 40px rgba(124, 58, 237, 0.15)',
-          padding: '2rem 1.5rem',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 20px 50px -12px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(124, 58, 237, 0.06)',
+          padding: '1.75rem 1.25rem',
           boxSizing: 'border-box',
           textAlign: 'center'
         }}
         className={error ? 'animate-shake' : ''}
       >
         {/* App Branding Top - Clean & Properly Centered */}
-        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.03em', margin: '0 0 0.25rem 0', lineHeight: 1.2 }}>
+        <div style={{ textAlign: 'center', marginBottom: selectedPartner ? '1.15rem' : '1.5rem' }}>
+          <h1 style={{ fontSize: '1.55rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.03em', margin: '0 0 0.25rem 0', lineHeight: 1.2 }}>
             Xpenser
           </h1>
-          <p style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', margin: 0 }}>
+          <p style={{ fontSize: '0.76rem', color: '#475569', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', margin: 0 }}>
             Personal Life & Finance
           </p>
         </div>
@@ -182,20 +180,21 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
             aria-label="Install App"
             style={{
               position: 'absolute',
-              top: '18px',
-              right: '18px',
+              top: '16px',
+              right: '16px',
               width: '38px',
               height: '38px',
               borderRadius: '50%',
               border: '1.5px solid #c4b5fd',
-              background: 'rgba(245, 243, 255, 0.95)',
+              background: '#f5f3ff',
               color: '#7c3aed',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.15)',
+              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.12)',
               zIndex: 10
             }}
             onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.92)'; }}
@@ -208,16 +207,16 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
         {/* ════════ VIEW 1: CHOOSE PROFILE (RAJESH & SEETHA) ════════ */}
         {!selectedPartner ? (
           <div>
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', margin: '0 0 0.35rem 0', letterSpacing: '-0.01em' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.35rem' }}>
+              <h2 style={{ fontSize: '1.22rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.3rem 0', letterSpacing: '-0.01em' }}>
                 Select Profile
               </h2>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+              <p style={{ fontSize: '0.84rem', color: '#475569', margin: 0, fontWeight: 500 }}>
                 Choose your private workspace to continue
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '0.5rem' }}>
               {partnerList.map(partner => {
                 const isRajesh = partner.id === 'partner_1' || partner.name.toLowerCase().includes('rajesh');
                 const displayName = partner.name || (isRajesh ? 'Rajesh' : 'Mia');
@@ -225,8 +224,6 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                 const gradient = isRajesh
                   ? 'linear-gradient(135deg, #7c3aed, #6366f1)'
                   : 'linear-gradient(135deg, #0ea5e9, #06b6d4)';
-                const lightBg = isRajesh ? 'rgba(124, 58, 237, 0.05)' : 'rgba(14, 165, 233, 0.05)';
-                const borderColor = isRajesh ? 'rgba(124, 58, 237, 0.25)' : 'rgba(14, 165, 233, 0.25)';
 
                 return (
                   <button
@@ -237,10 +234,12 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '1.15rem 1.25rem',
-                      borderRadius: '22px',
-                      border: `2px solid ${borderColor}`,
-                      background: lightBg,
+                      gap: '12px',
+                      padding: '1rem 1.1rem',
+                      borderRadius: '20px',
+                      border: '1px solid #e2e8f0',
+                      background: '#ffffff',
+                      boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -251,12 +250,12 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = 'translateY(-2px)';
                       e.currentTarget.style.borderColor = accentColor;
-                      e.currentTarget.style.boxShadow = `0 10px 25px ${isRajesh ? 'rgba(124,58,237,0.18)' : 'rgba(14,165,233,0.18)'}`;
+                      e.currentTarget.style.boxShadow = `0 10px 24px ${isRajesh ? 'rgba(124,58,237,0.14)' : 'rgba(14,165,233,0.14)'}`;
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.borderColor = borderColor;
-                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(15, 23, 42, 0.04)';
                     }}
                     onTouchStart={e => {
                       e.currentTarget.style.transform = 'scale(0.98)';
@@ -265,27 +264,28 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                       e.currentTarget.style.transform = 'scale(1)';
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flex: 1 }}>
                       <div
                         style={{
-                          width: '56px',
-                          height: '56px',
-                          borderRadius: '18px',
+                          width: '52px',
+                          height: '52px',
+                          borderRadius: '16px',
                           background: gradient,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          flexShrink: 0,
                           color: '#fff',
-                          boxShadow: `0 6px 16px ${isRajesh ? 'rgba(124,58,237,0.3)' : 'rgba(14,165,233,0.3)'}`
+                          boxShadow: `0 6px 14px ${isRajesh ? 'rgba(124,58,237,0.25)' : 'rgba(14,165,233,0.25)'}`
                         }}
                       >
-                        {isRajesh ? <User size={28} color="#fff" /> : <Users size={28} color="#fff" />}
+                        {isRajesh ? <User size={26} color="#fff" /> : <Users size={26} color="#fff" />}
                       </div>
-                      <div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '2px' }}>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontSize: '1.12rem', fontWeight: 800, color: '#0f172a', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {displayName}
                         </div>
-                        <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+                        <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {displayName}'s Private Workspace
                         </div>
                         <div style={{ fontSize: '0.72rem', color: accentColor, fontWeight: 700, marginTop: '2px' }}>
@@ -298,22 +298,22 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                         width: '36px',
                         height: '36px',
                         borderRadius: '50%',
-                        background: '#ffffff',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        flexShrink: 0,
                         color: accentColor,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                        boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)'
                       }}
                     >
-                      <ChevronRight size={20} />
+                      <ChevronRight size={19} />
                     </div>
                   </button>
                 );
               })}
             </div>
-
-
           </div>
         ) : (
           /* ════════ VIEW 2: NATIVE MOBILE PIN ENTRY SCREEN ════════ */
@@ -324,13 +324,14 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
               onClick={handleBackToSelection}
               style={{
                 position: 'absolute',
-                top: '1.25rem',
-                left: '1.25rem',
+                top: '16px',
+                left: '16px',
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '5px',
-                background: 'rgba(0,0,0,0.04)',
-                border: 'none',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
                 color: '#475569',
                 fontSize: '0.78rem',
                 fontWeight: 700,
@@ -344,38 +345,39 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
             </button>
 
             {/* Selected Partner Header */}
-            <div style={{ margin: '0.75rem 0 1rem' }}>
+            <div style={{ margin: '0.5rem 0 0.85rem' }}>
               <div
                 style={{
-                  width: '68px',
-                  height: '68px',
-                  borderRadius: '22px',
-                  margin: '0 auto 0.6rem',
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '20px',
+                  margin: '0 auto 0.5rem',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                   background: success
                     ? 'linear-gradient(135deg, #10b981, #059669)'
                     : selectedPartner.id === 'partner_1'
                       ? 'linear-gradient(135deg, #7c3aed, #6366f1)'
                       : 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
                   boxShadow: success
-                    ? '0 8px 24px rgba(16,185,129,0.35)'
-                    : '0 8px 24px rgba(124,58,237,0.25)',
+                    ? '0 8px 20px rgba(16,185,129,0.28)'
+                    : '0 8px 20px rgba(124,58,237,0.22)',
                   transition: 'all 0.4s ease'
                 }}
               >
                 {success ? (
-                  <CheckCircle2 size={36} color="#fff" />
+                  <CheckCircle2 size={32} color="#fff" />
                 ) : (
-                  <Lock size={32} color="#fff" />
+                  <Lock size={28} color="#fff" />
                 )}
               </div>
 
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.2rem 0' }}>
+              <h2 style={{ fontSize: '1.28rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.2rem 0' }}>
                 Unlock {selectedPartner.name}
               </h2>
-              <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+              <p style={{ fontSize: '0.82rem', color: '#475569', margin: 0, fontWeight: 500 }}>
                 Enter your 6-digit passcode
               </p>
             </div>
@@ -387,7 +389,7 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '12px',
-                margin: '1.25rem 0 1.25rem'
+                margin: '1rem 0 1.1rem'
               }}
             >
               {[0, 1, 2, 3, 4, 5].map(index => {
@@ -397,8 +399,8 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                   <div
                     key={index}
                     style={{
-                      width: '16px',
-                      height: '16px',
+                      width: '15px',
+                      height: '15px',
                       borderRadius: '50%',
                       border: `2px solid ${isFilled ? accent : '#cbd5e1'}`,
                       background: isFilled ? accent : 'transparent',
@@ -425,7 +427,8 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                   marginBottom: '0.75rem',
                   padding: '6px 12px',
                   borderRadius: '10px',
-                  background: '#fef2f2'
+                  background: '#fef2f2',
+                  border: '1px solid #fecaca'
                 }}
               >
                 <AlertCircle size={15} /> {error}
@@ -444,7 +447,8 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                   marginBottom: '0.75rem',
                   padding: '6px 12px',
                   borderRadius: '10px',
-                  background: '#ecfdf5'
+                  background: '#ecfdf5',
+                  border: '1px solid #a7f3d0'
                 }}
               >
                 <CheckCircle2 size={16} /> Access granted! Welcome, {selectedPartner.name}
@@ -484,7 +488,7 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                 gridTemplateColumns: 'repeat(3, 1fr)',
                 gap: '10px',
                 maxWidth: '280px',
-                margin: '0 auto 1rem'
+                margin: '0 auto 0.25rem'
               }}
             >
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
@@ -494,20 +498,21 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                   onClick={() => handleDigitPress(num)}
                   disabled={checking || success}
                   style={{
-                    height: '56px',
+                    height: '52px',
                     borderRadius: '16px',
                     border: '1px solid #e2e8f0',
                     background: '#f8fafc',
                     color: '#0f172a',
-                    fontSize: '1.45rem',
+                    fontSize: '1.4rem',
                     fontWeight: 700,
+                    lineHeight: 1,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     outline: 'none',
                     transition: 'all 0.12s ease',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
                   }}
                   onMouseEnter={e => {
                     e.currentTarget.style.background = '#ede9fe';
@@ -536,13 +541,14 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                 onClick={handleClear}
                 disabled={checking || success}
                 style={{
-                  height: '56px',
+                  height: '52px',
                   borderRadius: '16px',
                   border: 'none',
                   background: 'transparent',
-                  color: '#64748b',
+                  color: '#475569',
                   fontSize: '0.82rem',
                   fontWeight: 700,
+                  lineHeight: 1,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -559,20 +565,21 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                 onClick={() => handleDigitPress('0')}
                 disabled={checking || success}
                 style={{
-                  height: '56px',
+                  height: '52px',
                   borderRadius: '16px',
                   border: '1px solid #e2e8f0',
                   background: '#f8fafc',
                   color: '#0f172a',
-                  fontSize: '1.45rem',
+                  fontSize: '1.4rem',
                   fontWeight: 700,
+                  lineHeight: 1,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   outline: 'none',
                   transition: 'all 0.12s ease',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+                  boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.background = '#ede9fe';
@@ -597,14 +604,15 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
               {/* Backspace */}
               <button
                 type="button"
+                aria-label="Backspace"
                 onClick={handleBackspace}
                 disabled={checking || success}
                 style={{
-                  height: '56px',
+                  height: '52px',
                   borderRadius: '16px',
                   border: 'none',
                   background: 'transparent',
-                  color: '#64748b',
+                  color: '#475569',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -615,8 +623,6 @@ export const PartnerGateway: React.FC<PartnerGatewayProps> = ({
                 <Delete size={22} />
               </button>
             </div>
-
-
           </div>
         )}
       </div>

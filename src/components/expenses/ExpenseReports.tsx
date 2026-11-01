@@ -226,7 +226,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
   };
 
   return (
-    <div className="space-y-4 pb-36">
+    <div className="space-y-4 pb-24">
       {/* Filters */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
         <div className="flex items-center gap-1.5 mb-3">
@@ -236,39 +236,39 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
-          <div>
+          <div className="min-w-0">
             <label className="label-unified">From</label>
-            <input type="date" value={filters.fromDate} onChange={e => setFilters({...filters, fromDate: e.target.value})} className="input-unified" />
+            <input type="date" value={filters.fromDate} onChange={e => setFilters({...filters, fromDate: e.target.value})} className="input-unified min-w-0" />
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="label-unified">To</label>
-            <input type="date" value={filters.toDate} onChange={e => setFilters({...filters, toDate: e.target.value})} className="input-unified" />
+            <input type="date" value={filters.toDate} onChange={e => setFilters({...filters, toDate: e.target.value})} className="input-unified min-w-0" />
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="label-unified">Type</label>
-            <select value={filters.type} onChange={e => setFilters({...filters, type: e.target.value as any, category: 'all'})} className="input-unified font-semibold">
+            <select value={filters.type} onChange={e => setFilters({...filters, type: e.target.value as any, category: 'all'})} className="input-unified min-w-0 font-semibold">
               <option value="all">All (Income & Exp)</option>
               <option value="expense">Expenses Only</option>
               <option value="income">Income Only</option>
             </select>
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="label-unified">Category</label>
-            <select value={filters.category} onChange={e => setFilters({...filters, category: e.target.value})} className="input-unified">
+            <select value={filters.category} onChange={e => setFilters({...filters, category: e.target.value})} className="input-unified min-w-0">
               <option value="all">All Categories</option>
               {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="label-unified">Platform</label>
-            <select value={filters.platform} onChange={e => setFilters({...filters, platform: e.target.value})} className="input-unified">
+            <select value={filters.platform} onChange={e => setFilters({...filters, platform: e.target.value})} className="input-unified min-w-0">
               <option value="all">All Platforms</option>
               {allPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="label-unified">Payment</label>
-            <select value={filters.paymentMethod} onChange={e => setFilters({...filters, paymentMethod: e.target.value})} className="input-unified">
+            <select value={filters.paymentMethod} onChange={e => setFilters({...filters, paymentMethod: e.target.value})} className="input-unified min-w-0">
               <option value="all">All Methods</option>
               {allPayments.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
@@ -276,8 +276,8 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
         </div>
 
         {/* Smart Tag Filters Bar */}
-        <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-none">
-          <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider shrink-0 flex items-center gap-1">
+        <div className="flex items-center gap-1.5 pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-none">
+          <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider shrink-0 inline-flex items-center gap-1">
             <Tag size={12} /> Tags:
           </span>
           {['all', '#reimbursable', '#tax-deductible', '#shared', '#personal', '#medical', '#recurring'].map(tag => (
@@ -286,10 +286,10 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
               type="button"
               onClick={() => setSelectedTag(tag)}
               style={{ borderRadius: '9999px' }}
-              className={`px-3 py-1 text-xs font-bold transition cursor-pointer shrink-0 ${
+              className={`inline-flex items-center justify-center leading-none px-3 py-1.5 text-xs font-bold transition cursor-pointer shrink-0 ${
                 selectedTag === tag
                   ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/70 dark:border-slate-700'
               }`}
             >
               {tag === 'all' ? 'All Tags' : tag}
@@ -480,9 +480,9 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             type="button"
             onClick={exportMonthlyStatement}
             style={{ borderRadius: '12px' }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 dark:bg-indigo-600 dark:hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition shrink-0 shadow-sm"
+            className="w-full sm:w-auto px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 dark:bg-indigo-600 dark:hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs leading-none inline-flex items-center justify-center gap-2 cursor-pointer transition shrink-0 shadow-sm"
           >
-            <Download size={14} />
+            <Download size={14} className="shrink-0" />
             <span>Download Statement (PDF)</span>
           </button>
         </div>
@@ -491,25 +491,28 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
       {/* Quick Export Data Buttons */}
       <div className="grid grid-cols-3 gap-2 w-full">
         <button
+          type="button"
           onClick={exportCSV}
           style={{ borderRadius: '12px' }}
-          className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs"
+          className="inline-flex items-center justify-center leading-none gap-1.5 py-2.5 px-2.5 sm:px-3 min-w-0 whitespace-nowrap border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer"
         >
           <FileSpreadsheet size={15} className="text-emerald-600 shrink-0" />
           <span>CSV</span>
         </button>
         <button
+          type="button"
           onClick={exportExcel}
           style={{ borderRadius: '12px' }}
-          className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs"
+          className="inline-flex items-center justify-center leading-none gap-1.5 py-2.5 px-2.5 sm:px-3 min-w-0 whitespace-nowrap border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer"
         >
           <FileSpreadsheet size={15} className="text-green-600 shrink-0" />
           <span>Excel</span>
         </button>
         <button
+          type="button"
           onClick={exportPDF}
           style={{ borderRadius: '12px' }}
-          className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs"
+          className="inline-flex items-center justify-center leading-none gap-1.5 py-2.5 px-2.5 sm:px-3 min-w-0 whitespace-nowrap border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer"
         >
           <FileText size={15} className="text-red-500 shrink-0" />
           <span>Raw PDF</span>
@@ -550,16 +553,21 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
               6-Month Income vs Expense Trajectory
             </span>
           </div>
-          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">Monthly Cashflow</span>
+          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Monthly Cashflow</span>
         </div>
         <div className="h-[210px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyBarData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fontWeight: 600 }} />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip formatter={(value: any) => fmt(Number(value))} />
-              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" stroke="#64748b" tick={{ fontSize: 11, fontWeight: 600, fill: '#475569' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
+              <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
+              <Tooltip
+                formatter={(value: any) => fmt(Number(value))}
+                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '12px', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)', color: '#0f172a', fontSize: '12px', fontWeight: 600 }}
+                itemStyle={{ color: '#0f172a' }}
+                labelStyle={{ color: '#475569', fontWeight: 700, marginBottom: '2px' }}
+              />
+              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px', color: '#475569', fontWeight: 600 }} />
               <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} />
               <Bar dataKey="expense" name="Expense" fill="#f43f5e" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -576,17 +584,21 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
               Spending Trend
             </span>
           </div>
-          <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/60 dark:border-slate-700/60">
+          <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/60 dark:border-slate-700/60">
             {(['day', 'week', 'month'] as TimeGranularity[]).map(g => (
-              <button key={g} onClick={() => setGranularity(g)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md capitalize transition cursor-pointer ${granularity === g ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+              <button
+                key={g}
+                type="button"
+                onClick={() => setGranularity(g)}
+                className={`inline-flex items-center justify-center leading-none px-3 py-1.5 text-xs font-semibold rounded-md capitalize transition cursor-pointer ${granularity === g ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+              >
                 {g}
               </button>
             ))}
           </div>
         </div>
         {filteredExpenses.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm">No expense data available.</div>
+          <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-sm">No expense data available.</div>
         ) : (
           <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -597,10 +609,15 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="label" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip formatter={(value: any) => fmt(Number(value))} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="label" stroke="#64748b" tick={{ fontSize: 10, fill: '#475569' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} interval="preserveStartEnd" />
+                <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
+                <Tooltip
+                  formatter={(value: any) => fmt(Number(value))}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '12px', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)', color: '#0f172a', fontSize: '12px', fontWeight: 600 }}
+                  itemStyle={{ color: '#0f172a' }}
+                  labelStyle={{ color: '#475569', fontWeight: 700, marginBottom: '2px' }}
+                />
                 <Area type="monotone" dataKey="amount" stroke="#10b981" strokeWidth={2} fill="url(#trendFill)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -624,18 +641,22 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                   <Pie data={catBreakdown} dataKey="amount" nameKey="category" cx="50%" cy="50%" outerRadius={70} label={(e: any) => `${e.percentage}%`}>
                     {catBreakdown.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
-                  <Tooltip formatter={(value: any) => fmt(Number(value))} />
+                  <Tooltip
+                    formatter={(value: any) => fmt(Number(value))}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '12px', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)', color: '#0f172a', fontSize: '12px', fontWeight: 600 }}
+                    itemStyle={{ color: '#0f172a' }}
+                  />
                 </RechartsPie>
               </ResponsiveContainer>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2">
               {catBreakdown.slice(0, 6).map((item, i) => (
-                <div key={item.category} className="flex justify-between items-center text-xs p-1.5 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700/60">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                    <span className="truncate max-w-[80px] text-slate-800 dark:text-slate-200">{item.category}</span>
+                <div key={item.category} className="flex justify-between items-center gap-1.5 text-xs p-1.5 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700/60 min-w-0">
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                    <span className="truncate text-slate-800 dark:text-slate-200">{item.category}</span>
                   </div>
-                  <span className="font-bold text-slate-800 dark:text-slate-100">{fmt(item.amount)}</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-100 shrink-0">{fmt(item.amount)}</span>
                 </div>
               ))}
             </div>
@@ -754,10 +775,10 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
             {topExpenses.map((exp, i) => (
               <div key={exp.id} className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/80 dark:hover:bg-slate-800 rounded-xl transition border border-slate-100 dark:border-slate-700/60">
                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                  <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">{i + 1}</span>
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 inline-flex items-center justify-center leading-none rounded-full bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{(exp.description || '').trim() || exp.category}</p>
-                    <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-medium truncate mt-0.5">
+                    <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                       {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       {exp.payment_method ? ` • ${exp.payment_method}` : ''}
                     </p>
@@ -771,7 +792,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                       onClick={() => onEdit?.(exp)}
                       title="Edit expense"
                       aria-label="Edit expense"
-                      className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
+                      className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 inline-flex items-center justify-center leading-none shrink-0 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
                     >
                       <Edit2 size={12} strokeWidth={2.2} />
                     </button>
@@ -780,7 +801,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                       onClick={() => { if (window.confirm('Are you sure you want to delete this expense?')) onDelete?.(exp.id); }}
                       title="Delete expense"
                       aria-label="Delete expense"
-                      className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
+                      className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 inline-flex items-center justify-center leading-none shrink-0 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
                     >
                       <Trash2 size={12} strokeWidth={2.2} />
                     </button>
@@ -794,27 +815,27 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
 
       {/* Expense History List */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs">
-        <div className="flex items-center justify-between gap-2 mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800/50">
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 inline-flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800/50">
               <Store size={16} />
             </div>
             <span style={{ fontSize: '12px', fontWeight: 800, margin: 0, lineHeight: 1 }} className="text-slate-900 dark:text-slate-100">
               Expense History
             </span>
-            <span className="px-2 py-0.5 text-xs font-black bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/50 rounded-full leading-none">
+            <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/50 rounded-full leading-none shrink-0">
               {filteredExpenses.length}
             </span>
           </div>
           {filteredExpenses.length > 0 && (
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
               Total: {fmt(filteredExpenses.reduce((s, e) => s + Number(e.amount || 0), 0))}
             </span>
           )}
         </div>
 
         {filteredExpenses.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm">No expenses found for these filters.</div>
+          <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-sm">No expenses found for these filters.</div>
         ) : (
           <div className="space-y-1.5">
             {filteredExpenses.map((exp, i) => {
@@ -827,7 +848,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                 >
                   {/* Left: Number circle + Details */}
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                    <span className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">
+                    <span className="w-6 h-6 sm:w-7 sm:h-7 inline-flex items-center justify-center leading-none rounded-full bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 text-xs font-black shrink-0">
                       {i + 1}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -836,20 +857,20 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                           {(exp.description || '').trim() || exp.category}
                         </p>
                         {isInc && (
-                          <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
+                          <span className="inline-flex items-center justify-center leading-none text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
                             Income
                           </span>
                         )}
                         {fuelBadge?.mileage && (
                           <span
-                            className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0"
+                            className="inline-flex items-center justify-center leading-none gap-0.5 text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0"
                             title={`Mileage: ${fuelBadge.mileage} km/l${fuelBadge.distance ? ` · Dist: ${fuelBadge.distance} km` : ''}`}
                           >
                             ⛽ {fuelBadge.mileage} km/l
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-medium truncate mt-0.5">
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                         {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                         {exp.payment_method ? ` • ${exp.payment_method}` : ''}
                         {exp.description && exp.category ? ` • ${exp.category}` : ''}
@@ -868,7 +889,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                         onClick={() => onEdit?.(exp)}
                         aria-label="Edit expense"
                         title="Edit expense"
-                        className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
+                        className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 inline-flex items-center justify-center leading-none shrink-0 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-90 cursor-pointer shadow-2xs"
                       >
                         <Edit2 size={12} strokeWidth={2.2} />
                       </button>
@@ -881,7 +902,7 @@ const ExpenseReports: React.FC<ExpenseReportsProps> = ({ expenses, settings, onE
                         }}
                         aria-label="Delete expense"
                         title="Delete expense"
-                        className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
+                        className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200/70 dark:border-rose-800/60 inline-flex items-center justify-center leading-none shrink-0 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition active:scale-90 cursor-pointer shadow-2xs"
                       >
                         <Trash2 size={12} strokeWidth={2.2} />
                       </button>

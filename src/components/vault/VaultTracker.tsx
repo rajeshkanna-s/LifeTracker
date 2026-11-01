@@ -259,29 +259,41 @@ const VaultTracker: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Sub-tabs */}
       <div className="module-subtabs">
         <button 
+          type="button"
+          title="Credentials"
+          aria-label="Credentials"
           onClick={() => setActiveSubTab('list')} 
           className={`module-subtab ${activeSubTab === 'list' ? 'active-vault' : ''}`}
         >
           <Lock size={16} /> <span className="label-text">Credentials</span>
         </button>
         <button 
+          type="button"
+          title="Add Account"
+          aria-label="Add Account"
           onClick={() => { resetForm(); setShowForm(true); }} 
           className="module-subtab" 
-          style={{ color: '#3b82f6' }}
+          style={{ color: '#2563eb' }}
         >
           <Plus size={16} /> <span className="label-text">Add Account</span>
         </button>
         <button 
+          type="button"
+          title="Key Generator"
+          aria-label="Key Generator"
           onClick={() => setActiveSubTab('generator')} 
           className={`module-subtab ${activeSubTab === 'generator' ? 'active-vault' : ''}`}
         >
           <RefreshCw size={16} /> <span className="label-text">Key Generator</span>
         </button>
         <button 
+          type="button"
+          title="Security Info"
+          aria-label="Security Info"
           onClick={() => setActiveSubTab('info')} 
           className={`module-subtab ${activeSubTab === 'info' ? 'active-vault' : ''}`}
         >
@@ -306,7 +318,7 @@ const VaultTracker: React.FC = () => {
               />
             </div>
             
-            <div className="text-right text-[11px] font-semibold text-slate-400 self-center">
+            <div className="text-right text-[11px] font-semibold text-slate-500 self-center">
               Total Logins: <span className="text-slate-700 font-bold">{credentials.length}</span>
             </div>
           </div>
@@ -317,13 +329,13 @@ const VaultTracker: React.FC = () => {
               <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredCredentials.length === 0 ? (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-12 rounded-2xl text-center space-y-4 shadow-sm">
-              <div className="w-16 h-16 bg-blue-50/50 dark:bg-blue-950/40 text-blue-500/70 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center space-y-4 shadow-sm">
+              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
                 <KeyRound size={28} />
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">No accounts found</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                <h3 className="font-bold text-slate-800 text-sm">No accounts found</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   {searchQuery ? "No matches for your current search filters." : "Your vault is empty. Click 'Add Account' in sub-tabs above to secure your first login details."}
                 </p>
               </div>
@@ -338,9 +350,9 @@ const VaultTracker: React.FC = () => {
                   <div key={cred.id} className="card-dark flex flex-col justify-between space-y-4">
                     <div className="space-y-3.5">
                       {/* Card Title Header */}
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-0.5">
-                          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm truncate max-w-[180px]">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="space-y-0.5 min-w-0">
+                          <h3 className="font-bold text-slate-800 text-sm truncate max-w-[180px]">
                             {cred.service_name}
                           </h3>
                           {cred.url && (
@@ -348,47 +360,53 @@ const VaultTracker: React.FC = () => {
                               href={cred.url.startsWith('http') ? cred.url : `https://${cred.url}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-500 dark:text-blue-400 hover:underline"
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:underline"
                             >
                               Visit link <ExternalLink size={10} />
                             </a>
                           )}
                         </div>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 shrink-0">
                           <button
+                            type="button"
                             onClick={() => handleEdit(cred)}
-                            className="p-1.5 text-slate-400 hover:text-blue-600 bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 rounded-lg transition"
+                            className="w-8 h-8 inline-flex items-center justify-center shrink-0 text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg transition"
                             title="Edit Account"
+                            aria-label="Edit Account"
                           >
                             <Pencil size={13} />
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDelete(cred.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 bg-slate-50 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-rose-950/40 border border-slate-100 dark:border-slate-700 rounded-lg transition"
+                            className="w-8 h-8 inline-flex items-center justify-center shrink-0 text-slate-500 hover:text-red-600 bg-slate-50 hover:bg-red-50 border border-slate-200 rounded-lg transition"
                             title="Delete Account"
+                            aria-label="Delete Account"
                           >
                             <Trash2 size={13} />
                           </button>
                         </div>
                       </div>
 
-                      <hr className="border-slate-100 dark:border-slate-800" />
+                      <hr className="border-slate-100" />
 
                       {/* Vault Item Details */}
                       <div className="space-y-3">
                         {/* Username */}
                         {cred.username && (
                           <div className="space-y-1">
-                            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Username / ID</span>
-                            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 p-2 rounded-xl border border-slate-100 dark:border-slate-700 gap-2">
-                              <span className="text-xs text-slate-700 dark:text-slate-200 font-semibold truncate select-all">{cred.username}</span>
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Username / ID</span>
+                            <div className="flex justify-between items-center bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-100 gap-2">
+                              <span className="text-xs text-slate-700 font-semibold truncate select-all">{cred.username}</span>
                               <button
+                                type="button"
                                 onClick={() => copyToClipboard(cred.username || '', cred.id, 'username')}
-                                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
+                                className="w-8 h-8 inline-flex items-center justify-center shrink-0 text-slate-500 hover:text-blue-600 hover:bg-white rounded-lg transition"
                                 title="Copy Username"
+                                aria-label="Copy Username"
                               >
                                 {copiedState?.id === cred.id && copiedState?.type === 'username' ? (
-                                  <Check size={14} className="text-emerald-500" />
+                                  <Check size={14} className="text-emerald-600" />
                                 ) : (
                                   <Copy size={14} />
                                 )}
@@ -401,31 +419,35 @@ const VaultTracker: React.FC = () => {
                         {cred.password && (
                           <div className="space-y-1">
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Password</span>
+                              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Password</span>
                               <div className="flex items-center gap-1.5">
                                 <span className={`w-2 h-2 rounded-full ${strength.color}`} title={`Strength: ${strength.label}`} />
-                                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">{strength.label}</span>
+                                <span className="text-[9px] font-bold text-slate-500 uppercase">{strength.label}</span>
                               </div>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 p-2 rounded-xl border border-slate-100 dark:border-slate-700 gap-2">
-                              <span className="text-xs text-slate-700 dark:text-slate-200 font-bold truncate font-mono select-all tracking-wider">
+                            <div className="flex justify-between items-center bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-100 gap-2">
+                              <span className="text-xs text-slate-700 font-bold truncate font-mono select-all tracking-wider">
                                 {isPasswordVisible ? cred.password : '••••••••••••••••'}
                               </span>
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 shrink-0">
                                 <button
+                                  type="button"
                                   onClick={() => togglePasswordVisibility(cred.id)}
-                                  className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
+                                  className="w-8 h-8 inline-flex items-center justify-center shrink-0 text-slate-500 hover:text-blue-600 hover:bg-white rounded-lg transition"
                                   title={isPasswordVisible ? 'Hide Password' : 'Show Password'}
+                                  aria-label={isPasswordVisible ? 'Hide Password' : 'Show Password'}
                                 >
                                   {isPasswordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => copyToClipboard(cred.password || '', cred.id, 'password')}
-                                  className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
+                                  className="w-8 h-8 inline-flex items-center justify-center shrink-0 text-slate-500 hover:text-blue-600 hover:bg-white rounded-lg transition"
                                   title="Copy Password"
+                                  aria-label="Copy Password"
                                 >
                                   {copiedState?.id === cred.id && copiedState?.type === 'password' ? (
-                                    <Check size={14} className="text-emerald-500" />
+                                    <Check size={14} className="text-emerald-600" />
                                   ) : (
                                     <Copy size={14} />
                                   )}
@@ -439,9 +461,9 @@ const VaultTracker: React.FC = () => {
 
                     {/* Notes */}
                     {cred.notes && (
-                      <div className="pt-2 border-t border-dashed border-slate-100 dark:border-slate-800 space-y-1">
-                        <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Security Notes</span>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100/50 dark:border-slate-700/50 leading-relaxed max-h-20 overflow-y-auto font-sans">
+                      <div className="pt-2 border-t border-dashed border-slate-100 space-y-1">
+                        <span className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Security Notes</span>
+                        <p className="text-xs text-slate-600 bg-slate-50/70 p-2 rounded-lg border border-slate-100 leading-relaxed max-h-20 overflow-y-auto font-sans">
                           {cred.notes}
                         </p>
                       </div>
@@ -458,12 +480,12 @@ const VaultTracker: React.FC = () => {
       {activeSubTab === 'generator' && (
         <div className="card-dark p-6 max-w-xl mx-auto space-y-6 animate-in fade-in duration-200">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl inline-flex items-center justify-center shrink-0">
               <RefreshCw size={20} />
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-800">Password Generator</h2>
-              <p className="text-xs text-slate-400">Create ultra-secure, cryptographically robust keys instantly.</p>
+              <p className="text-xs text-slate-500">Create ultra-secure, cryptographically robust keys instantly.</p>
             </div>
           </div>
 
@@ -474,17 +496,20 @@ const VaultTracker: React.FC = () => {
             <span className="text-base font-bold text-slate-800 font-mono tracking-wider break-all select-all self-center">
               {genResult || 'Select Options to Generate'}
             </span>
-            <div className="flex gap-2">
+            <div className="flex gap-2 justify-end">
               <button
+                type="button"
                 onClick={generateDedicatedPassword}
-                className="p-2.5 text-slate-500 hover:text-blue-600 bg-white border border-slate-200 hover:border-blue-200 rounded-xl transition flex items-center justify-center"
+                className="w-10 h-10 text-slate-500 hover:text-blue-600 bg-white border border-slate-200 hover:border-blue-200 rounded-xl transition inline-flex items-center justify-center shrink-0"
                 title="Regenerate"
+                aria-label="Regenerate password"
               >
                 <RefreshCw size={16} />
               </button>
               <button
+                type="button"
                 onClick={copyDedicatedPassword}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition inline-flex items-center justify-center gap-1.5 shadow-sm"
               >
                 {genCopied ? (
                   <>
@@ -504,10 +529,10 @@ const VaultTracker: React.FC = () => {
             <div className="space-y-1">
               <div className="flex justify-between items-center text-xs font-semibold">
                 <span className="text-slate-500">Key Strength:</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                  getPasswordStrength(genResult).label === 'Strong' ? 'bg-emerald-50 text-emerald-600' :
-                  getPasswordStrength(genResult).label === 'Moderate' ? 'bg-amber-50 text-amber-600' :
-                  'bg-red-50 text-red-600'
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase inline-flex items-center justify-center ${
+                  getPasswordStrength(genResult).label === 'Strong' ? 'bg-emerald-50 text-emerald-700' :
+                  getPasswordStrength(genResult).label === 'Moderate' ? 'bg-amber-50 text-amber-700' :
+                  'bg-red-50 text-red-700'
                 }`}>
                   {getPasswordStrength(genResult).label}
                 </span>
@@ -538,13 +563,13 @@ const VaultTracker: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <label className="flex items-center gap-2.5 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/50 transition">
                 <input
                   type="checkbox"
                   checked={genUpper}
                   onChange={(e) => { setGenUpper(e.target.checked); setTimeout(generateDedicatedPassword, 0); }}
-                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4"
+                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4 shrink-0"
                 />
                 <span className="text-xs font-semibold text-slate-700">A-Z (Uppercase)</span>
               </label>
@@ -554,7 +579,7 @@ const VaultTracker: React.FC = () => {
                   type="checkbox"
                   checked={genLower}
                   onChange={(e) => { setGenLower(e.target.checked); setTimeout(generateDedicatedPassword, 0); }}
-                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4"
+                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4 shrink-0"
                 />
                 <span className="text-xs font-semibold text-slate-700">a-z (Lowercase)</span>
               </label>
@@ -564,7 +589,7 @@ const VaultTracker: React.FC = () => {
                   type="checkbox"
                   checked={genNumbers}
                   onChange={(e) => { setGenNumbers(e.target.checked); setTimeout(generateDedicatedPassword, 0); }}
-                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4"
+                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4 shrink-0"
                 />
                 <span className="text-xs font-semibold text-slate-700">0-9 (Numbers)</span>
               </label>
@@ -574,7 +599,7 @@ const VaultTracker: React.FC = () => {
                   type="checkbox"
                   checked={genSymbols}
                   onChange={(e) => { setGenSymbols(e.target.checked); setTimeout(generateDedicatedPassword, 0); }}
-                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4"
+                  className="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4 shrink-0"
                 />
                 <span className="text-xs font-semibold text-slate-700">!@#$ (Special Chars)</span>
               </label>
@@ -582,8 +607,9 @@ const VaultTracker: React.FC = () => {
           </div>
           
           <button
+            type="button"
             onClick={generateDedicatedPassword}
-            className="btn-submit vault-blue w-full flex items-center justify-center gap-2"
+            className="btn-submit vault-blue w-full inline-flex items-center justify-center gap-2"
           >
             <RefreshCw size={14} /> Refresh generated key
           </button>
@@ -594,12 +620,12 @@ const VaultTracker: React.FC = () => {
       {activeSubTab === 'info' && (
         <div className="card-dark p-6 max-w-xl mx-auto space-y-6 animate-in fade-in duration-200">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl inline-flex items-center justify-center shrink-0">
               <ShieldCheck size={20} />
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-800">Security Vault Architecture</h2>
-              <p className="text-xs text-slate-400">Rest assured that your password and credentials data are fully guarded.</p>
+              <p className="text-xs text-slate-500">Rest assured that your password and credentials data are fully guarded.</p>
             </div>
           </div>
 
@@ -607,32 +633,32 @@ const VaultTracker: React.FC = () => {
 
           <div className="space-y-4 text-xs leading-relaxed text-slate-600">
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-700 flex-shrink-0">1</div>
+              <div className="w-6 h-6 bg-slate-100 rounded-full inline-flex items-center justify-center font-bold text-slate-700 shrink-0">1</div>
               <p>
-                <strong className="text-slate-800">PIN Access Lock:</strong> The app utilizes a global frontend lock protection system (`PinLock.tsx`) to guard access at page load. No one can view your credentials or open pages without entering the correct secure vault PIN.
+                <strong className="text-slate-800">PIN Access Lock:</strong> The app utilizes a global frontend lock protection system (<code className="px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded font-mono text-[11px]">PinLock.tsx</code>) to guard access at page load. No one can view your credentials or open pages without entering the correct secure vault PIN.
               </p>
             </div>
 
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-700 flex-shrink-0">2</div>
+              <div className="w-6 h-6 bg-slate-100 rounded-full inline-flex items-center justify-center font-bold text-slate-700 shrink-0">2</div>
               <p>
                 <strong className="text-slate-800">Row Level Security (RLS):</strong> The database utilizes Supabase policies to secure data directly at the API gateway layer. High performance SSL certificates fully encrypt all traffic back and forth to the server.
               </p>
             </div>
 
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-700 flex-shrink-0">3</div>
+              <div className="w-6 h-6 bg-slate-100 rounded-full inline-flex items-center justify-center font-bold text-slate-700 shrink-0">3</div>
               <p>
-                <strong className="text-slate-800">Dynamic UI Masking:</strong> Active text inputs and password labels remain fully hidden under standard dot-masks (`••••••••`) in list views. They are only loaded into system RAM and never stored plain in readable cache pools.
+                <strong className="text-slate-800">Dynamic UI Masking:</strong> Active text inputs and password labels remain fully hidden under standard dot-masks (<code className="px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded font-mono text-[11px]">••••••••</code>) in list views. They are only loaded into system RAM and never stored plain in readable cache pools.
               </p>
             </div>
           </div>
 
           <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex gap-3 text-blue-700">
-            <HelpCircle size={18} className="flex-shrink-0 mt-0.5" />
+            <HelpCircle size={18} className="shrink-0 mt-0.5" />
             <div className="space-y-1">
               <h4 className="text-xs font-bold font-sans">Need to change your Global PIN?</h4>
-              <p className="text-[10px] leading-relaxed">
+              <p className="text-[11px] leading-relaxed">
                 You can easily manage your entry lock code by navigating to the core Dashboard profile settings inside your sidebar panels.
               </p>
             </div>
@@ -642,19 +668,21 @@ const VaultTracker: React.FC = () => {
 
       {/* Add / Edit Form Modal (Native Overlay Styling) */}
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-box">
+        <div className="modal-overlay" onClick={() => setShowForm(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
             {/* Modal Header */}
             <div className="modal-header">
               <div className="flex items-center gap-2">
-                <Lock size={18} className="text-blue-500" />
+                <Lock size={18} className="text-blue-600" />
                 <h3 className="text-base font-bold text-slate-800">
                   {editId ? 'Edit Secure Details' : 'Secure New Details'}
                 </h3>
               </div>
               <button
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setShowForm(false)}
-                className="modal-close"
+                className="modal-close inline-flex items-center justify-center"
               >
                 <X size={16} />
               </button>
@@ -703,7 +731,7 @@ const VaultTracker: React.FC = () => {
                     <button
                       type="button"
                       onClick={generateFormPassword}
-                      className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-0.5 rounded transition"
+                      className="inline-flex items-center justify-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-0.5 rounded transition"
                     >
                       <RefreshCw size={10} /> Generate Strong
                     </button>
@@ -724,7 +752,7 @@ const VaultTracker: React.FC = () => {
                           style={{ width: `${(getPasswordStrength(form.password).score / 5) * 100}%` }}
                         />
                       </div>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase">{getPasswordStrength(form.password).label}</span>
+                      <span className="text-[9px] font-bold text-slate-500 uppercase">{getPasswordStrength(form.password).label}</span>
                     </div>
                   )}
                 </div>
@@ -747,14 +775,14 @@ const VaultTracker: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="btn-cancel"
+                className="btn-cancel inline-flex items-center justify-center"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 form="vault-credential-form"
-                className="btn-submit blue"
+                className="btn-submit blue inline-flex items-center justify-center"
               >
                 {editId ? 'Save Edits' : 'Store Securely'}
               </button>

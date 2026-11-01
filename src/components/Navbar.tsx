@@ -29,7 +29,6 @@ import {
 } from 'lucide-react';
 import type { TabId } from '../types';
 import { usePartner } from '../context/PartnerContext';
-import { useTheme } from '../context/ThemeContext';
 import { fetchRemindersAndNotifications, type AppNotification } from '../utils/notificationService';
 import NotificationModal from './NotificationModal';
 import SecurityModal from './SecurityModal';
@@ -44,18 +43,18 @@ interface NavbarProps {
 const tabs: { id: TabId; label: string; icon: React.ReactNode; color: string; desc: string }[] = [
   { id: 'expenses', label: 'Expenses', icon: <Receipt size={18} />, color: '#7c3aed', desc: 'Income & Expense Tracker' },
   { id: 'accounts', label: 'Accounts', icon: <WalletCards size={18} />, color: '#0284c7', desc: 'Cash, Banks & Cards' },
-  { id: 'budgets', label: 'Budgets', icon: <PieChart size={18} />, color: '#ec4899', desc: 'Monthly & Category Budgets' },
-  { id: 'goals', label: 'Goals', icon: <Target size={18} />, color: '#f59e0b', desc: 'Active & Reached Goals' },
+  { id: 'budgets', label: 'Budgets', icon: <PieChart size={18} />, color: '#db2777', desc: 'Monthly & Category Budgets' },
+  { id: 'goals', label: 'Goals', icon: <Target size={18} />, color: '#d97706', desc: 'Active & Reached Goals' },
   { id: 'calendar', label: 'Calendar', icon: <CalendarDays size={18} />, color: '#0284c7', desc: 'Monthly Activity & Dues' },
-  { id: 'calculator', label: 'Calculator', icon: <Calculator size={18} />, color: '#06b6d4', desc: 'Basic, EMI, Loan, GST, Interest' },
-  { id: 'warranties', label: 'Warranties', icon: <ShieldCheck size={18} />, color: '#10b981', desc: 'Track Product Warranties' },
-  { id: 'debt', label: 'Debt', icon: <CreditCard size={18} />, color: '#ef4444', desc: 'Loans & EMI Manager' },
-  { id: 'habits', label: 'Habits', icon: <CheckSquare size={18} />, color: '#10b981', desc: 'Daily Habits & Streaks' },
-  { id: 'fitness', label: 'Fitness', icon: <Dumbbell size={18} />, color: '#f97316', desc: 'Workouts & Progress' },
+  { id: 'calculator', label: 'Calculator', icon: <Calculator size={18} />, color: '#0891b2', desc: 'Basic, EMI, Loan, GST, Interest' },
+  { id: 'warranties', label: 'Warranties', icon: <ShieldCheck size={18} />, color: '#059669', desc: 'Track Product Warranties' },
+  { id: 'debt', label: 'Debt', icon: <CreditCard size={18} />, color: '#dc2626', desc: 'Loans & EMI Manager' },
+  { id: 'habits', label: 'Habits', icon: <CheckSquare size={18} />, color: '#059669', desc: 'Daily Habits & Streaks' },
+  { id: 'fitness', label: 'Fitness', icon: <Dumbbell size={18} />, color: '#ea580c', desc: 'Workouts & Progress' },
   { id: 'notes', label: 'Notes', icon: <StickyNote size={18} />, color: '#d97706', desc: 'Notebook & Quick Notes' },
   { id: 'routines', label: 'Routines', icon: <ListChecks size={18} />, color: '#0891b2', desc: 'Daily Schedules' },
   { id: 'vault', label: 'Vault', icon: <Lock size={18} />, color: '#2563eb', desc: 'Secure Credentials' },
-  { id: 'jobs', label: 'Jobs', icon: <Building2 size={18} />, color: '#6366f1', desc: 'Job Application Tracker' },
+  { id: 'jobs', label: 'Jobs', icon: <Building2 size={18} />, color: '#4f46e5', desc: 'Job Application Tracker' },
 ];
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -67,7 +66,6 @@ const Navbar: React.FC<NavbarProps> = ({
   const { activePartner, activePartnerId, lockPartner } = usePartner();
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { isDark } = useTheme();
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
@@ -365,7 +363,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
       {/* ════════ Mobile Top App Bar (Visible <= 768px) ════════ */}
       <header className="mobile-app-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
           {/* Hamburger Menu Button (Three Lines) */}
           <button
             type="button"
@@ -375,12 +373,12 @@ const Navbar: React.FC<NavbarProps> = ({
               width: '38px',
               height: '38px',
               borderRadius: '11px',
-              background: isDark ? '#1e293b' : '#f8fafc',
-              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: isDark ? '#f1f5f9' : '#1e293b',
+              color: '#1e293b',
               cursor: 'pointer',
               flexShrink: 0,
               transition: 'transform 0.15s ease'
@@ -392,7 +390,7 @@ const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <span style={{ fontWeight: 900, fontSize: '1.05rem', color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+            <span style={{ fontWeight: 900, fontSize: '1.05rem', color: '#0f172a', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
               Xpenser
             </span>
             <span style={{ fontSize: '0.68rem', color: activeTabMeta.color, fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -410,14 +408,16 @@ const Navbar: React.FC<NavbarProps> = ({
             style={{
               display: 'inline-flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '6px',
-              padding: '5px 9px',
+              padding: '5px 10px',
               borderRadius: '18px',
               border: `1.5px solid ${accentColor}`,
-              background: isP1 ? (isDark ? 'rgba(124, 58, 237, 0.2)' : 'rgba(124, 58, 237, 0.08)') : (isDark ? 'rgba(14, 165, 233, 0.2)' : 'rgba(14, 165, 233, 0.08)'),
+              background: isP1 ? 'rgba(124, 58, 237, 0.08)' : 'rgba(14, 165, 233, 0.08)',
               color: accentColor,
               fontSize: '0.76rem',
               fontWeight: 700,
+              lineHeight: 1,
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
               outline: 'none'
@@ -425,7 +425,7 @@ const Navbar: React.FC<NavbarProps> = ({
             onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.95)'; }}
             onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
           >
-            <span style={{ fontSize: '0.9rem' }}>{activePartner?.avatar || (isP1 ? '👤' : '👥')}</span>
+            <span style={{ fontSize: '0.9rem', lineHeight: 1 }}>{activePartner?.avatar || (isP1 ? '👤' : '👥')}</span>
             <span>{partnerName}</span>
             <KeyRound size={11} style={{ opacity: 0.75 }} />
           </button>
@@ -437,12 +437,12 @@ const Navbar: React.FC<NavbarProps> = ({
             aria-label="Alerts & Reminders"
             style={{
               position: 'relative',
-              width: '32px',
-              height: '32px',
+              width: '34px',
+              height: '34px',
               borderRadius: '10px',
-              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
-              background: isDark ? '#1e293b' : '#f8fafc',
-              color: notifications.length > 0 ? '#ef4444' : isDark ? '#94a3b8' : '#64748b',
+              border: '1px solid #e2e8f0',
+              background: '#f8fafc',
+              color: notifications.length > 0 ? '#ef4444' : '#64748b',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -462,16 +462,16 @@ const Navbar: React.FC<NavbarProps> = ({
                   color: '#fff',
                   fontSize: '0.6rem',
                   fontWeight: 900,
-                  width: '14px',
-                  height: '14px',
+                  width: '15px',
+                  height: '15px',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: isDark ? '1.5px solid #1e293b' : '1.5px solid #fff'
+                  border: '1.5px solid #fff'
                 }}
               >
-                {notifications.length}
+                {notifications.length > 9 ? '9+' : notifications.length}
               </span>
             )}
           </button>
@@ -483,12 +483,12 @@ const Navbar: React.FC<NavbarProps> = ({
             title="Lock & Switch Profile"
             aria-label="Lock application"
             style={{
-              width: '32px',
-              height: '32px',
+              width: '34px',
+              height: '34px',
               borderRadius: '10px',
-              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
-              background: isDark ? '#1e293b' : '#f8fafc',
-              color: isDark ? '#94a3b8' : '#64748b',
+              border: '1px solid #e2e8f0',
+              background: '#f8fafc',
+              color: '#64748b',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -623,8 +623,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   padding: '11px 16px',
                   borderRadius: '9999px',
                   border: 'none',
-                  background: isActive ? (isDark ? 'rgba(14, 165, 233, 0.2)' : '#e0f2fe') : 'transparent',
-                  color: isActive ? '#38bdf8' : (isDark ? '#f1f5f9' : '#1e293b'),
+                  background: isActive ? '#e0f2fe' : 'transparent',
+                  color: isActive ? '#0369a1' : '#1e293b',
                   fontWeight: isActive ? 700 : 600,
                   fontSize: '0.92rem',
                   textAlign: 'left',
@@ -711,7 +711,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, fontWeight: 700, fontSize: '0.86rem', color: '#1e293b' }}>Profile & Security</p>
-              <p style={{ margin: 0, fontSize: '0.72rem', color: '#94a3b8' }}>Manage passcode</p>
+              <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>Manage passcode</p>
             </div>
           </button>
 

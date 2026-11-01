@@ -119,14 +119,15 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
         <div
           style={{
             background: 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%)',
-            padding: '20px',
+            padding: '18px 16px',
             color: '#fff',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            gap: '10px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
             <div
               style={{
                 width: '40px',
@@ -135,29 +136,35 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
                 background: 'rgba(255,255,255,0.2)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                flexShrink: 0
               }}
             >
               <Flame size={22} className="text-yellow-300" />
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <h3 style={{ fontSize: '1.02rem', fontWeight: 800, margin: 0, lineHeight: 1.2 }}>
                   No-Spend Challenge
                 </h3>
                 <span
                   style={{
                     fontSize: '0.65rem',
                     background: 'rgba(255,255,255,0.25)',
-                    padding: '2px 7px',
+                    padding: '3px 7px',
                     borderRadius: '99px',
-                    fontWeight: 800
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
                   }}
                 >
                   {today.toLocaleDateString('en-US', { month: 'short' })}
                 </span>
               </div>
-              <p style={{ fontSize: '0.72rem', opacity: 0.9, margin: '2px 0 0 0' }}>
+              <p style={{ fontSize: '0.72rem', opacity: 0.92, margin: '2px 0 0 0', lineHeight: 1.3 }}>
                 Build savings discipline & earn achievement badges
               </p>
             </div>
@@ -171,13 +178,14 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.18)',
               border: 'none',
               color: '#fff',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              flexShrink: 0
             }}
           >
             <X size={17} />
@@ -185,35 +193,35 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
         </div>
 
         {/* Content */}
-        <div style={{ padding: '18px 20px', overflowY: 'auto', flex: 1 }} className="space-y-4">
+        <div style={{ padding: '16px 16px 20px', overflowY: 'auto', flex: 1 }} className="space-y-4">
           {/* Main Streak & Target Overview */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-orange-200/80 dark:border-orange-800/60 rounded-2xl p-3.5 text-center shadow-2xs">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-orange-200/80 dark:border-orange-800/60 rounded-2xl p-3 sm:p-3.5 text-center shadow-2xs min-w-0">
               <div className="flex items-center justify-center gap-1 text-orange-600 dark:text-orange-400 mb-1">
-                <Flame size={18} className="animate-bounce" />
-                <span className="text-[11px] font-black uppercase tracking-wider">Current Streak</span>
+                <Flame size={16} className="animate-bounce shrink-0" />
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider truncate">Current Streak</span>
               </div>
-              <p className="text-2xl font-black text-orange-950 dark:text-orange-200">{streak} {streak === 1 ? 'Day' : 'Days'}</p>
+              <p className="text-xl sm:text-2xl font-black text-orange-950 dark:text-orange-200">{streak} {streak === 1 ? 'Day' : 'Days'}</p>
               <p className="text-[10px] text-orange-700/80 dark:text-orange-300 font-semibold mt-0.5">Consecutive Zero Spend</p>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl p-3.5 text-center shadow-2xs">
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl p-3 sm:p-3.5 text-center shadow-2xs min-w-0">
               <div className="flex items-center justify-center gap-1 text-emerald-600 dark:text-emerald-400 mb-1">
-                <Target size={18} />
-                <span className="text-[11px] font-black uppercase tracking-wider">Month Total</span>
+                <Target size={16} className="shrink-0" />
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider truncate">Month Total</span>
               </div>
-              <p className="text-2xl font-black text-emerald-950 dark:text-emerald-200">{noSpendDaysCount} / {targetDays}</p>
+              <p className="text-xl sm:text-2xl font-black text-emerald-950 dark:text-emerald-200">{noSpendDaysCount} / {targetDays}</p>
               <p className="text-[10px] text-emerald-700/80 dark:text-emerald-300 font-semibold mt-0.5">{pct}% of Monthly Target</p>
             </div>
           </div>
 
           {/* Target Progress Bar */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold">
+            <div className="flex items-center justify-between gap-2 text-xs font-bold">
               <span className="text-slate-700 dark:text-slate-200 flex items-center gap-1">
-                <Trophy size={14} className="text-amber-500" /> Target Progress
+                <Trophy size={14} className="text-amber-500 shrink-0" /> Target Progress
               </span>
-              <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">{pct}% Complete</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-extrabold shrink-0">{pct}% Complete</span>
             </div>
 
             <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
@@ -224,18 +232,18 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
             </div>
 
             {/* Target Selector */}
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Monthly Target:</span>
-              <div className="flex items-center gap-1">
+            <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
+              <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Monthly Target:</span>
+              <div className="flex items-center gap-1 flex-wrap">
                 {[5, 10, 15, 20].map(val => (
                   <button
                     key={val}
                     type="button"
                     onClick={() => handleSaveTarget(val)}
-                    className={`px-2.5 py-0.5 text-xs font-bold rounded-lg transition cursor-pointer ${
+                    className={`inline-flex items-center justify-center leading-none px-2.5 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
                       targetDays === val
                         ? 'bg-orange-600 text-white shadow-2xs'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     {val}d
@@ -246,13 +254,22 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
           </div>
 
           {/* Month Calendar Mini-Heatmap */}
-          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 space-y-2">
-            <h4 className="text-xs font-black uppercase text-slate-700 dark:text-slate-300 tracking-wider flex items-center justify-between">
-              <span>{today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} Grid</span>
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 capitalize">
-                🟢 Zero Spend • ⚪ Spent
-              </span>
-            </h4>
+          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between flex-wrap gap-1.5">
+              <h4 className="text-xs font-black uppercase text-slate-700 dark:text-slate-300 tracking-wider m-0">
+                {today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} Grid
+              </h4>
+              <div className="flex items-center gap-2.5 flex-wrap text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                <span className="inline-flex items-center gap-1 leading-none">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shrink-0" />
+                  <span>Zero Spend</span>
+                </span>
+                <span className="inline-flex items-center gap-1 leading-none">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shrink-0" />
+                  <span>Spent</span>
+                </span>
+              </div>
+            </div>
 
             <div className="grid grid-cols-7 gap-1">
               {Array.from({ length: daysInMonth }, (_, idx) => {
@@ -266,17 +283,18 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
                   <div
                     key={dayNum}
                     title={`${dStr}: ${isPastOrToday ? (isNoSpend ? 'Zero Spend (No Spend Day!)' : `Spent ₹${spent.toLocaleString()}`) : 'Future Day'}`}
-                    style={{ minHeight: '34px' }}
-                    className={`rounded-xl flex flex-col items-center justify-center text-[11px] font-bold transition select-none ${
+                    style={{ minHeight: '36px' }}
+                    className={`rounded-xl flex flex-col items-center justify-center leading-none text-[11px] font-bold transition select-none ${
                       !isPastOrToday
-                        ? 'bg-white/60 dark:bg-slate-800/30 text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-slate-800'
+                        ? 'bg-slate-100 dark:bg-slate-800/40 text-slate-500 dark:text-slate-500 border border-slate-200/80 dark:border-slate-800'
                         : isNoSpend
                         ? 'bg-emerald-500 text-white shadow-2xs font-black'
-                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                        : 'bg-rose-50 dark:bg-slate-800 text-rose-800 dark:text-slate-300 border border-rose-200 dark:border-slate-700'
                     }`}
                   >
                     <span>{dayNum}</span>
                     {isNoSpend && <CheckCircle2 size={9} strokeWidth={3} className="text-emerald-100 mt-0.5" />}
+                    {isPastOrToday && !isNoSpend && <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1" />}
                   </div>
                 );
               })}
@@ -286,7 +304,7 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
           {/* Badges & Achievements */}
           <div className="space-y-2">
             <h4 className="text-xs font-black uppercase text-slate-700 dark:text-slate-300 tracking-wider flex items-center gap-1.5">
-              <Award size={14} className="text-amber-500" />
+              <Award size={14} className="text-amber-500 shrink-0" />
               <span>Milestone Badges</span>
             </h4>
 
@@ -297,18 +315,16 @@ export const NoSpendChallengeModal: React.FC<NoSpendChallengeModalProps> = ({
                 return (
                   <div
                     key={b.id}
-                    className={`p-3 rounded-xl border flex items-center gap-2.5 transition ${
+                    className={`p-2.5 sm:p-3 rounded-xl border flex items-center gap-2 transition min-w-0 ${
                       isUnlocked
                         ? 'bg-white dark:bg-slate-900 border-amber-200 dark:border-amber-800/50 shadow-2xs'
-                        : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-800 opacity-60'
+                        : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-800 opacity-75'
                     }`}
                   >
-                    <div className="text-2xl shrink-0">{b.icon}</div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1">
-                        <p className="text-xs font-black text-slate-900 dark:text-slate-100 truncate">{b.name}</p>
-                      </div>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                    <div className="text-xl sm:text-2xl shrink-0">{b.icon}</div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-black text-slate-900 dark:text-slate-100 truncate">{b.name}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
                         {isUnlocked ? 'Unlocked 🎉' : `${b.days} days required`}
                       </p>
                     </div>

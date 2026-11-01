@@ -131,22 +131,55 @@ const FitnessTracker: React.FC = () => {
   const allTypes = [...TYPES, ...(settings.customTypes || [])];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Sub-tabs */}
       <div className="module-subtabs">
-        <button onClick={() => setActiveTab('home')} className={`module-subtab ${activeTab === 'home' ? 'active-fitness' : ''}`}>
+        <button
+          type="button"
+          title="Dashboard"
+          aria-label="Dashboard"
+          onClick={() => setActiveTab('home')}
+          className={`module-subtab ${activeTab === 'home' ? 'active-fitness' : ''}`}
+        >
           <Dumbbell size={16} /> <span className="label-text">Dashboard</span>
         </button>
-        <button onClick={() => { resetForm(); setShowModal(true); }} className="module-subtab" style={{ color: '#f97316' }}>
+        <button
+          type="button"
+          title="Log Workout"
+          aria-label="Log Workout"
+          onClick={() => { resetForm(); setShowModal(true); }}
+          className="module-subtab"
+          style={{ color: '#ea580c' }}
+        >
           <Plus size={16} /> <span className="label-text">Log Workout</span>
         </button>
-        <button onClick={() => setActiveTab('plan')} className={`module-subtab ${activeTab === 'plan' ? 'active-fitness' : ''}`}>
+        <button
+          type="button"
+          title="My Plan"
+          aria-label="My Plan"
+          onClick={() => setActiveTab('plan')}
+          className={`module-subtab ${activeTab === 'plan' ? 'active-fitness' : ''}`}
+        >
           <ClipboardList size={16} /> <span className="label-text">My Plan</span>
         </button>
-        <a href="https://dfits.netlify.app/" target="_blank" rel="noopener noreferrer" className="module-subtab" style={{ color: '#f97316', textDecoration: 'none' }}>
+        <a
+          href="https://dfits.netlify.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Workout Guide"
+          aria-label="Workout Guide"
+          className="module-subtab"
+          style={{ color: '#ea580c', textDecoration: 'none' }}
+        >
           <ExternalLink size={16} /> <span className="label-text">Workout</span>
         </a>
-        <button onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-fitness' : ''}`}>
+        <button
+          type="button"
+          title="Settings"
+          aria-label="Settings"
+          onClick={() => setActiveTab('settings')}
+          className={`module-subtab ${activeTab === 'settings' ? 'active-fitness' : ''}`}
+        >
           <Settings size={16} /> <span className="label-text">Settings</span>
         </button>
       </div>
@@ -157,15 +190,15 @@ const FitnessTracker: React.FC = () => {
             {/* Summary Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Total Workouts', value: totalWorkouts, icon: '💪', gradient: 'linear-gradient(135deg, #f97316, #fbbf24)' },
-                { label: 'Total Duration', value: `${totalDuration}m`, icon: '⏱️', gradient: 'linear-gradient(135deg, #6366f1, #818cf8)' },
-                { label: 'Calories Burned', value: totalCalories.toLocaleString(), icon: '🔥', gradient: 'linear-gradient(135deg, #ef4444, #f87171)' },
-                { label: 'This Week', value: thisWeek, icon: '📅', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
+                { label: 'Total Workouts', value: totalWorkouts, icon: '💪', gradient: 'linear-gradient(135deg, #d97706, #ea580c)' },
+                { label: 'Total Duration', value: `${totalDuration}m`, icon: '⏱️', gradient: 'linear-gradient(135deg, #4f46e5, #6366f1)' },
+                { label: 'Calories Burned', value: totalCalories.toLocaleString(), icon: '🔥', gradient: 'linear-gradient(135deg, #dc2626, #ef4444)' },
+                { label: 'This Week', value: thisWeek, icon: '📅', gradient: 'linear-gradient(135deg, #059669, #10b981)' },
               ].map(s => (
                 <div key={s.label} className="rounded-2xl p-4 shadow-md text-white" style={{ background: s.gradient }}>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-base">{s.icon}</div>
-                    <span className="text-xs font-semibold text-white/80">{s.label}</span>
+                    <div className="w-8 h-8 bg-white/20 rounded-lg inline-flex items-center justify-center text-base shrink-0">{s.icon}</div>
+                    <span className="text-xs font-semibold text-white/90">{s.label}</span>
                   </div>
                   <p className="text-2xl font-bold">{s.value}</p>
                 </div>
@@ -174,15 +207,15 @@ const FitnessTracker: React.FC = () => {
 
             {/* Workout List */}
             <div className="card-dark !p-0">
-              <div className="flex items-center justify-between p-3 border-b border-slate-100 dark:border-slate-800">
-                <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Workout Log</h3>
-                <span className="text-xs text-slate-400 dark:text-slate-500">{workouts.length} workouts</span>
+              <div className="flex items-center justify-between p-3 border-b border-slate-100">
+                <h3 className="font-bold text-sm text-slate-900">Workout Log</h3>
+                <span className="text-xs text-slate-500">{workouts.length} workouts</span>
               </div>
               {workouts.length === 0 ? (
                 <div className="text-center py-10 px-4">
                   <div className="text-4xl mb-3 opacity-40">🏋️</div>
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No workouts logged</h4>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Start logging your fitness journey</p>
+                  <h4 className="text-sm font-bold text-slate-800">No workouts logged</h4>
+                  <p className="text-xs text-slate-500 mt-1">Start logging your fitness journey</p>
                 </div>
               ) : (
                 <div className="px-1">
@@ -198,9 +231,9 @@ const FitnessTracker: React.FC = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{new Date(w.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
-                        <button className="btn-action" onClick={() => handleEdit(w)}><Pencil size={13} /></button>
-                        <button className="btn-action danger" onClick={() => handleDelete(w.id)}><Trash2 size={13} /></button>
+                        <span className="text-[10px] text-slate-500 font-medium">{new Date(w.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
+                        <button type="button" title="Edit workout" aria-label="Edit workout" className="btn-action inline-flex items-center justify-center" onClick={() => handleEdit(w)}><Pencil size={13} /></button>
+                        <button type="button" title="Delete workout" aria-label="Delete workout" className="btn-action danger inline-flex items-center justify-center" onClick={() => handleDelete(w.id)}><Trash2 size={13} /></button>
                       </div>
                     </div>
                   ))}
@@ -218,7 +251,10 @@ const FitnessTracker: React.FC = () => {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h3>{editId ? 'Edit Workout' : 'Log Workout'}</h3><button className="modal-close" onClick={() => setShowModal(false)}>✕</button></div>
+            <div className="modal-header">
+              <h3>{editId ? 'Edit Workout' : 'Log Workout'}</h3>
+              <button type="button" aria-label="Close modal" className="modal-close inline-flex items-center justify-center" onClick={() => setShowModal(false)}>✕</button>
+            </div>
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-group"><label className="form-label">Date</label><input type="date" className="form-control-custom" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} /></div>
@@ -232,7 +268,10 @@ const FitnessTracker: React.FC = () => {
                 <div className="form-group full"><label className="form-label">Notes</label><textarea className="form-control-custom" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></div>
               </div>
             </div>
-            <div className="modal-footer"><button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button><button className="btn-submit orange" onClick={handleSubmit}>{editId ? 'Update' : 'Log Workout'}</button></div>
+            <div className="modal-footer">
+              <button type="button" className="btn-cancel inline-flex items-center justify-center" onClick={() => setShowModal(false)}>Cancel</button>
+              <button type="button" className="btn-submit orange inline-flex items-center justify-center" onClick={handleSubmit}>{editId ? 'Update' : 'Log Workout'}</button>
+            </div>
           </div>
         </div>
       )}

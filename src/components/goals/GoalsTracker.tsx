@@ -277,7 +277,7 @@ export const GoalsTracker: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-10">
+    <div className="space-y-4 max-w-4xl mx-auto pb-24">
       {/* ════════ Top Hero Banner (Sharp & Modern) ════════ */}
       <div
         className="rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden"
@@ -285,14 +285,14 @@ export const GoalsTracker: React.FC = () => {
       >
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-white/20 inline-flex items-center justify-center shrink-0">
               <Target size={20} className="text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
                 Goals
               </h2>
-              <p className="text-xs text-amber-100 font-semibold mt-0.5">
+              <p className="text-xs text-white/90 font-semibold mt-0.5">
                 Set targets & track savings progress
               </p>
             </div>
@@ -302,9 +302,9 @@ export const GoalsTracker: React.FC = () => {
             type="button"
             onClick={() => handleOpenAdd()}
             style={{ minHeight: '44px', whiteSpace: 'nowrap', borderRadius: '9999px' }}
-            className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 bg-white text-amber-950 font-extrabold text-sm rounded-full shadow-md active:scale-95 transition cursor-pointer hover:bg-amber-50"
+            className="inline-flex items-center justify-center leading-none gap-2 w-full px-5 py-3 bg-white text-amber-950 font-extrabold text-sm rounded-full shadow-md active:scale-95 transition cursor-pointer hover:bg-amber-50"
           >
-            <Plus size={16} strokeWidth={2.5} />
+            <Plus size={16} strokeWidth={2.5} className="shrink-0" />
             <span>New Goal</span>
           </button>
         </div>
@@ -312,7 +312,7 @@ export const GoalsTracker: React.FC = () => {
 
       {/* ════════ Preset Shortcuts (Matches "What are you saving for?") ════════ */}
       <div className="space-y-2">
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
+        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
           Quick Inspiration
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
@@ -322,10 +322,10 @@ export const GoalsTracker: React.FC = () => {
               type="button"
               onClick={() => handleOpenAdd(p)}
               style={{ borderRadius: '9999px' }}
-              className="bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/80 hover:border-amber-400 dark:hover:border-amber-400 rounded-full px-3.5 py-2 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-sm transition cursor-pointer group active:scale-95"
+              className="min-h-[36px] bg-white border border-slate-200/90 hover:border-amber-400 rounded-full px-3 py-2 inline-flex items-center justify-center leading-none gap-1.5 shadow-2xs hover:shadow-sm transition cursor-pointer group active:scale-95"
             >
-              <span className="text-base group-hover:scale-110 transition-transform shrink-0">{p.icon}</span>
-              <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-200 leading-tight whitespace-nowrap">
+              <span className="text-base leading-none group-hover:scale-110 transition-transform shrink-0">{p.icon}</span>
+              <span className="text-[11px] font-extrabold text-slate-700 leading-none whitespace-nowrap">
                 {p.name}
               </span>
             </button>
@@ -334,13 +334,16 @@ export const GoalsTracker: React.FC = () => {
       </div>
 
       {/* ════════ Goals Segment Bar (Active, Paused, Reached) ════════ */}
-      <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-full" style={{ borderRadius: '9999px' }}>
+      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-full" style={{ borderRadius: '9999px' }}>
         <button
           type="button"
           onClick={() => setGoalTab('active')}
           style={{ borderRadius: '9999px' }}
-          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'active' ? 'bg-white dark:bg-slate-900 text-amber-900 dark:text-amber-400 shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
+          className={`flex-1 min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-full inline-flex items-center justify-center leading-none whitespace-nowrap transition cursor-pointer ${
+            goalTab === 'active'
+              ? 'bg-white text-amber-900 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
         >
           Active ({goals.filter(g => g.status === 'active' || (!g.status && g.savedAmount < g.targetAmount)).length})
         </button>
@@ -348,8 +351,11 @@ export const GoalsTracker: React.FC = () => {
           type="button"
           onClick={() => setGoalTab('paused')}
           style={{ borderRadius: '9999px' }}
-          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'paused' ? 'bg-white dark:bg-slate-900 text-amber-900 dark:text-amber-400 shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
+          className={`flex-1 min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-full inline-flex items-center justify-center leading-none whitespace-nowrap transition cursor-pointer ${
+            goalTab === 'paused'
+              ? 'bg-white text-amber-900 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
         >
           Paused ({goals.filter(g => g.status === 'paused').length})
         </button>
@@ -357,8 +363,11 @@ export const GoalsTracker: React.FC = () => {
           type="button"
           onClick={() => setGoalTab('reached')}
           style={{ borderRadius: '9999px' }}
-          className={`flex-1 py-2 px-3 text-xs font-extrabold rounded-full transition cursor-pointer ${goalTab === 'reached' ? 'bg-white dark:bg-slate-900 text-emerald-900 dark:text-emerald-400 shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
+          className={`flex-1 min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-full inline-flex items-center justify-center leading-none whitespace-nowrap transition cursor-pointer ${
+            goalTab === 'reached'
+              ? 'bg-white text-emerald-900 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
         >
           Reached ({goals.filter(g => g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount)).length})
         </button>
@@ -366,10 +375,10 @@ export const GoalsTracker: React.FC = () => {
 
       {/* ════════ Goals List ════════ */}
       {filteredGoals.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 p-6 space-y-2">
+        <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-6 space-y-2">
           <div className="text-3xl opacity-50">🎯</div>
-          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No {goalTab} goals</h4>
-          <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
+          <h4 className="text-sm font-bold text-slate-800">No {goalTab} goals</h4>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
             {goalTab === 'active'
               ? 'Save for your goals! Tap the New Goal button or one of the presets above to create your first goal.'
               : `Goals marked as ${goalTab} will appear here.`}
@@ -384,43 +393,31 @@ export const GoalsTracker: React.FC = () => {
             return (
               <div
                 key={g.id}
-                className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
+                className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs hover:shadow-sm transition space-y-3"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-2xl flex items-center justify-center shrink-0 border border-amber-100 dark:border-amber-800/40 shadow-2xs">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-11 h-11 rounded-2xl bg-amber-50 text-2xl inline-flex items-center justify-center leading-none shrink-0 border border-amber-100 shadow-2xs">
                       {g.icon || '🎯'}
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 leading-snug break-words">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-extrabold text-sm text-slate-900 leading-snug break-words">
                         {g.name}
                       </h4>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
-                        Target: {g.deadline ? `Target ${new Date(g.deadline).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : 'Ongoing'}
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                        Target: {g.deadline ? new Date(g.deadline).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Ongoing'}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => toggleReachedGoal(g)}
-                      title={g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount) ? 'Move back to Active' : 'Mark as Reached'}
-                      style={{ borderRadius: '9999px' }}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer active:scale-95 shadow-2xs ${
-                        g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount)
-                          ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700'
-                      }`}
-                    >
-                      <CheckCircle2 size={15} />
-                    </button>
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
                       type="button"
                       onClick={() => togglePauseGoal(g)}
                       title={g.status === 'paused' ? 'Resume Goal' : 'Pause Goal'}
+                      aria-label={g.status === 'paused' ? 'Resume Goal' : 'Pause Goal'}
                       style={{ borderRadius: '9999px' }}
-                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition cursor-pointer active:scale-95 shadow-2xs"
+                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 inline-flex items-center justify-center leading-none shrink-0 text-slate-600 hover:text-amber-600 transition cursor-pointer active:scale-95 shadow-2xs"
                     >
                       {g.status === 'paused' ? <PlayCircle size={15} /> : <PauseCircle size={15} />}
                     </button>
@@ -429,7 +426,7 @@ export const GoalsTracker: React.FC = () => {
                       onClick={() => handleOpenEdit(g)}
                       aria-label="Edit goal"
                       style={{ borderRadius: '9999px' }}
-                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition cursor-pointer active:scale-95 shadow-2xs"
+                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 inline-flex items-center justify-center leading-none shrink-0 text-slate-600 hover:text-slate-800 transition cursor-pointer active:scale-95 shadow-2xs"
                     >
                       <Pencil size={13} />
                     </button>
@@ -438,7 +435,7 @@ export const GoalsTracker: React.FC = () => {
                       onClick={() => handleDeleteGoal(g.id)}
                       aria-label="Delete goal"
                       style={{ borderRadius: '9999px' }}
-                      className="w-8 h-8 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 flex items-center justify-center text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition cursor-pointer active:scale-95 shadow-2xs"
+                      className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 inline-flex items-center justify-center leading-none shrink-0 text-rose-600 hover:text-rose-700 transition cursor-pointer active:scale-95 shadow-2xs"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -447,48 +444,49 @@ export const GoalsTracker: React.FC = () => {
 
                 {/* Progress bar */}
                 <div>
-                  <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-                    <span className="text-amber-800 dark:text-amber-400 font-extrabold">
+                  <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-bold mb-1.5">
+                    <span className="text-amber-800 font-extrabold">
                       ₹{g.savedAmount.toLocaleString()} saved ({pct}%)
                     </span>
-                    <span className="text-slate-500 dark:text-slate-400 font-semibold">
+                    <span className="text-slate-600 font-semibold">
                       Goal: ₹{g.targetAmount.toLocaleString()}
                     </span>
                   </div>
 
-                  <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex" style={{ borderRadius: '9999px' }}>
+                  <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex" style={{ borderRadius: '9999px' }}>
                     <div
                       style={{ width: `${pct}%`, borderRadius: '9999px' }}
-                      className={`h-full transition-all duration-300 rounded-full ${isCompleted
-                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
-                        : 'bg-gradient-to-r from-amber-400 to-amber-500'
-                        }`}
+                      className={`h-full transition-all duration-300 rounded-full ${
+                        isCompleted
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                          : 'bg-gradient-to-r from-amber-400 to-amber-500'
+                      }`}
                     />
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-semibold mt-2.5 pt-1 gap-2 flex-wrap">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium">
+                  <div className="flex flex-wrap items-center justify-between text-[11px] font-semibold mt-2.5 pt-1 gap-2">
+                    <span className="text-slate-500 font-medium">
                       {isCompleted || g.status === 'reached' ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 size={13} /> Target Reached!
+                        <span className="text-emerald-600 font-bold inline-flex items-center gap-1">
+                          <CheckCircle2 size={13} className="shrink-0" /> Target Reached!
                         </span>
                       ) : (
                         `₹${Math.max(0, g.targetAmount - g.savedAmount).toLocaleString()} more needed`
                       )}
                     </span>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         onClick={() => toggleReachedGoal(g)}
                         style={{ borderRadius: '9999px' }}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-extrabold rounded-full transition cursor-pointer active:scale-95 border shadow-2xs ${
+                        className={`min-h-[34px] inline-flex items-center justify-center leading-none whitespace-nowrap gap-1.5 px-3 py-1.5 text-xs font-extrabold rounded-full transition cursor-pointer active:scale-95 border shadow-2xs ${
                           g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount)
-                            ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700'
-                            : 'bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300'
                         }`}
                       >
-                        <CheckCircle2 size={14} />
+                        <CheckCircle2 size={14} className="shrink-0" />
                         <span>{g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount) ? 'Reactivate' : 'Mark Reached'}</span>
                       </button>
 
@@ -499,9 +497,9 @@ export const GoalsTracker: React.FC = () => {
                           setDepositAmount('');
                         }}
                         style={{ borderRadius: '9999px' }}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-extrabold rounded-full shadow-xs active:scale-95 transition cursor-pointer"
+                        className="min-h-[34px] inline-flex items-center justify-center leading-none whitespace-nowrap gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-extrabold rounded-full shadow-xs active:scale-95 transition cursor-pointer"
                       >
-                        <Plus size={14} strokeWidth={2.5} />
+                        <Plus size={14} strokeWidth={2.5} className="shrink-0" />
                         <span>Add Funds</span>
                       </button>
                     </div>
@@ -516,15 +514,16 @@ export const GoalsTracker: React.FC = () => {
       {/* ════════ Add / Edit Goal Modal ════════ */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
+              <h3 className="font-extrabold text-base text-slate-900 min-w-0 truncate">
                 {editingGoal ? 'Edit Goal' : 'Create New Goal'}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                aria-label="Close modal"
+                className="w-8 h-8 rounded-full bg-slate-100 inline-flex items-center justify-center leading-none shrink-0 text-slate-600 hover:bg-slate-200 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -532,76 +531,76 @@ export const GoalsTracker: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Goal Name</label>
+                <label className="font-bold text-slate-700 block mb-1">Goal Name</label>
                 <input
                   type="text"
                   placeholder="e.g. New Vehicle, Holiday trip, Education"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 dark:text-slate-100 outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-amber-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Target Amount (₹)</label>
+                  <label className="font-bold text-slate-700 block mb-1">Target Amount (₹)</label>
                   <input
                     type="number"
                     placeholder="0"
                     value={targetAmount}
                     onChange={e => setTargetAmount(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-amber-500"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Saved Already (₹)</label>
+                  <label className="font-bold text-slate-700 block mb-1">Saved Already (₹)</label>
                   <input
                     type="number"
                     placeholder="0"
                     value={savedAmount}
                     onChange={e => setSavedAmount(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Desired Date</label>
+                  <label className="font-bold text-slate-700 block mb-1">Desired Date</label>
                   <input
                     type="date"
                     value={deadline}
                     onChange={e => setDeadline(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Icon / Emoji</label>
+                  <label className="font-bold text-slate-700 block mb-1">Icon / Emoji</label>
                   <input
                     type="text"
                     value={icon}
                     onChange={e => setIcon(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-base text-center font-bold text-slate-800 dark:text-slate-100 outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-base text-center font-bold text-slate-800 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Status / Track</label>
-                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <label className="font-bold text-slate-700 block mb-1">Status / Track</label>
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl">
                   {(['active', 'paused', 'reached'] as const).map(st => (
                     <button
                       key={st}
                       type="button"
                       onClick={() => setStatus(st)}
-                      className={`py-1.5 text-xs font-bold rounded-lg capitalize transition cursor-pointer ${
+                      className={`min-h-[32px] py-1.5 text-xs font-bold rounded-lg capitalize inline-flex items-center justify-center leading-none transition cursor-pointer ${
                         status === st
                           ? st === 'reached'
                             ? 'bg-emerald-600 text-white shadow-xs'
                             : 'bg-amber-500 text-white shadow-xs'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       {st}
@@ -611,13 +610,13 @@ export const GoalsTracker: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Note (Optional)</label>
+                <label className="font-bold text-slate-700 block mb-1">Note (Optional)</label>
                 <input
                   type="text"
                   placeholder="Notes or monthly savings target"
                   value={note}
                   onChange={e => setNote(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-100 outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none"
                 />
               </div>
             </div>
@@ -627,7 +626,7 @@ export const GoalsTracker: React.FC = () => {
                 type="button"
                 onClick={() => setShowModal(false)}
                 style={{ minHeight: '44px', whiteSpace: 'nowrap' }}
-                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center leading-none rounded-xl border border-slate-200 text-slate-700 bg-slate-50 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -640,7 +639,7 @@ export const GoalsTracker: React.FC = () => {
                   background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
                   boxShadow: '0 2px 8px rgba(217, 119, 6, 0.28)'
                 }}
-                className="flex-1 rounded-xl text-white font-bold text-xs active:scale-98 transition cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center leading-none rounded-xl text-white font-bold text-xs active:scale-98 transition cursor-pointer"
               >
                 Save Goal
               </button>
@@ -652,15 +651,17 @@ export const GoalsTracker: React.FC = () => {
       {/* ════════ Add Funds Modal ════════ */}
       {showDepositModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-sm shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <span>{showDepositModal.icon}</span> Add Funds to {showDepositModal.name}
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-sm shadow-2xl space-y-4">
+            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
+              <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2 min-w-0">
+                <span className="shrink-0">{showDepositModal.icon}</span>
+                <span className="truncate">Add Funds to {showDepositModal.name}</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setShowDepositModal(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                aria-label="Close modal"
+                className="w-8 h-8 rounded-full bg-slate-100 inline-flex items-center justify-center leading-none shrink-0 text-slate-600 hover:bg-slate-200 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -668,17 +669,17 @@ export const GoalsTracker: React.FC = () => {
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Deposit Amount (₹)</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Deposit Amount (₹)</label>
                 <input
                   type="number"
                   placeholder="0"
                   value={depositAmount}
                   onChange={e => setDepositAmount(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-lg font-black text-slate-900 dark:text-slate-100 outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-lg font-black text-slate-900 outline-none focus:border-amber-500"
                 />
               </div>
 
-              <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
+              <div className="flex flex-wrap gap-1.5">
                 {[1000, 2000, 5000, 10000].map(amt => (
                   <button
                     key={amt}
@@ -687,7 +688,7 @@ export const GoalsTracker: React.FC = () => {
                       const cur = parseFloat(depositAmount) || 0;
                       setDepositAmount(String(cur + amt));
                     }}
-                    className="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 shrink-0 cursor-pointer"
+                    className="min-h-[30px] px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 inline-flex items-center justify-center leading-none whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     +₹{amt.toLocaleString()}
                   </button>
@@ -700,7 +701,7 @@ export const GoalsTracker: React.FC = () => {
                 type="button"
                 onClick={() => setShowDepositModal(null)}
                 style={{ minHeight: '44px', whiteSpace: 'nowrap' }}
-                className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center leading-none rounded-xl border border-slate-200 text-slate-700 bg-slate-50 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -714,7 +715,7 @@ export const GoalsTracker: React.FC = () => {
                   background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
                   boxShadow: '0 2px 8px rgba(217, 119, 6, 0.28)'
                 }}
-                className="flex-1 rounded-xl disabled:opacity-50 text-white font-bold text-xs active:scale-98 transition cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center leading-none rounded-xl disabled:opacity-50 text-white font-bold text-xs active:scale-98 transition cursor-pointer"
               >
                 Add Funds
               </button>

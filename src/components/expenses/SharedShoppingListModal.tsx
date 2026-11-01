@@ -42,7 +42,7 @@ const COMMON_ITEMS = [
   { name: 'Fruits / Banana', category: 'Grocery', price: 100, icon: '🍌' },
   { name: 'Eggs (Pack of 6/12)', category: 'Grocery', price: 90, icon: '🥚' },
   { name: 'Rice / Provisions', category: 'Grocery', price: 800, icon: '🍚' },
-  { name: 'Cooking Oil', category: 'Grocery', price: 180, icon: '🫒' },
+  { name: 'Cooking Oil', category: 'Grocery', price: 180, icon: '🌻' },
   { name: 'Snacks / Biscuits', category: 'Food', price: 80, icon: '🍪' },
   { name: 'Cleaning / Soap', category: 'Home Maintenance', price: 120, icon: '🧼' },
 ];
@@ -245,14 +245,15 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
         <div
           style={{
             background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%)',
-            padding: '18px 20px',
+            padding: '18px 16px',
             color: '#fff',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            gap: '10px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
             <div
               style={{
                 width: '38px',
@@ -261,29 +262,35 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                 background: 'rgba(255,255,255,0.2)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                flexShrink: 0
               }}
             >
               <ShoppingCart size={19} />
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <h3 style={{ fontSize: '1.02rem', fontWeight: 800, margin: 0, lineHeight: 1.2 }}>
                   Shared Shopping List
                 </h3>
                 <span
                   style={{
                     fontSize: '0.66rem',
                     background: 'rgba(255,255,255,0.25)',
-                    padding: '2px 8px',
+                    padding: '3px 8px',
                     borderRadius: '99px',
-                    fontWeight: 700
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
                   }}
                 >
                   Rajesh 🤝 Mia
                 </span>
               </div>
-              <p style={{ fontSize: '0.72rem', opacity: 0.9, margin: '2px 0 0 0' }}>
+              <p style={{ fontSize: '0.72rem', opacity: 0.92, margin: '2px 0 0 0', lineHeight: 1.3 }}>
                 Shared in real-time. Checking an item auto-adds an expense!
               </p>
             </div>
@@ -297,13 +304,14 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.18)',
               border: 'none',
               color: '#fff',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              flexShrink: 0
             }}
           >
             <X size={17} />
@@ -317,21 +325,21 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
               e.preventDefault();
               handleAddItem();
             }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1.5 sm:gap-2 min-w-0"
           >
             <input
               type="text"
-              placeholder="Add grocery or household item..."
+              placeholder="Add grocery or item..."
               value={itemName}
               onChange={e => setItemName(e.target.value)}
-              className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:border-emerald-500 shadow-2xs"
+              className="flex-1 min-w-0 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:border-emerald-500 shadow-2xs"
             />
             <input
               type="number"
               placeholder="Est. ₹"
               value={estimatedPrice}
               onChange={e => setEstimatedPrice(e.target.value)}
-              className="w-20 sm:w-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 text-center outline-none focus:border-emerald-500 shadow-2xs shrink-0"
+              className="w-16 sm:w-24 min-w-0 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 text-center outline-none focus:border-emerald-500 shadow-2xs shrink-0"
             />
             <button
               type="submit"
@@ -340,78 +348,79 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                 background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                 boxShadow: '0 2px 8px rgba(5, 150, 105, 0.28)'
               }}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-extrabold text-xs shrink-0 active:scale-95 transition cursor-pointer shadow-xs min-h-[38px]"
+              className="inline-flex items-center justify-center leading-none gap-1 px-3 sm:px-4 py-2 text-white font-extrabold text-xs shrink-0 active:scale-95 transition cursor-pointer shadow-xs min-h-[38px]"
             >
-              <Plus size={15} strokeWidth={2.5} />
+              <Plus size={15} strokeWidth={2.5} className="shrink-0" />
               <span>Add</span>
             </button>
           </form>
 
           {/* Quick Suggestions Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Quick Add:</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0">Quick Add:</span>
             {COMMON_ITEMS.map(ci => (
               <button
                 key={ci.name}
                 type="button"
                 onClick={() => handleAddItem(ci.name, ci.category, ci.price)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 rounded-full text-xs font-semibold text-slate-700 dark:text-slate-200 shrink-0 shadow-2xs hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center justify-center leading-none gap-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 rounded-full text-xs font-semibold text-slate-700 dark:text-slate-200 shrink-0 shadow-2xs hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition active:scale-95 cursor-pointer"
               >
                 <span>{ci.icon}</span>
                 <span>{ci.name}</span>
-                <span className="text-[10px] text-slate-400 font-normal">₹{ci.price}</span>
+                <span className="text-[10px] text-slate-500 font-normal">₹{ci.price}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Items List */}
-        <div className="p-3.5 sm:p-4 overflow-y-auto flex-1 space-y-4">
+        <div className="p-3 sm:p-4 overflow-y-auto flex-1 space-y-4">
           {/* Pending to Buy */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between px-0.5">
-              <h4 className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <div className="flex items-center justify-between gap-2 px-0.5">
+              <h4 className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 To Buy ({pendingItems.length})
               </h4>
-              <span className="text-[10px] text-slate-400 font-medium">Auto-syncs in real-time</span>
+              <span className="text-[10px] text-slate-500 font-medium">Auto-syncs in real-time</span>
             </div>
 
             {pendingItems.length === 0 ? (
               <div className="p-6 text-center bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
                 <PackageCheck size={28} className="mx-auto text-emerald-500 mb-1" />
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200">All groceries & items are bought!</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Type above or tap quick suggestions to add items.</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Type above or tap quick suggestions to add items.</p>
               </div>
             ) : (
               pendingItems.map(item => (
                 <div
                   key={item.id}
-                  className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between gap-3 shadow-2xs hover:border-emerald-300 dark:hover:border-emerald-700 transition"
+                  className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-2.5 shadow-2xs hover:border-emerald-300 dark:hover:border-emerald-700 transition"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="flex items-center gap-2.5 min-w-[165px] flex-1">
                     <button
                       type="button"
                       onClick={() => handleOpenBuyPrompt(item)}
                       title="Click when bought (auto-records expense)"
-                      className="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 hover:border-emerald-500 dark:hover:border-emerald-400 flex items-center justify-center transition cursor-pointer shrink-0 group active:scale-90"
+                      aria-label={`Mark ${item.name} as bought`}
+                      className="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 hover:border-emerald-500 dark:hover:border-emerald-400 inline-flex items-center justify-center transition cursor-pointer shrink-0 group active:scale-90"
                     >
                       <Check size={12} className="text-transparent group-hover:text-emerald-500 transition" />
                     </button>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate leading-snug">
                         {item.name}
                       </p>
-                      <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5 leading-none">
+                      <p className="text-[11px] text-slate-500 flex items-center flex-wrap gap-x-1.5 gap-y-0.5 mt-0.5 leading-tight">
                         <span>{item.category}</span>
                         <span>•</span>
-                        <span>Added by <strong className="font-semibold text-slate-600 dark:text-slate-300">{item.addedBy}</strong></span>
+                        <span>Added by <strong className="font-semibold text-slate-700 dark:text-slate-300">{item.addedBy}</strong></span>
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                     {item.estimatedAmount && (
-                      <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-lg border border-emerald-200/80 dark:border-emerald-800/40">
+                      <span className="inline-flex items-center justify-center leading-none text-[11px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-1 rounded-lg border border-emerald-200/80 dark:border-emerald-800/40 shrink-0">
                         ₹{item.estimatedAmount}
                       </span>
                     )}
@@ -419,20 +428,21 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                       type="button"
                       onClick={() => handleOpenBuyPrompt(item)}
                       style={{
-                        borderRadius: '12px',
+                        borderRadius: '10px',
                         background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                         boxShadow: '0 2px 6px rgba(5, 150, 105, 0.28)'
                       }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-white text-xs font-extrabold transition active:scale-95 cursor-pointer shadow-xs"
+                      className="inline-flex items-center justify-center leading-none gap-1 min-h-[30px] px-2.5 py-1.5 text-white text-xs font-extrabold transition active:scale-95 cursor-pointer shadow-xs shrink-0"
                     >
-                      <Check size={12} strokeWidth={2.5} />
+                      <Check size={12} strokeWidth={2.5} className="shrink-0" />
                       <span>Bought</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteItem(item.id)}
                       title="Remove item"
-                      className="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center transition cursor-pointer"
+                      aria-label={`Remove ${item.name}`}
+                      className="w-7 h-7 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 inline-flex items-center justify-center shrink-0 transition cursor-pointer"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -445,14 +455,14 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
           {/* Already Bought */}
           {boughtItems.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex items-center justify-between px-0.5">
-                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="flex items-center justify-between gap-2 px-0.5">
+                <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Bought Items ({boughtItems.length})
                 </h4>
                 <button
                   type="button"
                   onClick={handleClearBought}
-                  className="text-[11px] font-bold text-rose-500 hover:text-rose-700 cursor-pointer"
+                  className="inline-flex items-center justify-center leading-none text-[11px] font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
                 >
                   Clear Completed
                 </button>
@@ -461,20 +471,21 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
               {boughtItems.map(item => (
                 <div
                   key={item.id}
-                  className="p-2.5 bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 rounded-xl flex items-center justify-between gap-2 opacity-80"
+                  className="p-2.5 bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 rounded-xl flex items-center justify-between gap-2 opacity-85"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
                     <button
                       type="button"
                       onClick={() => handleOpenBuyPrompt(item)}
                       title="Mark as unbought"
-                      className="text-emerald-600 cursor-pointer"
+                      aria-label={`Mark ${item.name} as unbought`}
+                      className="inline-flex items-center justify-center shrink-0 text-emerald-600 cursor-pointer"
                     >
                       <CheckCircle2 size={18} />
                     </button>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 line-through truncate leading-snug">{item.name}</p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-slate-500 truncate">
                         Bought by {item.boughtBy || 'Partner'} {item.boughtAmount ? `• ₹${item.boughtAmount}` : ''}
                       </p>
                     </div>
@@ -482,8 +493,9 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
 
                   <button
                     type="button"
+                    aria-label={`Remove ${item.name}`}
                     onClick={() => handleDeleteItem(item.id)}
-                    className="p-1 text-slate-400 hover:text-rose-500 transition cursor-pointer"
+                    className="w-7 h-7 rounded-lg inline-flex items-center justify-center shrink-0 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                   >
                     <Trash2 size={13} />
                   </button>
@@ -508,7 +520,7 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                 <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2 border border-emerald-100 dark:border-emerald-800/60">
                   <PackageCheck size={24} />
                 </div>
-                <h4 className="m-0 font-extrabold text-base text-slate-900 dark:text-slate-100 leading-snug">
+                <h4 className="m-0 font-extrabold text-base text-slate-900 dark:text-slate-100 leading-snug break-words">
                   Mark "{buyingItem.name}" as Bought
                 </h4>
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -535,6 +547,7 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                     checked={logAsExpense}
                     onChange={e => setLogAsExpense(e.target.checked)}
                     style={{ width: '16px', height: '16px', accentColor: '#059669' }}
+                    className="shrink-0"
                   />
                   <span>Auto-add ₹{actualAmount || '0'} to {partnerName}'s Expenses</span>
                 </label>
@@ -544,14 +557,14 @@ export const SharedShoppingListModal: React.FC<SharedShoppingListModalProps> = (
                 <button
                   type="button"
                   onClick={() => setBuyingItem(null)}
-                  className="flex-1 min-h-[40px] rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                  className="flex-1 min-h-[40px] inline-flex items-center justify-center leading-none rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmBuy}
-                  className="flex-1 min-h-[40px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs cursor-pointer shadow-md shadow-emerald-600/30 transition active:scale-95"
+                  className="flex-1 min-h-[40px] inline-flex items-center justify-center leading-none rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs cursor-pointer shadow-md shadow-emerald-600/30 transition active:scale-95"
                 >
                   Confirm
                 </button>

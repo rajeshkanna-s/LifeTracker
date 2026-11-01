@@ -47,7 +47,12 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
       <div className="modal-box">
         <div className="modal-header">
           <h3>{initialData?.id ? 'Edit Debt' : 'Add New Debt'}</h3>
-          <button onClick={onClose} className="modal-close">
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="modal-close inline-flex items-center justify-center"
+          >
             <X size={18} />
           </button>
         </div>
@@ -144,13 +149,13 @@ const DebtForm: React.FC<DebtFormProps> = ({ initialData, settings, onSubmit, on
             <button 
               type="button" 
               onClick={onClose} 
-              className="btn-cancel flex-1"
+              className="btn-cancel flex-1 inline-flex items-center justify-center"
             >
               Cancel
             </button>
             <button 
               type="submit" 
-              className="btn-submit red flex-1"
+              className="btn-submit red flex-1 inline-flex items-center justify-center"
             >
               {initialData?.id ? 'Update Debt' : 'Add Debt'}
             </button>

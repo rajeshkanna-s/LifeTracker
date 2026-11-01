@@ -129,7 +129,14 @@ const JobTracker: React.FC = () => {
   const interviews = jobs.filter(j => j.status === 'Interview').length;
   const offers = jobs.filter(j => j.status === 'Offer').length;
   const rejected = jobs.filter(j => j.status === 'Rejected').length;
-  const statusClass = (s: string) => s === 'Applied' ? 'applied' : s === 'Interview' ? 'interview' : s === 'Offer' ? 'offer' : 'rejected';
+  const statusClass = (s: string) => {
+    const norm = (s || '').trim().toLowerCase();
+    if (norm === 'applied') return 'applied';
+    if (norm === 'interview') return 'interview';
+    if (norm === 'offer') return 'offer';
+    if (norm === 'rejected') return 'rejected';
+    return 'neutral';
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
@@ -141,17 +148,35 @@ const JobTracker: React.FC = () => {
   const allStatuses = [...STATUSES, ...(settings.customStatuses || [])];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Sub-tabs */}
       <div className="module-subtabs">
-        <button onClick={() => setActiveTab('home')} className={`module-subtab ${activeTab === 'home' ? 'active-job' : ''}`}>
+        <button
+          type="button"
+          title="Dashboard"
+          aria-label="Dashboard"
+          onClick={() => setActiveTab('home')}
+          className={`module-subtab ${activeTab === 'home' ? 'active-job' : ''}`}
+        >
           <Building2 size={16} /> <span className="label-text">Dashboard</span>
         </button>
-        <button onClick={() => { resetForm(); setShowModal(true); }} className="module-subtab"
-          style={{ color: '#6366f1' }}>
+        <button
+          type="button"
+          title="Add Job"
+          aria-label="Add Job"
+          onClick={() => { resetForm(); setShowModal(true); }}
+          className="module-subtab"
+          style={{ color: '#4f46e5' }}
+        >
           <Plus size={16} /> <span className="label-text">Add Job</span>
         </button>
-        <button onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-job' : ''}`}>
+        <button
+          type="button"
+          title="Settings"
+          aria-label="Settings"
+          onClick={() => setActiveTab('settings')}
+          className={`module-subtab ${activeTab === 'settings' ? 'active-job' : ''}`}
+        >
           <Settings size={16} /> <span className="label-text">Settings</span>
         </button>
       </div>
@@ -162,15 +187,15 @@ const JobTracker: React.FC = () => {
             {/* Summary Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Total Applied', value: totalApplied, icon: '💼', gradient: 'linear-gradient(135deg, #6366f1, #818cf8)' },
-                { label: 'Interviews', value: interviews, icon: '📅', gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
-                { label: 'Offers', value: offers, icon: '🎉', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
-                { label: 'Rejected', value: rejected, icon: '❌', gradient: 'linear-gradient(135deg, #ef4444, #f87171)' },
+                { label: 'Total Applied', value: totalApplied, icon: '💼', gradient: 'linear-gradient(135deg, #4f46e5, #6366f1)' },
+                { label: 'Interviews', value: interviews, icon: '📅', gradient: 'linear-gradient(135deg, #d97706, #ea580c)' },
+                { label: 'Offers', value: offers, icon: '🎉', gradient: 'linear-gradient(135deg, #059669, #10b981)' },
+                { label: 'Rejected', value: rejected, icon: '❌', gradient: 'linear-gradient(135deg, #dc2626, #ef4444)' },
               ].map(s => (
                 <div key={s.label} className="rounded-2xl p-4 shadow-md text-white" style={{ background: s.gradient }}>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-base">{s.icon}</div>
-                    <span className="text-xs font-semibold text-white/80">{s.label}</span>
+                    <div className="w-8 h-8 bg-white/20 rounded-lg inline-flex items-center justify-center text-base shrink-0">{s.icon}</div>
+                    <span className="text-xs font-semibold text-white/90">{s.label}</span>
                   </div>
                   <p className="text-2xl font-bold">{s.value}</p>
                 </div>
@@ -182,10 +207,10 @@ const JobTracker: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3">
                 <div className="flex-1 relative">
                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-400 placeholder:text-slate-400"
+                  <input className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-indigo-400 placeholder:text-slate-400"
                     placeholder="Search company or role..." value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
-                <select className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-xs text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
+                <select aria-label="Filter by status" className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-xs text-slate-700 outline-none cursor-pointer"
                   value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
                   <option>All Status</option>{allStatuses.map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -194,12 +219,12 @@ const JobTracker: React.FC = () => {
               {filtered.length === 0 ? (
                 <div className="text-center py-10 px-4">
                   <div className="text-4xl mb-3 opacity-40">🏢</div>
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No applications found</h4>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Start tracking your job applications</p>
+                  <h4 className="text-sm font-bold text-slate-800">No applications found</h4>
+                  <p className="text-xs text-slate-500 mt-1">Start tracking your job applications</p>
                 </div>
               ) : (
                 <div className="px-1">
-                  {filtered.map((j, i) => (
+                  {filtered.map((j) => (
                     <div key={j.id} className="tx-item">
                       <div className="tx-icon">💼</div>
                       <div className="tx-details">
@@ -208,8 +233,8 @@ const JobTracker: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`status-badge ${statusClass(j.status)}`}>{j.status}</span>
-                        <button className="btn-action" onClick={() => handleEdit(j)}><Pencil size={13} /></button>
-                        <button className="btn-action danger" onClick={() => handleDelete(j.id)}><Trash2 size={13} /></button>
+                        <button type="button" title="Edit application" aria-label={`Edit ${j.company}`} className="btn-action inline-flex items-center justify-center" onClick={() => handleEdit(j)}><Pencil size={13} /></button>
+                        <button type="button" title="Delete application" aria-label={`Delete ${j.company}`} className="btn-action danger inline-flex items-center justify-center" onClick={() => handleDelete(j.id)}><Trash2 size={13} /></button>
                       </div>
                     </div>
                   ))}
@@ -226,7 +251,10 @@ const JobTracker: React.FC = () => {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h3>{editId ? 'Edit Application' : 'Add Job Application'}</h3><button className="modal-close" onClick={() => setShowModal(false)}>✕</button></div>
+            <div className="modal-header">
+              <h3>{editId ? 'Edit Application' : 'Add Job Application'}</h3>
+              <button type="button" aria-label="Close modal" className="modal-close inline-flex items-center justify-center" onClick={() => setShowModal(false)}>✕</button>
+            </div>
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-group"><label className="form-label">Company Name *</label><input className="form-control-custom" value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} /></div>
@@ -244,7 +272,10 @@ const JobTracker: React.FC = () => {
                 <div className="form-group full"><label className="form-label">Notes</label><textarea className="form-control-custom" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></div>
               </div>
             </div>
-            <div className="modal-footer"><button className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button><button className="btn-submit blue" onClick={handleSubmit}>{editId ? 'Update' : 'Add'}</button></div>
+            <div className="modal-footer">
+              <button type="button" className="btn-cancel inline-flex items-center justify-center" onClick={() => setShowModal(false)}>Cancel</button>
+              <button type="button" className="btn-submit blue inline-flex items-center justify-center" onClick={handleSubmit}>{editId ? 'Update' : 'Add'}</button>
+            </div>
           </div>
         </div>
       )}

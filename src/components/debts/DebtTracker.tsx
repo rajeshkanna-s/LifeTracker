@@ -201,25 +201,25 @@ const DebtTracker: React.FC = () => {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       <div className="module-subtabs">
-        <button onClick={() => setActiveTab('home')} className={`module-subtab ${activeTab === 'home' ? 'active-debt' : ''}`}>
+        <button type="button" title="Home" aria-label="Home" onClick={() => setActiveTab('home')} className={`module-subtab ${activeTab === 'home' ? 'active-debt' : ''}`}>
           <Home size={16} /> <span className="label-text">Home</span>
         </button>
-        <button onClick={() => setActiveTab('track')} className={`module-subtab ${activeTab === 'track' ? 'active-debt' : ''}`}>
+        <button type="button" title="EMI Track" aria-label="EMI Track" onClick={() => setActiveTab('track')} className={`module-subtab ${activeTab === 'track' ? 'active-debt' : ''}`}>
           <Calendar size={16} /> <span className="label-text">EMI Track</span>
         </button>
-        <button onClick={() => setActiveTab('insurance')} className={`module-subtab ${activeTab === 'insurance' ? 'active-debt' : ''}`}>
+        <button type="button" title="Insurance" aria-label="Insurance" onClick={() => setActiveTab('insurance')} className={`module-subtab ${activeTab === 'insurance' ? 'active-debt' : ''}`}>
           <Shield size={16} /> <span className="label-text">Insurance</span>
         </button>
-        <button onClick={() => openForm()} className={`module-subtab ${activeTab === 'add' ? 'active-debt' : ''}`}
+        <button type="button" title="Add Debt" aria-label="Add Debt" onClick={() => openForm()} className={`module-subtab ${activeTab === 'add' ? 'active-debt' : ''}`}
           style={activeTab !== 'add' ? { color: '#ef4444' } : {}}>
           <Plus size={16} /> <span className="label-text">Add Debt</span>
         </button>
-        <button onClick={() => setActiveTab('reports')} className={`module-subtab ${activeTab === 'reports' ? 'active-debt' : ''}`}>
+        <button type="button" title="Reports" aria-label="Reports" onClick={() => setActiveTab('reports')} className={`module-subtab ${activeTab === 'reports' ? 'active-debt' : ''}`}>
           <ChartIcon size={16} /> <span className="label-text">Reports</span>
         </button>
-        <button onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-debt' : ''}`}>
+        <button type="button" title="Settings" aria-label="Settings" onClick={() => setActiveTab('settings')} className={`module-subtab ${activeTab === 'settings' ? 'active-debt' : ''}`}>
           <SettingsIcon size={16} /> <span className="label-text">Settings</span>
         </button>
       </div>

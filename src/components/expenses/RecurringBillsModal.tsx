@@ -150,14 +150,15 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
         <div
           style={{
             background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #4c1d95 100%)',
-            padding: '18px 20px',
+            padding: '18px 16px',
             color: '#fff',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            gap: '10px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
             <div
               style={{
                 width: '38px',
@@ -166,16 +167,17 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
                 background: 'rgba(255,255,255,0.2)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                flexShrink: 0
               }}
             >
               <Repeat size={19} />
             </div>
-            <div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <h3 style={{ fontSize: '1.02rem', fontWeight: 800, margin: 0, lineHeight: 1.2 }}>
                 Recurring Transactions
               </h3>
-              <p style={{ fontSize: '0.72rem', opacity: 0.9, margin: '2px 0 0 0' }}>
+              <p style={{ fontSize: '0.72rem', opacity: 0.92, margin: '2px 0 0 0', lineHeight: 1.3 }}>
                 Auto-bills, fixed dues & 1-click expense logging
               </p>
             </div>
@@ -189,13 +191,14 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.18)',
               border: 'none',
               color: '#fff',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              flexShrink: 0
             }}
           >
             <X size={17} />
@@ -214,10 +217,10 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="text"
-                placeholder="Bill name (e.g. Internet Bill)..."
+                placeholder="Bill name (e.g. Internet)..."
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="input-unified"
+                className="input-unified min-w-0"
                 style={{ fontSize: '0.84rem' }}
                 required
               />
@@ -226,16 +229,16 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
                 placeholder="Amount (₹)..."
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
-                className="input-unified"
+                className="input-unified min-w-0"
                 style={{ fontSize: '0.84rem' }}
                 required
               />
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="input-unified col-span-2"
+                className="input-unified min-w-0"
                 style={{ fontSize: '0.84rem' }}
               >
                 <option value="Internet Bill">Internet Bill</option>
@@ -245,67 +248,59 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
                 <option value="Petrol / Fuel">Fuel</option>
                 <option value="Miscellaneous">Miscellaneous</option>
               </select>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min="1"
-                  max="31"
-                  placeholder="Day"
-                  title="Day of month"
-                  value={dueDay}
-                  onChange={e => setDueDay(e.target.value)}
-                  className="input-unified text-center"
-                  style={{ width: '54px', fontSize: '0.84rem' }}
-                />
-                <button
-                  type="submit"
-                  style={{
-                    flex: 1,
-                    minHeight: '38px',
-                    borderRadius: '10px',
-                    background: '#7c3aed',
-                    color: '#fff',
-                    border: 'none',
-                    fontWeight: 700,
-                    fontSize: '0.82rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Plus size={15} /> Save
-                </button>
-              </div>
+              <input
+                type="number"
+                min="1"
+                max="31"
+                placeholder="Due Day (1-31)"
+                title="Due day of month (1-31)"
+                value={dueDay}
+                onChange={e => setDueDay(e.target.value)}
+                className="input-unified min-w-0"
+                style={{ fontSize: '0.84rem' }}
+              />
             </div>
+            <button
+              type="submit"
+              style={{
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                color: '#fff',
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)'
+              }}
+              className="w-full min-h-[42px] inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-extrabold leading-none cursor-pointer transition active:scale-98"
+            >
+              <Plus size={16} strokeWidth={2.5} className="shrink-0" />
+              <span>Save Recurring Bill</span>
+            </button>
           </form>
 
           {/* Quick Presets */}
           <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-0.5 scrollbar-none">
-            <span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">Presets:</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase shrink-0">Presets:</span>
             {COMMON_RECURRING.map(cr => (
               <button
                 key={cr.name}
                 type="button"
                 onClick={() => handleAddBill(cr)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600 rounded-full text-xs font-semibold text-slate-700 dark:text-slate-200 shrink-0 shadow-2xs hover:bg-purple-50 dark:hover:bg-purple-950/30 transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center justify-center leading-none gap-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600 rounded-full text-xs font-semibold text-slate-700 dark:text-slate-200 shrink-0 shadow-2xs hover:bg-purple-50 dark:hover:bg-purple-950/30 transition active:scale-95 cursor-pointer"
               >
                 <span>{cr.name}</span>
                 <span className="text-purple-600 dark:text-purple-400 font-bold">₹{cr.amount}</span>
-                <span className="text-[10px] text-slate-400">({cr.dueDay}th)</span>
+                <span className="text-[10px] text-slate-500">({cr.dueDay}th)</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Recurring List */}
-        <div style={{ padding: '16px 18px', overflowY: 'auto', flex: 1 }} className="space-y-2.5">
+        <div style={{ padding: '14px 16px 18px', overflowY: 'auto', flex: 1 }} className="space-y-2.5">
           {recurringBills.length === 0 ? (
-            <div className="p-8 text-center text-slate-400">
-              <Clock size={32} className="mx-auto text-purple-400 mb-2 opacity-60" />
+            <div className="p-8 text-center text-slate-500">
+              <Clock size={32} className="mx-auto text-purple-400 mb-2 opacity-70" />
               <p className="text-sm font-bold text-slate-700 dark:text-slate-200">No recurring bills added yet</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Add Internet, Rent, or Mobile recharges above to track and 1-click log every month.
               </p>
             </div>
@@ -320,7 +315,7 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
               return (
                 <div
                   key={bill.id}
-                  className={`p-3.5 rounded-2xl border transition flex items-center justify-between gap-3 shadow-2xs ${
+                  className={`p-3 sm:p-3.5 rounded-2xl border transition flex flex-wrap items-center justify-between gap-2.5 shadow-2xs ${
                     isPaid
                       ? 'bg-emerald-50/50 dark:bg-emerald-950/30 border-emerald-200/70 dark:border-emerald-800/60'
                       : isDueToday || isOverdue
@@ -328,35 +323,35 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
                       : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
                   }`}
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 leading-tight truncate">
+                  <div className="flex-1 min-w-[165px]">
+                    <div className="flex items-center gap-2 flex-wrap min-w-0">
+                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 leading-tight truncate min-w-0">
                         {bill.name}
                       </h4>
                       {isPaid ? (
-                        <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full flex items-center gap-0.5 border border-emerald-200 dark:border-emerald-800">
-                          <CheckCircle2 size={11} /> Paid
+                        <span className="inline-flex items-center justify-center leading-none gap-0.5 text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 shrink-0">
+                          <CheckCircle2 size={11} className="shrink-0" /> Paid
                         </span>
                       ) : isDueToday ? (
-                        <span className="text-[10px] font-black text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-800">
+                        <span className="inline-flex items-center justify-center leading-none text-[10px] font-black text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-800 shrink-0">
                           Due Today
                         </span>
                       ) : isOverdue ? (
-                        <span className="text-[10px] font-black text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-800">
+                        <span className="inline-flex items-center justify-center leading-none text-[10px] font-black text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-800 shrink-0">
                           Due {Math.abs(daysDiff)}d ago
                         </span>
                       ) : isDueSoon ? (
-                        <span className="text-[10px] font-black text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                        <span className="inline-flex items-center justify-center leading-none text-[10px] font-black text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800 shrink-0">
                           In {daysDiff} days
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 shrink-0">
                           {bill.dueDay}th of month
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 flex items-center gap-1.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 flex items-center flex-wrap gap-x-1.5 gap-y-0.5">
                       <span className="font-bold text-slate-800 dark:text-slate-200">₹{Number(bill.amount).toLocaleString()}</span>
                       <span>•</span>
                       <span>{bill.category}</span>
@@ -369,12 +364,12 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                     <button
                       type="button"
                       onClick={() => handleApplyToExpenses(bill)}
                       style={{ borderRadius: '10px' }}
-                      className={`px-3 py-1.5 text-xs font-bold transition active:scale-95 cursor-pointer shadow-2xs flex items-center gap-1 ${
+                      className={`min-h-[34px] px-3 py-1.5 text-xs font-bold leading-none transition active:scale-95 cursor-pointer shadow-2xs inline-flex items-center justify-center gap-1 shrink-0 ${
                         justAddedId === bill.id
                           ? 'bg-emerald-600 text-white'
                           : isPaid
@@ -384,21 +379,23 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
                     >
                       {justAddedId === bill.id ? (
                         <>
-                          <CheckCircle2 size={13} /> Logged!
+                          <CheckCircle2 size={13} className="shrink-0" /> Logged!
                         </>
                       ) : isPaid ? (
                         'Log Again'
                       ) : (
                         <>
-                          <Plus size={13} /> Log Expense
+                          <Plus size={13} className="shrink-0" /> Log Paid
                         </>
                       )}
                     </button>
 
                     <button
                       type="button"
+                      aria-label={`Delete ${bill.name}`}
+                      title="Delete recurring bill"
                       onClick={() => handleDeleteBill(bill.id)}
-                      className="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer"
+                      className="w-8 h-8 rounded-lg inline-flex items-center justify-center shrink-0 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                     >
                       <Trash2 size={14} />
                     </button>

@@ -33,12 +33,17 @@ const MEALS_RIGHT = [
 const NUTS_MIX = ['≥5 Walnut', '5 Almond', '5 Black Grapes', '5 Pumpkin Seeds', '8 Dry Fig'];
 
 const AVOID_LIST = [
-  ['Sugar', 'Oil'],
-  ['Outside Foods', 'Chips'],
-  ['Chocolates', 'Beer'],
-  ['Packed Food', 'Coconut'],
-  ['Peanut', 'Peanut Butter'],
-  ['Potato', ''],
+  'Sugar',
+  'Oil',
+  'Outside Foods',
+  'Chips',
+  'Chocolates',
+  'Beer',
+  'Packed Food',
+  'Coconut',
+  'Peanut',
+  'Peanut Butter',
+  'Potato',
 ];
 
 const SUPPLEMENTS = [
@@ -59,7 +64,7 @@ const FitnessPlan: React.FC = () => {
   const today = formatDate(new Date());
 
   return (
-    <div className="fitness-plan-wrapper">
+    <div className="fitness-plan-wrapper pb-6">
       {/* ───────── PAGE 1: PERSONALIZED FITNESS PLAN ───────── */}
       <div className="fp-card">
         <h1 className="fp-title">PERSONALIZED FITNESS PLAN</h1>
@@ -92,7 +97,7 @@ const FitnessPlan: React.FC = () => {
           <div className="fp-day-list">
             {WORKOUT_SCHEDULE.map(w => (
               <div key={w.day} className="fp-day-row">
-                <span className={`fp-day-pill fp-pill-${w.tone}`}>{w.day}</span>
+                <span className={`fp-day-pill fp-pill-${w.tone} inline-flex items-center justify-center`}>{w.day}</span>
                 <span className="fp-day-arrow">→</span>
                 <span className="fp-day-content">{w.plan}</span>
               </div>
@@ -150,11 +155,8 @@ const FitnessPlan: React.FC = () => {
           <div className="fp-avoid-card">
             <div className="fp-avoid-label">AVOID LIST</div>
             <div className="fp-avoid-grid">
-              {AVOID_LIST.map((pair, idx) => (
-                <React.Fragment key={idx}>
-                  <span className="fp-avoid-item">{pair[0] && `• ${pair[0]}`}</span>
-                  <span className="fp-avoid-item">{pair[1] && `• ${pair[1]}`}</span>
-                </React.Fragment>
+              {AVOID_LIST.map(item => (
+                <span key={item} className="fp-avoid-item">• {item}</span>
               ))}
             </div>
           </div>

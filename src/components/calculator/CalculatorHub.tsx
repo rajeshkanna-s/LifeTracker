@@ -47,28 +47,28 @@ const CalcField: React.FC<CalcFieldProps> = ({
   unitToggle
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5 transition hover:border-slate-300 dark:hover:border-slate-700">
+    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5 transition hover:border-slate-300">
       {/* Top Header: Label & Input Badge */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 inline-flex items-center justify-center shrink-0">
             {icon}
           </div>
-          <span className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{label}</span>
+          <span className="text-sm font-bold text-slate-800 whitespace-nowrap">{label}</span>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 ml-auto shrink-0">
           {unitToggle && (
-            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
               {unitToggle.options.map(opt => (
                 <button
                   key={opt}
                   type="button"
                   onClick={() => unitToggle.onChange(opt)}
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition cursor-pointer ${
+                  className={`inline-flex items-center justify-center leading-none text-[11px] font-bold px-2.5 py-1 min-h-[26px] rounded-md transition cursor-pointer whitespace-nowrap ${
                     unitToggle.active === opt
-                      ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                      ? 'bg-white text-emerald-800 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {opt}
@@ -77,8 +77,8 @@ const CalcField: React.FC<CalcFieldProps> = ({
             </div>
           )}
 
-          <div className="flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-xl px-3 py-1.5 shadow-2xs focus-within:border-emerald-500 focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-2 focus-within:ring-emerald-500/20 transition">
-            {prefix && <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 mr-1">{prefix}</span>}
+          <div className="flex items-center bg-slate-50 border border-slate-200/90 rounded-xl px-3 py-1.5 shadow-2xs focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-500/20 transition">
+            {prefix && <span className="text-xs font-black text-emerald-700 mr-1">{prefix}</span>}
             <input
               type="number"
               min={min}
@@ -89,9 +89,9 @@ const CalcField: React.FC<CalcFieldProps> = ({
                 const n = parseFloat(e.target.value);
                 onChange(isNaN(n) ? 0 : n);
               }}
-              className="w-20 sm:w-26 text-right font-black text-sm text-slate-900 dark:text-slate-100 outline-none bg-transparent"
+              className="w-20 sm:w-26 text-right font-black text-sm text-slate-900 outline-none bg-transparent"
             />
-            {suffix && <span className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>}
+            {suffix && <span className="text-xs font-bold text-slate-500 ml-1">{suffix}</span>}
           </div>
         </div>
       </div>
@@ -107,7 +107,7 @@ const CalcField: React.FC<CalcFieldProps> = ({
           onChange={e => onChange(parseFloat(e.target.value))}
           className="calc-range-slider"
         />
-        <div className="flex justify-between text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-1.5 px-0.5">
+        <div className="flex justify-between text-[11px] font-semibold text-slate-500 mt-1.5 px-0.5">
           <span>{minLabel || `${prefix}${min.toLocaleString('en-IN')}${suffix}`}</span>
           <span>{maxLabel || `${prefix}${max.toLocaleString('en-IN')}${suffix}`}</span>
         </div>
@@ -401,7 +401,7 @@ export const CalculatorHub: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-4 max-w-2xl mx-auto pb-10">
+    <div className="space-y-4 max-w-2xl mx-auto pb-24">
       {/* ════════ White & Emerald Top Nav Bar (100% Mobile Clean Grid) ════════ */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-1.5 shadow-xs">
         <div className="grid grid-cols-5 gap-1 w-full">
@@ -739,7 +739,7 @@ export const CalculatorHub: React.FC = () => {
       {activeTab === 'loan' && (
         <div className="space-y-4">
           {/* Mode Switcher */}
-          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200/80">
             <button
               type="button"
               onClick={() => setLoanMode('eligibility')}
@@ -747,8 +747,8 @@ export const CalculatorHub: React.FC = () => {
                 background: loanMode === 'eligibility' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
                 color: loanMode === 'eligibility' ? '#ffffff' : undefined
               }}
-              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
-                loanMode === 'eligibility' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              className={`min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-xl transition cursor-pointer inline-flex items-center justify-center leading-none gap-1.5 shadow-xs ${
+                loanMode === 'eligibility' ? '' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <TrendingUp size={14} /> Eligibility
@@ -760,8 +760,8 @@ export const CalculatorHub: React.FC = () => {
                 background: loanMode === 'prepayment' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
                 color: loanMode === 'prepayment' ? '#ffffff' : undefined
               }}
-              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
-                loanMode === 'prepayment' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              className={`min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-xl transition cursor-pointer inline-flex items-center justify-center leading-none gap-1.5 shadow-xs ${
+                loanMode === 'prepayment' ? '' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Zap size={14} /> Prepayment
@@ -920,7 +920,7 @@ export const CalculatorHub: React.FC = () => {
       {activeTab === 'gst' && (
         <div className="space-y-4">
           {/* Mode Switcher */}
-          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200/80">
             <button
               type="button"
               onClick={() => setGstMode('exclusive')}
@@ -928,8 +928,8 @@ export const CalculatorHub: React.FC = () => {
                 background: gstMode === 'exclusive' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
                 color: gstMode === 'exclusive' ? '#ffffff' : undefined
               }}
-              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
-                gstMode === 'exclusive' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              className={`min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-xl transition cursor-pointer inline-flex items-center justify-center leading-none gap-1.5 shadow-xs ${
+                gstMode === 'exclusive' ? '' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Exclusive (+GST)
@@ -941,8 +941,8 @@ export const CalculatorHub: React.FC = () => {
                 background: gstMode === 'inclusive' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
                 color: gstMode === 'inclusive' ? '#ffffff' : undefined
               }}
-              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
-                gstMode === 'inclusive' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              className={`min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-xl transition cursor-pointer inline-flex items-center justify-center leading-none gap-1.5 shadow-xs ${
+                gstMode === 'inclusive' ? '' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Inclusive (−GST)
@@ -952,27 +952,33 @@ export const CalculatorHub: React.FC = () => {
           {/* Emerald GST Result Card */}
           <div
             style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)' }}
-            className="rounded-3xl p-5 text-white shadow-md text-center"
+            className="rounded-3xl p-4 sm:p-5 text-white shadow-md text-center"
           >
-            <p className="text-xs font-bold text-emerald-100 uppercase tracking-wider">
+            <p className="text-xs font-bold text-white/90 uppercase tracking-wider">
               {gstMode === 'exclusive' ? 'Total Amount (Incl. GST)' : 'Net Amount (Excl. GST)'}
             </p>
-            <h3 className="text-3xl sm:text-4xl font-black text-white mt-1">
-              ₹{gstResults.totalAmount.toLocaleString('en-IN')}
+            <h3 className="text-3xl sm:text-4xl font-black text-white mt-1 truncate">
+              ₹{(gstMode === 'exclusive' ? gstResults.totalAmount : gstResults.netAmount).toLocaleString('en-IN')}
             </h3>
 
             <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/20 text-xs">
-              <div>
-                <p className="text-[10px] text-emerald-100 font-bold uppercase">Total GST</p>
-                <p className="font-extrabold text-sm text-white">₹{gstResults.gstTotal.toLocaleString('en-IN')}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] text-white/90 font-bold uppercase truncate">Total GST</p>
+                <p className="font-extrabold text-xs sm:text-sm text-white truncate mt-0.5">
+                  ₹{gstResults.gstTotal.toLocaleString('en-IN')}
+                </p>
               </div>
-              <div>
-                <p className="text-[10px] text-emerald-100 font-bold uppercase">CGST (50%)</p>
-                <p className="font-extrabold text-sm text-white">₹{gstResults.cgst.toLocaleString('en-IN')}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] text-white/90 font-bold uppercase truncate">CGST (50%)</p>
+                <p className="font-extrabold text-xs sm:text-sm text-white truncate mt-0.5">
+                  ₹{gstResults.cgst.toLocaleString('en-IN')}
+                </p>
               </div>
-              <div>
-                <p className="text-[10px] text-emerald-100 font-bold uppercase">SGST (50%)</p>
-                <p className="font-extrabold text-sm text-white">₹{gstResults.sgst.toLocaleString('en-IN')}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] text-white/90 font-bold uppercase truncate">SGST (50%)</p>
+                <p className="font-extrabold text-xs sm:text-sm text-white truncate mt-0.5">
+                  ₹{gstResults.sgst.toLocaleString('en-IN')}
+                </p>
               </div>
             </div>
           </div>
@@ -992,8 +998,8 @@ export const CalculatorHub: React.FC = () => {
           />
 
           {/* GST Slab Cards (Proper Grid) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-2">
-            <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 block">GST Rate Slab</label>
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-2">
+            <label className="text-xs font-extrabold text-slate-700 block">GST Rate Slab</label>
             <div className="grid grid-cols-5 gap-1.5">
               {[
                 { r: 3, label: 'Gold' },
@@ -1006,14 +1012,14 @@ export const CalculatorHub: React.FC = () => {
                   key={item.r}
                   type="button"
                   onClick={() => setGstRate(item.r)}
-                  className={`py-2 px-1 text-center rounded-xl border transition cursor-pointer active:scale-95 ${
+                  className={`inline-flex flex-col items-center justify-center gap-0.5 py-2 px-1 min-w-0 text-center rounded-xl border transition cursor-pointer active:scale-95 ${
                     gstRate === item.r
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-500/20'
-                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+                      : 'bg-slate-50 text-slate-700 border-slate-200/90 hover:bg-slate-100'
                   }`}
                 >
-                  <p className="text-xs font-black">{item.r}%</p>
-                  <p className="text-[9px] font-semibold opacity-75 truncate">{item.label}</p>
+                  <span className="text-xs font-black leading-none">{item.r}%</span>
+                  <span className="text-[9px] font-semibold opacity-85 leading-tight truncate max-w-full">{item.label}</span>
                 </button>
               ))}
             </div>
@@ -1027,7 +1033,7 @@ export const CalculatorHub: React.FC = () => {
       {activeTab === 'interest' && (
         <div className="space-y-4">
           {/* Mode Switcher */}
-          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+          <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200/80">
             <button
               type="button"
               onClick={() => setInterestType('simple')}
@@ -1035,8 +1041,8 @@ export const CalculatorHub: React.FC = () => {
                 background: interestType === 'simple' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
                 color: interestType === 'simple' ? '#ffffff' : undefined
               }}
-              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
-                interestType === 'simple' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              className={`min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-xl transition cursor-pointer inline-flex items-center justify-center leading-none gap-1.5 shadow-xs ${
+                interestType === 'simple' ? '' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Simple (SI)
@@ -1048,8 +1054,8 @@ export const CalculatorHub: React.FC = () => {
                 background: interestType === 'compound' ? 'linear-gradient(135deg, #059669, #10b981)' : 'transparent',
                 color: interestType === 'compound' ? '#ffffff' : undefined
               }}
-              className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
-                interestType === 'compound' ? '' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              className={`min-h-[36px] py-2 px-2 text-xs font-extrabold rounded-xl transition cursor-pointer inline-flex items-center justify-center leading-none gap-1.5 shadow-xs ${
+                interestType === 'compound' ? '' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Compound (CI)
@@ -1152,8 +1158,8 @@ export const CalculatorHub: React.FC = () => {
 
             {/* Compounding frequency for CI */}
             {interestType === 'compound' && (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 space-y-2 shadow-xs">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Compounding Frequency</label>
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-4 space-y-2 shadow-xs">
+                <label className="text-xs font-bold text-slate-800 block">Compounding Frequency</label>
                 <div className="grid grid-cols-4 gap-1.5">
                   {[
                     { label: 'Annual', freq: 1 },
@@ -1165,10 +1171,10 @@ export const CalculatorHub: React.FC = () => {
                       key={f.label}
                       type="button"
                       onClick={() => setCompoundFreq(f.freq)}
-                      className={`py-2 text-xs font-bold rounded-xl border transition cursor-pointer active:scale-95 ${
+                      className={`inline-flex items-center justify-center leading-none min-h-[36px] py-2 px-1 text-xs font-bold rounded-xl border transition cursor-pointer active:scale-95 whitespace-nowrap ${
                         compoundFreq === f.freq
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-500/20'
-                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+                          : 'bg-slate-50 text-slate-700 border-slate-200/80 hover:bg-slate-100'
                       }`}
                     >
                       {f.label}

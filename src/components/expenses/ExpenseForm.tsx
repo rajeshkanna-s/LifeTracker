@@ -162,246 +162,251 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ initialData, settings, expens
     >
       <div className="modal-box" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <div className="flex items-center gap-2">
-            <span className={`w-2.5 h-2.5 rounded-full ${isIncome ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-            <h3>{initialData?.id ? (isIncome ? 'Edit Income' : 'Edit Expense') : (isIncome ? 'Add Income' : 'Add Expense')}</h3>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isIncome ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+            <h3 className="truncate">{initialData?.id ? (isIncome ? 'Edit Income' : 'Edit Expense') : (isIncome ? 'Add Income' : 'Add Expense')}</h3>
           </div>
-          <button onClick={onClose} className="modal-close"><X size={18} /></button>
+          <button type="button" onClick={onClose} aria-label="Close modal" className="modal-close"><X size={18} /></button>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-body space-y-4">
-          {/* Income vs Expense Segmented Toggle (Matte Finish with Proper Padding) */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '6px',
-              padding: '5px',
-              borderRadius: '16px',
-              background: '#f1f5f9',
-              border: '1px solid #e2e8f0'
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => {
-                setType('expense');
-                if (DEFAULT_INCOME_CATEGORIES.includes(form.category)) {
-                  setForm(prev => ({ ...prev, category: '', platform: '' }));
-                }
-              }}
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body space-y-4">
+            {/* Income vs Expense Segmented Toggle (Matte Finish with Proper Padding) */}
+            <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '10px 16px',
-                minHeight: '42px',
-                borderRadius: '12px',
-                border: 'none',
-                background: !isIncome ? '#e11d48' : 'transparent',
-                color: !isIncome ? '#ffffff' : '#64748b',
-                fontWeight: 700,
-                fontSize: '0.86rem',
-                cursor: 'pointer',
-                boxShadow: !isIncome ? '0 2px 8px rgba(225, 29, 72, 0.22)' : 'none',
-                transition: 'all 0.18s ease'
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '6px',
+                padding: '5px',
+                borderRadius: '16px',
+                background: '#f1f5f9',
+                border: '1px solid #e2e8f0'
               }}
-              onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
-              onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <ArrowDownLeft size={16} strokeWidth={2.4} />
-              <span>Expense</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setType('income');
-                if (DEFAULT_CATEGORIES.includes(form.category)) {
-                  setForm(prev => ({ ...prev, category: '', platform: '' }));
-                }
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '10px 16px',
-                minHeight: '42px',
-                borderRadius: '12px',
-                border: 'none',
-                background: isIncome ? '#059669' : 'transparent',
-                color: isIncome ? '#ffffff' : '#64748b',
-                fontWeight: 700,
-                fontSize: '0.86rem',
-                cursor: 'pointer',
-                boxShadow: isIncome ? '0 2px 8px rgba(5, 150, 105, 0.22)' : 'none',
-                transition: 'all 0.18s ease'
-              }}
-              onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
-              onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-            >
-              <ArrowUpRight size={16} strokeWidth={2.4} />
-              <span>Income</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="label-unified">Date</label>
-              <input type="date" value={form.date} onChange={e => setForm({...form, date: e.target.value})} className="input-unified" required />
+              <button
+                type="button"
+                onClick={() => {
+                  setType('expense');
+                  if (DEFAULT_INCOME_CATEGORIES.includes(form.category)) {
+                    setForm(prev => ({ ...prev, category: '', platform: '' }));
+                  }
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 14px',
+                  minHeight: '42px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: !isIncome ? '#e11d48' : 'transparent',
+                  color: !isIncome ? '#ffffff' : '#475569',
+                  fontWeight: 700,
+                  fontSize: '0.86rem',
+                  lineHeight: 1,
+                  cursor: 'pointer',
+                  boxShadow: !isIncome ? '0 2px 8px rgba(225, 29, 72, 0.22)' : 'none',
+                  transition: 'all 0.18s ease'
+                }}
+                onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+                onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                <ArrowDownLeft size={16} strokeWidth={2.4} />
+                <span>Expense</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setType('income');
+                  if (DEFAULT_CATEGORIES.includes(form.category)) {
+                    setForm(prev => ({ ...prev, category: '', platform: '' }));
+                  }
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 14px',
+                  minHeight: '42px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: isIncome ? '#059669' : 'transparent',
+                  color: isIncome ? '#ffffff' : '#475569',
+                  fontWeight: 700,
+                  fontSize: '0.86rem',
+                  lineHeight: 1,
+                  cursor: 'pointer',
+                  boxShadow: isIncome ? '0 2px 8px rgba(5, 150, 105, 0.22)' : 'none',
+                  transition: 'all 0.18s ease'
+                }}
+                onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+                onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                <ArrowUpRight size={16} strokeWidth={2.4} />
+                <span>Income</span>
+              </button>
             </div>
-            <div>
-              <label className="label-unified">Time</label>
-              <input type="time" value={form.time} onChange={e => setForm({...form, time: e.target.value})} className="input-unified" required />
-            </div>
-          </div>
 
-          <div>
-            <label className="label-unified">Amount ({settings.currencySymbol})</label>
-            <input
-              type="number"
-              step="any"
-              placeholder="0"
-              value={form.amount}
-              onChange={e => setForm({...form, amount: e.target.value})}
-              className={`input-unified text-lg font-bold ${isIncome ? 'text-emerald-600 focus:border-emerald-500' : 'text-rose-600 focus:border-rose-500'}`}
-              required
-            />
-          </div>
-
-          {!isIncome && (
-            <div>
-              <label className="label-unified">What was this for?</label>
-              <input
-                placeholder="Short description"
-                value={form.description}
-                onChange={e => setForm({...form, description: e.target.value})}
-                className="input-unified"
-                required
-              />
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="label-unified">{isIncome ? 'Income Source' : 'Category'}</label>
-              <select value={form.category} onChange={e => setForm({...form, category: e.target.value, platform: ''})} className="input-unified" required>
-                <option value="">Select...</option>
-                {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label-unified">{isIncome ? 'Received Via' : 'Platform / Shop'}</label>
-              <select value={form.platform} onChange={e => setForm({...form, platform: e.target.value})} className="input-unified">
-                <option value="">Select...</option>
-                {contextPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {/* Simple & Clean: Only Current Odometer for Fuel Expenses */}
-          {isFuel && (
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="label-unified !mb-0">Current Odometer (KM)</label>
-                {prevKm && (
-                  <span className="text-[11px] text-slate-400 font-medium">
-                    Last: {Number(prevKm).toLocaleString()} km
-                  </span>
-                )}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="min-w-0">
+                <label className="label-unified">Date</label>
+                <input type="date" value={form.date} onChange={e => setForm({...form, date: e.target.value})} className="input-unified min-w-0 !px-2.5 sm:!px-3.5 text-xs sm:text-sm" required />
               </div>
+              <div className="min-w-0">
+                <label className="label-unified">Time</label>
+                <input type="time" value={form.time} onChange={e => setForm({...form, time: e.target.value})} className="input-unified min-w-0 !px-2.5 sm:!px-3.5 text-xs sm:text-sm" required />
+              </div>
+            </div>
+
+            <div>
+              <label className="label-unified">Amount ({settings.currencySymbol})</label>
               <input
                 type="number"
                 step="any"
-                placeholder={prevKm ? `e.g. ${Math.round(Number(prevKm) + 180)}` : 'e.g. 27200'}
-                value={currentKm}
-                onChange={e => setCurrentKm(e.target.value)}
-                className="input-unified font-semibold"
+                placeholder="0"
+                value={form.amount}
+                onChange={e => setForm({...form, amount: e.target.value})}
+                className={`input-unified text-lg font-bold ${isIncome ? 'text-emerald-600 focus:border-emerald-500' : 'text-rose-600 focus:border-rose-500'}`}
+                required
               />
-              {distance > 0 && mileage !== null && (
-                <p className="text-[11px] text-emerald-700 font-medium mt-1 flex items-center gap-1.5">
-                  <span>⚡ +{distance} km</span>
-                  <span>•</span>
-                  <span className="font-bold">~{mileage} km/l</span>
-                </p>
-              )}
             </div>
-          )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {!isIncome && (
+              <div>
+                <label className="label-unified">What was this for?</label>
+                <input
+                  placeholder="Short description"
+                  value={form.description}
+                  onChange={e => setForm({...form, description: e.target.value})}
+                  className="input-unified"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="min-w-0">
+                <label className="label-unified">{isIncome ? 'Income Source' : 'Category'}</label>
+                <select value={form.category} onChange={e => setForm({...form, category: e.target.value, platform: ''})} className="input-unified min-w-0" required>
+                  <option value="">Select...</option>
+                  {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="min-w-0">
+                <label className="label-unified">{isIncome ? 'Received Via' : 'Platform / Shop'}</label>
+                <select value={form.platform} onChange={e => setForm({...form, platform: e.target.value})} className="input-unified min-w-0">
+                  <option value="">Select...</option>
+                  {contextPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* Simple & Clean: Only Current Odometer for Fuel Expenses */}
+            {isFuel && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="label-unified !mb-0">Current Odometer (KM)</label>
+                  {prevKm && (
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      Last: {Number(prevKm).toLocaleString()} km
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="number"
+                  step="any"
+                  placeholder={prevKm ? `e.g. ${Math.round(Number(prevKm) + 180)}` : 'e.g. 27200'}
+                  value={currentKm}
+                  onChange={e => setCurrentKm(e.target.value)}
+                  className="input-unified font-semibold"
+                />
+                {distance > 0 && mileage !== null && (
+                  <p className="text-[11px] text-emerald-700 font-medium mt-1 flex items-center gap-1.5">
+                    <span>⚡ +{distance} km</span>
+                    <span>•</span>
+                    <span className="font-bold">~{mileage} km/l</span>
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="min-w-0">
+                <label className="label-unified">Payment Method</label>
+                <select value={form.payment_method} onChange={e => setForm({...form, payment_method: e.target.value})} className="input-unified min-w-0" required>
+                  {allPayments.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              <div className="min-w-0">
+                <label className="label-unified">Person</label>
+                <select value={form.person} onChange={e => setForm({...form, person: e.target.value})} className="input-unified min-w-0" required>
+                  {family.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+            </div>
+
             <div>
-              <label className="label-unified">Payment Method</label>
-              <select value={form.payment_method} onChange={e => setForm({...form, payment_method: e.target.value})} className="input-unified" required>
-                {allPayments.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
+              <div className="flex items-center justify-between mb-1">
+                <label className="label-unified !mb-0">Tags & Smart Filters</label>
+                <span className="text-[10px] text-slate-500 font-medium">Tap to toggle</span>
+              </div>
+              <input placeholder="e.g. #reimbursable, #tax-deductible" value={form.tags} onChange={e => setForm({...form, tags: e.target.value})} className="input-unified mb-2" />
+              
+              {/* Quick Tag Chips */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {['#reimbursable', '#tax-deductible', '#shared', '#personal', '#medical', '#business', '#recurring'].map(chip => {
+                  const isSelected = form.tags.toLowerCase().includes(chip.toLowerCase());
+                  return (
+                    <button
+                      key={chip}
+                      type="button"
+                      onClick={() => {
+                        const currentTags = form.tags.split(',').map(t => t.trim()).filter(Boolean);
+                        let newTags: string[];
+                        if (isSelected) {
+                          newTags = currentTags.filter(t => t.toLowerCase() !== chip.toLowerCase());
+                        } else {
+                          newTags = [...currentTags, chip];
+                        }
+                        setForm({ ...form, tags: newTags.join(', ') });
+                      }}
+                      style={{ borderRadius: '9999px' }}
+                      className={`inline-flex items-center justify-center leading-none px-2.5 py-1.5 text-[11px] font-bold border transition cursor-pointer select-none active:scale-95 ${
+                        isSelected
+                          ? 'bg-purple-100 text-purple-800 border-purple-300 shadow-2xs font-extrabold'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {chip}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
             <div>
-              <label className="label-unified">Person</label>
-              <select value={form.person} onChange={e => setForm({...form, person: e.target.value})} className="input-unified" required>
-                {family.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
+              <label className="label-unified">Notes</label>
+              <textarea placeholder="Optional extra details" rows={2} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} className="input-unified" />
             </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="label-unified !mb-0">Tags & Smart Filters</label>
-              <span className="text-[10px] text-slate-400 font-medium">Tap to toggle</span>
-            </div>
-            <input placeholder="e.g. #reimbursable, #tax-deductible" value={form.tags} onChange={e => setForm({...form, tags: e.target.value})} className="input-unified mb-2" />
-            
-            {/* Quick Tag Chips */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {['#reimbursable', '#tax-deductible', '#shared', '#personal', '#medical', '#business', '#recurring'].map(chip => {
-                const isSelected = form.tags.toLowerCase().includes(chip.toLowerCase());
-                return (
-                  <button
-                    key={chip}
-                    type="button"
-                    onClick={() => {
-                      const currentTags = form.tags.split(',').map(t => t.trim()).filter(Boolean);
-                      let newTags: string[];
-                      if (isSelected) {
-                        newTags = currentTags.filter(t => t.toLowerCase() !== chip.toLowerCase());
-                      } else {
-                        newTags = [...currentTags, chip];
-                      }
-                      setForm({ ...form, tags: newTags.join(', ') });
-                    }}
-                    style={{ borderRadius: '9999px' }}
-                    className={`px-2.5 py-0.5 text-[11px] font-bold border transition cursor-pointer select-none active:scale-95 ${
-                      isSelected
-                        ? 'bg-purple-100 text-purple-800 border-purple-300 shadow-2xs font-extrabold'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    {chip}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
-            <label className="label-unified">Notes</label>
-            <textarea placeholder="Optional extra details" rows={2} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} className="input-unified" />
           </div>
 
           <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="btn-cancel flex-1"
+              className="btn-cancel flex-1 min-w-0"
               style={{
                 minHeight: '46px',
-                padding: '11px 18px',
+                padding: '11px 14px',
                 borderRadius: '12px',
                 background: '#f8fafc',
                 border: '1.5px solid #cbd5e1',
                 color: '#334155',
-                fontSize: '0.88rem',
+                fontSize: '0.86rem',
                 fontWeight: 700,
+                lineHeight: 1,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -417,20 +422,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ initialData, settings, expens
             <button
               type="submit"
               disabled={loading}
-              className="btn-submit flex-1"
+              className="btn-submit flex-1 min-w-0"
               style={{
                 minHeight: '46px',
-                padding: '11px 18px',
+                padding: '11px 14px',
                 borderRadius: '12px',
                 border: 'none',
                 background: isIncome ? '#059669' : '#e11d48',
                 color: '#ffffff',
-                fontSize: '0.88rem',
+                fontSize: '0.86rem',
                 fontWeight: 700,
+                lineHeight: 1,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
+                gap: '6px',
                 whiteSpace: 'nowrap',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 boxShadow: isIncome ? '0 2px 8px rgba(5, 150, 105, 0.25)' : '0 2px 8px rgba(225, 29, 72, 0.25)',
@@ -444,7 +450,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ initialData, settings, expens
                 'Saving...'
               ) : (
                 <>
-                  <Check size={17} strokeWidth={2.5} />
+                  <Check size={16} strokeWidth={2.5} className="shrink-0" />
                   <span>{isIncome ? 'Save Income' : 'Save Expense'}</span>
                 </>
               )}

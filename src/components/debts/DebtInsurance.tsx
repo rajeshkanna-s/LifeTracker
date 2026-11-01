@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Shield, Heart, Activity, FileText, Calendar, Plus, Search, Trash2, Pencil, Download, ExternalLink, AlertCircle } from 'lucide-react';
+import { Shield, Heart, Activity, FileText, Calendar, Plus, Search, Trash2, Pencil, Download, AlertCircle, X } from 'lucide-react';
 import type { Insurance, DebtSettings } from '../../types';
 import { formatLocalDate } from '../../utils/expenseUtils';
 
@@ -298,8 +298,9 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
         </div>
 
         <button
+          type="button"
           onClick={openAddModal}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition shadow-sm w-full sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition shadow-sm w-full sm:w-auto shrink-0"
         >
           <Plus size={16} /> Add Policy
         </button>
@@ -307,10 +308,10 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
 
       {/* Grid List */}
       {filteredPolicies.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
           <div className="text-4xl mb-3">🛡️</div>
-          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No insurance policies found</h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Get started by uploading your first insurance details</p>
+          <h4 className="text-sm font-bold text-slate-800">No insurance policies found</h4>
+          <p className="text-xs text-slate-500 mt-1">Get started by uploading your first insurance details</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -319,81 +320,86 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
             return (
               <div
                 key={p.id}
-                className={`bg-white dark:bg-slate-900 border rounded-2xl p-4 shadow-sm flex flex-col justify-between transition-all hover:shadow-md ${
-                  isExpired ? 'border-red-100 dark:border-rose-900/40 bg-red-50/10 dark:bg-rose-950/20' : 'border-slate-200 dark:border-slate-800'
+                className={`bg-white border rounded-2xl p-4 shadow-sm flex flex-col justify-between transition-all hover:shadow-md min-w-0 ${
+                  isExpired ? 'border-red-100 bg-red-50/10' : 'border-slate-200'
                 }`}
               >
-                <div className="space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0">
+                <div className="space-y-3 min-w-0">
+                  <div className="flex justify-between items-start gap-2 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
                         {getTypeIcon(p.type)}
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate" title={p.policyName}>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs font-bold text-slate-800 truncate" title={p.policyName}>
                           {p.policyName}
                         </h4>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{p.type}</p>
+                        <p className="text-[10px] text-slate-500 mt-0.5 truncate">{p.type}</p>
                       </div>
                     </div>
                     {getExpiryBadge(p.expireDate)}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-[10px] pt-1">
-                    <div>
-                      <p className="text-slate-400 dark:text-slate-500 font-medium">Policy No</p>
-                      <p className="text-slate-700 dark:text-slate-200 font-bold mt-0.5 truncate" title={p.policyNumber}>
+                    <div className="min-w-0">
+                      <p className="text-slate-500 font-medium">Policy No</p>
+                      <p className="text-slate-700 font-bold mt-0.5 truncate" title={p.policyNumber}>
                         {p.policyNumber}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-slate-400 dark:text-slate-500 font-medium">Premium</p>
-                      <p className="text-slate-700 dark:text-slate-200 font-bold mt-0.5 text-orange-600 dark:text-amber-400">
+                    <div className="min-w-0">
+                      <p className="text-slate-500 font-medium">Premium</p>
+                      <p className="text-orange-600 font-bold mt-0.5 truncate">
                         {settings.currencySymbol}
                         {p.paymentAmount.toLocaleString()}
-                        <span className="text-[9px] text-slate-400 dark:text-slate-500 font-normal"> / {p.paymentFrequency}</span>
+                        <span className="text-[9px] text-slate-500 font-normal"> / {p.paymentFrequency}</span>
                       </p>
                     </div>
-                    <div>
-                      <p className="text-slate-400 dark:text-slate-500 font-medium">Start Date</p>
-                      <p className="text-slate-700 dark:text-slate-200 font-semibold mt-0.5">
+                    <div className="min-w-0">
+                      <p className="text-slate-500 font-medium">Start Date</p>
+                      <p className="text-slate-700 font-semibold mt-0.5">
                         {new Date(p.startDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-slate-400 dark:text-slate-500 font-medium">Expiry Date</p>
-                      <p className="text-slate-700 dark:text-slate-200 font-semibold mt-0.5">
+                    <div className="min-w-0">
+                      <p className="text-slate-500 font-medium">Expiry Date</p>
+                      <p className="text-slate-700 font-semibold mt-0.5">
                         {new Date(p.expireDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 mt-4 pt-3">
+                <div className="flex items-center justify-between gap-2 border-t border-slate-100 mt-4 pt-3">
                   {p.downloadUrl ? (
                     <button
+                      type="button"
                       onClick={() => handleDownload(p)}
-                      className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 px-2.5 py-1.5 rounded-lg transition"
+                      className="inline-flex items-center justify-center gap-1.5 text-[10px] font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1.5 rounded-lg transition"
                     >
                       <Download size={12} />
                       Download Policy
                     </button>
                   ) : (
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic">No document attached</span>
+                    <span className="text-[10px] text-slate-500 font-medium italic">No document attached</span>
                   )}
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
+                      type="button"
                       onClick={() => openEditModal(p)}
-                      className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
+                      className="w-8 h-8 inline-flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded-lg transition"
                       title="Edit"
+                      aria-label="Edit"
                     >
                       <Pencil size={13} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => onDelete(p.id)}
-                      className="p-1.5 text-red-500 dark:text-rose-400 hover:bg-red-50 dark:hover:bg-rose-950/50 rounded-lg transition"
+                      className="w-8 h-8 inline-flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition"
                       title="Delete"
+                      aria-label="Delete"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -411,8 +417,13 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{editingPolicy ? 'Edit Insurance Policy' : 'Add New Insurance Policy'}</h3>
-              <button className="modal-close" onClick={() => setShowModal(false)}>
-                ✕
+              <button
+                type="button"
+                aria-label="Close"
+                className="modal-close inline-flex items-center justify-center"
+                onClick={() => setShowModal(false)}
+              >
+                <X size={18} />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
@@ -517,16 +528,16 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
 
                   <div className="form-group full">
                     <label className="form-label">Or Upload Policy File (Max 2MB)</label>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-wrap items-center gap-2 mt-1 min-w-0">
                       <input
                         type="file"
                         accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
                         onChange={handleFileChange}
-                        className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer"
+                        className="max-w-full min-w-0 text-xs text-slate-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer"
                       />
                       {formData.fileName && (
-                        <span className="text-[10px] text-slate-600 font-bold bg-slate-100 px-2 py-1 rounded-md max-w-[200px] truncate">
-                          📎 {formData.fileName}
+                        <span className="inline-flex items-center gap-1 text-[10px] text-slate-700 font-bold bg-slate-100 px-2.5 py-1 rounded-md max-w-full truncate">
+                          📎 <span className="truncate">{formData.fileName}</span>
                         </span>
                       )}
                     </div>
@@ -534,10 +545,10 @@ const DebtInsurance: React.FC<DebtInsuranceProps> = ({ settings, onSave, onDelet
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>
+                <button type="button" className="btn-cancel inline-flex items-center justify-center" onClick={() => setShowModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-submit red">
+                <button type="submit" className="btn-submit red inline-flex items-center justify-center">
                   {editingPolicy ? 'Update Policy' : 'Add Policy'}
                 </button>
               </div>

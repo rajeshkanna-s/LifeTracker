@@ -69,7 +69,7 @@ const Section: React.FC<{
       >
         {/* Left: Icon + Title & Subtitle */}
         <div className="flex items-center gap-3.5 min-w-0 flex-1 pr-2">
-          <div className={`w-11 h-11 ${c.bg} rounded-2xl flex items-center justify-center shrink-0 border border-slate-100/80 transition-transform ${isOpen ? 'scale-105' : ''}`}>
+          <div className={`w-11 h-11 ${c.bg} rounded-2xl inline-flex items-center justify-center shrink-0 border border-slate-100/80 transition-transform ${isOpen ? 'scale-105' : ''}`}>
             <Icon size={20} className={c.text} />
           </div>
           <div className="min-w-0 flex-1">
@@ -77,7 +77,7 @@ const Section: React.FC<{
               {title}
             </h4>
             {subtitle && (
-              <p className="text-xs text-slate-400 font-medium mt-0.5 line-clamp-1">
+              <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">
                 {subtitle}
               </p>
             )}
@@ -87,11 +87,11 @@ const Section: React.FC<{
         {/* Right: Badge + Chevron (PERFECT ALIGNMENT) */}
         <div className="flex items-center gap-2.5 shrink-0">
           {badge !== undefined && (
-            <span className={`${c.badge} text-[11px] font-black min-w-[24px] h-[22px] px-2 rounded-full inline-flex items-center justify-center shadow-2xs`}>
+            <span className={`${c.badge} text-[11px] font-black leading-none min-w-[24px] h-[22px] px-2 rounded-full inline-flex items-center justify-center shrink-0 shadow-2xs`}>
               {badge}
             </span>
           )}
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-slate-400 transition-all duration-200 ${isOpen ? 'rotate-180 bg-slate-100 text-slate-700' : 'bg-slate-50 text-slate-400'}`}>
+          <div className={`w-8 h-8 rounded-full inline-flex items-center justify-center shrink-0 text-slate-400 transition-all duration-200 ${isOpen ? 'rotate-180 bg-slate-100 text-slate-700' : 'bg-slate-50 text-slate-500'}`}>
             <ChevronDown size={16} strokeWidth={2.4} />
           </div>
         </div>
@@ -123,14 +123,14 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-36">
+    <div className="max-w-3xl mx-auto space-y-6 pb-24">
       {/* ════════ Top Hero Banner (Sleek & Well-Proportioned) ════════ */}
       <div
         className="rounded-3xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 100%)' }}
       >
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 shadow-sm border border-white/20">
+          <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm inline-flex items-center justify-center shrink-0 shadow-sm border border-white/20">
             <Sliders size={20} className="text-white" strokeWidth={2.4} />
           </div>
           <div className="min-w-0">
@@ -146,7 +146,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
 
       {/* ════════ GROUP 1: BUDGETS & ALERTS ════════ */}
       <div className="space-y-2.5">
-        <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider px-1">
+        <p className="text-[11px] font-black text-slate-500 uppercase tracking-wider px-1">
           Budgets & Alerts
         </p>
         <div className="space-y-3">
@@ -243,9 +243,9 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                       setNewCatBudget({ category: '', budget: '' });
                     }
                   }}
-                  className="w-full py-2.5 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 text-white font-extrabold text-xs shadow-xs active:scale-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5"
+                  className="w-full min-h-[42px] py-2.5 px-4 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 text-white font-extrabold text-xs leading-none shadow-xs active:scale-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shrink-0"
                 >
-                  <Plus size={15} strokeWidth={2.5} />
+                  <Plus size={15} strokeWidth={2.5} className="shrink-0" />
                   <span>Add Category Budget</span>
                 </button>
               </div>
@@ -253,15 +253,16 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
               {(settings.categoryBudgets || []).length > 0 && (
                 <div className="space-y-2">
                   {(settings.categoryBudgets || []).map((cb, i) => (
-                    <div key={cb.category} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-2xl shadow-2xs">
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">{cb.category}</p>
+                    <div key={cb.category} className="flex items-center justify-between gap-2.5 p-3 bg-white border border-slate-200 rounded-2xl shadow-2xs">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-slate-900 truncate">{cb.category}</p>
                         <p className="text-[11px] text-slate-500 font-medium">₹{cb.budget.toLocaleString()} / month</p>
                       </div>
                       <button
                         type="button"
+                        aria-label={`Delete ${cb.category} budget`}
                         onClick={() => updateSettings({ categoryBudgets: (settings.categoryBudgets || []).filter((_, idx) => idx !== i) })}
-                        className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 hover:text-rose-700 transition active:scale-95 cursor-pointer"
+                        className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 inline-flex items-center justify-center shrink-0 text-rose-500 hover:text-rose-700 transition active:scale-95 cursor-pointer"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -276,7 +277,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
 
       {/* ════════ GROUP 2: PRESETS & PAYMENTS ════════ */}
       <div className="space-y-2.5">
-        <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider px-1">
+        <p className="text-[11px] font-black text-slate-500 uppercase tracking-wider px-1">
           Presets & Payment Methods
         </p>
         <div className="space-y-3">
@@ -313,7 +314,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                     <button
                       type="button"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="mt-0.5 text-xs font-bold text-violet-600 hover:text-violet-800 transition inline-flex items-center gap-1 cursor-pointer"
+                      className="mt-0.5 text-xs font-bold text-violet-600 hover:text-violet-800 transition inline-flex items-center justify-center leading-none gap-1 cursor-pointer"
                     >
                       <span>{showEmojiPicker ? 'Close Emoji Picker' : 'Choose Emoji Icon'}</span>
                       {showEmojiPicker ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
@@ -329,7 +330,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                       <button
                         type="button"
                         onClick={() => setEmojiFilter('all')}
-                        className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                        className={`inline-flex items-center justify-center leading-none shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
                           emojiFilter === 'all'
                             ? 'bg-violet-600 text-white shadow-2xs'
                             : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
@@ -341,7 +342,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                         <button
                           type="button"
                           onClick={() => setEmojiFilter('category')}
-                          className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                          className={`inline-flex items-center justify-center leading-none shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
                             emojiFilter === 'category'
                               ? 'bg-violet-600 text-white shadow-2xs'
                               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
@@ -432,7 +433,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                         setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
                         setShowEmojiPicker(false);
                       }}
-                      className="flex-1 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 transition active:scale-95 cursor-pointer"
+                      className="flex-1 min-h-[42px] py-2 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs leading-none hover:bg-slate-50 transition active:scale-95 cursor-pointer inline-flex items-center justify-center shrink-0"
                     >
                       Cancel
                     </button>
@@ -461,16 +462,16 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                       setNewQuickAdd({ name: '', amount: '', category: '', platform: '', icon: '☕' });
                       setShowEmojiPicker(false);
                     }}
-                    className="flex-1 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold text-xs shadow-sm hover:from-amber-600 hover:to-amber-700 transition active:scale-95 cursor-pointer inline-flex items-center justify-center gap-1.5"
+                    className="flex-1 min-h-[42px] py-2.5 px-4 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold text-xs leading-none shadow-sm hover:from-amber-600 hover:to-amber-700 transition active:scale-95 cursor-pointer inline-flex items-center justify-center gap-1.5 shrink-0"
                   >
                     {editingTemplateId ? (
                       <>
-                        <Check size={15} strokeWidth={2.5} />
+                        <Check size={15} strokeWidth={2.5} className="shrink-0" />
                         <span>Update Preset</span>
                       </>
                     ) : (
                       <>
-                        <Plus size={15} strokeWidth={2.5} />
+                        <Plus size={15} strokeWidth={2.5} className="shrink-0" />
                         <span>Save Preset</span>
                       </>
                     )}
@@ -485,19 +486,19 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                   return (
                     <div
                       key={t.id}
-                      className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
+                      className={`flex items-center justify-between gap-2.5 p-3 rounded-2xl border transition-all ${
                         isEditing
                           ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-400/20'
                           : 'bg-white border-slate-200/80 hover:border-slate-300 shadow-2xs'
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 bg-amber-50/70 border border-amber-100 rounded-xl flex items-center justify-center text-lg shadow-2xs shrink-0">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-amber-50/70 border border-amber-100 rounded-xl inline-flex items-center justify-center text-lg shadow-2xs shrink-0">
                           {t.icon}
                         </div>
-                        <div className="min-w-0">
+                        <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold text-slate-900 truncate leading-tight">{t.name}</p>
-                          <p className="text-[11px] text-slate-400 font-medium mt-0.5 truncate">
+                          <p className="text-[11px] text-slate-500 font-medium mt-0.5 truncate">
                             ₹{t.amount} • {t.category}{t.platform ? ` • ${t.platform}` : ''}
                           </p>
                         </div>
@@ -518,8 +519,9 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                             setShowEmojiPicker(true);
                             setEmojiFilter(t.category && CATEGORY_EMOJIS[t.category] ? 'category' : 'all');
                           }}
-                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition active:scale-95 cursor-pointer"
+                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 inline-flex items-center justify-center shrink-0 text-slate-600 hover:text-slate-900 transition active:scale-95 cursor-pointer"
                           title="Edit preset"
+                          aria-label={`Edit ${t.name}`}
                         >
                           <Pencil size={13} />
                         </button>
@@ -533,8 +535,9 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                               setShowEmojiPicker(false);
                             }
                           }}
-                          className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 hover:text-rose-700 transition active:scale-95 cursor-pointer"
+                          className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 inline-flex items-center justify-center shrink-0 text-rose-500 hover:text-rose-700 transition active:scale-95 cursor-pointer"
                           title="Delete preset"
+                          aria-label={`Delete ${t.name}`}
                         >
                           <Trash2 size={13} />
                         </button>
@@ -558,7 +561,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
             color="purple"
           >
             <div className="space-y-3.5 pt-1">
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <input
                   placeholder="Add new payment method (e.g. Cred Pay)..."
                   value={newPayment}
@@ -569,17 +572,18 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                       setNewPayment('');
                     }
                   }}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-purple-500 focus:bg-white"
+                  className="flex-1 min-w-0 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-purple-500 focus:bg-white"
                 />
                 <button
                   type="button"
+                  aria-label="Add payment method"
                   onClick={() => {
                     if (newPayment.trim()) {
                       updateSettings({ customPaymentMethods: [...(settings.customPaymentMethods || []), newPayment.trim()] });
                       setNewPayment('');
                     }
                   }}
-                  className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                  className="min-h-[42px] px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs inline-flex items-center justify-center shrink-0"
                 >
                   <Plus size={16} strokeWidth={2.5} />
                 </button>
@@ -589,7 +593,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 {PAYMENT_METHODS.map(p => (
                   <span
                     key={p}
-                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs"
+                    className="inline-flex items-center justify-center leading-none text-xs px-3 py-1.5 rounded-full font-bold bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs"
                   >
                     {p}
                   </span>
@@ -597,13 +601,14 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 {(settings.customPaymentMethods || []).map(p => (
                   <span
                     key={p}
-                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-purple-50 text-purple-800 border border-purple-200 flex items-center gap-1.5 shadow-2xs"
+                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-purple-50 text-purple-800 border border-purple-200 inline-flex items-center gap-1.5 leading-none shadow-2xs"
                   >
                     <span>{p}</span>
                     <button
                       type="button"
+                      aria-label={`Remove ${p}`}
                       onClick={() => updateSettings({ customPaymentMethods: (settings.customPaymentMethods || []).filter(x => x !== p) })}
-                      className="text-purple-400 hover:text-rose-600 transition ml-0.5 cursor-pointer"
+                      className="w-4 h-4 rounded-full text-purple-500 hover:text-rose-600 hover:bg-rose-50 transition ml-0.5 cursor-pointer inline-flex items-center justify-center shrink-0"
                     >
                       <X size={12} />
                     </button>
@@ -617,7 +622,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
 
       {/* ════════ GROUP 3: ORGANIZATION & FAMILY ════════ */}
       <div className="space-y-2.5">
-        <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider px-1">
+        <p className="text-[11px] font-black text-slate-500 uppercase tracking-wider px-1">
           Organization & Family
         </p>
         <div className="space-y-3">
@@ -633,7 +638,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
             color="teal"
           >
             <div className="space-y-3.5 pt-1">
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <input
                   placeholder="Add new category (e.g. Pet Care, Books)..."
                   value={newCategory}
@@ -644,17 +649,18 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                       setNewCategory('');
                     }
                   }}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white"
+                  className="flex-1 min-w-0 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white"
                 />
                 <button
                   type="button"
+                  aria-label="Add category"
                   onClick={() => {
                     if (newCategory.trim()) {
                       updateSettings({ customCategories: [...settings.customCategories, newCategory.trim()] });
                       setNewCategory('');
                     }
                   }}
-                  className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                  className="min-h-[42px] px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs inline-flex items-center justify-center shrink-0"
                 >
                   <Plus size={16} strokeWidth={2.5} />
                 </button>
@@ -664,7 +670,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 {DEFAULT_CATEGORIES.map(c => (
                   <span
                     key={c}
-                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs"
+                    className="inline-flex items-center justify-center leading-none text-xs px-3 py-1.5 rounded-full font-bold bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs"
                   >
                     {c}
                   </span>
@@ -672,13 +678,14 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 {settings.customCategories.map(c => (
                   <span
                     key={c}
-                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-teal-50 text-teal-800 border border-teal-200 flex items-center gap-1.5 shadow-2xs"
+                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-teal-50 text-teal-800 border border-teal-200 inline-flex items-center gap-1.5 leading-none shadow-2xs"
                   >
                     <span>{c}</span>
                     <button
                       type="button"
+                      aria-label={`Remove ${c}`}
                       onClick={() => updateSettings({ customCategories: settings.customCategories.filter(x => x !== c) })}
-                      className="text-teal-400 hover:text-rose-600 transition ml-0.5 cursor-pointer"
+                      className="w-4 h-4 rounded-full text-teal-500 hover:text-rose-600 hover:bg-rose-50 transition ml-0.5 cursor-pointer inline-flex items-center justify-center shrink-0"
                     >
                       <X size={12} />
                     </button>
@@ -700,7 +707,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
             color="indigo"
           >
             <div className="space-y-3.5 pt-1">
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <input
                   placeholder="Add new platform (e.g. Blinkit, Dunzo)..."
                   value={newPlatform}
@@ -711,17 +718,18 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                       setNewPlatform('');
                     }
                   }}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-indigo-500 focus:bg-white"
+                  className="flex-1 min-w-0 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-indigo-500 focus:bg-white"
                 />
                 <button
                   type="button"
+                  aria-label="Add platform"
                   onClick={() => {
                     if (newPlatform.trim()) {
                       updateSettings({ customPlatforms: [...settings.customPlatforms, newPlatform.trim()] });
                       setNewPlatform('');
                     }
                   }}
-                  className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                  className="min-h-[42px] px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs inline-flex items-center justify-center shrink-0"
                 >
                   <Plus size={16} strokeWidth={2.5} />
                 </button>
@@ -731,7 +739,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 {ALL_PLATFORMS.map(p => (
                   <span
                     key={p}
-                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs"
+                    className="inline-flex items-center justify-center leading-none text-xs px-3 py-1.5 rounded-full font-bold bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs"
                   >
                     {p}
                   </span>
@@ -739,13 +747,14 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 {settings.customPlatforms.map(p => (
                   <span
                     key={p}
-                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-indigo-50 text-indigo-800 border border-indigo-200 flex items-center gap-1.5 shadow-2xs"
+                    className="text-xs px-3 py-1.5 rounded-full font-bold bg-indigo-50 text-indigo-800 border border-indigo-200 inline-flex items-center gap-1.5 leading-none shadow-2xs"
                   >
                     <span>{p}</span>
                     <button
                       type="button"
+                      aria-label={`Remove ${p}`}
                       onClick={() => updateSettings({ customPlatforms: settings.customPlatforms.filter(x => x !== p) })}
-                      className="text-indigo-400 hover:text-rose-600 transition ml-0.5 cursor-pointer"
+                      className="w-4 h-4 rounded-full text-indigo-500 hover:text-rose-600 hover:bg-rose-50 transition ml-0.5 cursor-pointer inline-flex items-center justify-center shrink-0"
                     >
                       <X size={12} />
                     </button>
@@ -767,7 +776,7 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
             color="blue"
           >
             <div className="space-y-3 pt-1">
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <input
                   placeholder="Add family member (e.g. Mom, Rajesh)..."
                   value={newMember}
@@ -778,17 +787,18 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                       setNewMember('');
                     }
                   }}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                  className="flex-1 min-w-0 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
                 />
                 <button
                   type="button"
+                  aria-label="Add family member"
                   onClick={() => {
                     if (newMember.trim()) {
                       updateSettings({ familyMembers: [...(settings.familyMembers || []), newMember.trim()] });
                       setNewMember('');
                     }
                   }}
-                  className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                  className="min-h-[42px] px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs rounded-xl transition active:scale-95 cursor-pointer shadow-xs inline-flex items-center justify-center shrink-0"
                 >
                   <Plus size={16} strokeWidth={2.5} />
                 </button>
@@ -798,15 +808,16 @@ const ExpenseSettingsTab: React.FC<ExpenseSettingsProps> = ({ settings, onSettin
                 {(settings.familyMembers || []).map(m => (
                   <span
                     key={m}
-                    className="text-xs px-3 py-1.5 rounded-full font-bold transition-all bg-sky-50 border border-sky-200 text-sky-800 flex items-center gap-1.5 shadow-2xs"
+                    className="text-xs px-3 py-1.5 rounded-full font-bold transition-all bg-sky-50 border border-sky-200 text-sky-800 inline-flex items-center gap-1.5 leading-none shadow-2xs"
                   >
-                    <Users size={12} className="text-sky-600" />
+                    <Users size={12} className="text-sky-600 shrink-0" />
                     <span>{m}</span>
                     {m !== 'Me' && (
                       <button
                         type="button"
+                        aria-label={`Remove ${m}`}
                         onClick={() => updateSettings({ familyMembers: (settings.familyMembers || []).filter(x => x !== m) })}
-                        className="text-sky-400 hover:text-rose-600 transition ml-0.5 cursor-pointer"
+                        className="w-4 h-4 rounded-full text-sky-500 hover:text-rose-600 hover:bg-rose-50 transition ml-0.5 cursor-pointer inline-flex items-center justify-center shrink-0"
                       >
                         <X size={12} />
                       </button>

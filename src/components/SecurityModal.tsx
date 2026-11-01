@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, KeyRound, Shield, CheckCircle2, AlertCircle, RefreshCw, UserCheck, LogOut, Download } from 'lucide-react';
+import { X, Lock, KeyRound, CheckCircle2, AlertCircle, RefreshCw, UserCheck, LogOut, Download } from 'lucide-react';
 import { usePartner } from '../context/PartnerContext';
 
 interface SecurityModalProps {
@@ -86,7 +86,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 10000,
-        backgroundColor: 'rgba(15, 23, 42, 0.65)',
+        backgroundColor: 'rgba(15, 23, 42, 0.5)',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
@@ -107,15 +107,15 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
           overflowY: 'auto',
           background: '#ffffff',
           borderRadius: '24px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          padding: '1.75rem',
+          boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.2)',
+          padding: '1.5rem',
           boxSizing: 'border-box',
           position: 'relative'
         }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
             <div
               style={{
                 width: '42px',
@@ -125,34 +125,37 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
                 color: '#fff'
               }}
             >
               <KeyRound size={22} />
             </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#111827' }}>
+            <div style={{ minWidth: 0 }}>
+              <h3 style={{ margin: 0, fontSize: '1.12rem', fontWeight: 800, color: '#0f172a' }}>
                 Profile & Security
               </h3>
-              <span style={{ fontSize: '0.78rem', color: '#6b7280' }}>
+              <span style={{ fontSize: '0.78rem', color: '#475569', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 Manage PIN and settings for {activePartner.name}
               </span>
             </div>
           </div>
           <button
             type="button"
+            aria-label="Close"
             onClick={onClose}
             style={{
-              background: '#f3f4f6',
-              border: 'none',
+              background: '#f1f5f9',
+              border: '1px solid #e2e8f0',
               borderRadius: '50%',
-              width: '32px',
-              height: '32px',
-              display: 'flex',
+              width: '34px',
+              height: '34px',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
               cursor: 'pointer',
-              color: '#4b5563'
+              color: '#475569'
             }}
           >
             <X size={18} />
@@ -165,6 +168,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: '10px',
             padding: '0.85rem 1rem',
             borderRadius: '16px',
             background: isP1 ? 'rgba(124, 58, 237, 0.08)' : 'rgba(14, 165, 233, 0.08)',
@@ -172,25 +176,31 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             marginBottom: '1.25rem'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '1.4rem' }}>{activePartner.avatar}</span>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#111827' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+            <span style={{ fontSize: '1.4rem', flexShrink: 0 }}>{activePartner.avatar}</span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {activePartner.name}
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#6b7280' }}>
+              <div style={{ fontSize: '0.74rem', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 Active Profile • Fully Isolated Data
               </div>
             </div>
           </div>
           <span
             style={{
-              padding: '3px 8px',
+              padding: '4px 10px',
               borderRadius: '20px',
               fontSize: '0.72rem',
               fontWeight: 700,
+              lineHeight: 1,
               background: accentColor,
-              color: '#fff'
+              color: '#fff',
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
             {isP1 ? 'Partner 1' : 'Partner 2'}
@@ -214,20 +224,20 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               border: `1px solid ${statusMessage.type === 'success' ? '#a7f3d0' : '#fecaca'}`
             }}
           >
-            {statusMessage.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+            {statusMessage.type === 'success' ? <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> : <AlertCircle size={16} style={{ flexShrink: 0 }} />}
             <span>{statusMessage.text}</span>
           </div>
         )}
 
         {/* SECTION 1: RESET PASSCODE */}
-        <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
-          <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.92rem', fontWeight: 700, color: '#374151', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
+          <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Lock size={15} color={accentColor} /> Reset 6-Digit Passcode
           </h4>
 
           <form onSubmit={handleUpdatePin} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>
                 Current 6-Digit PIN
               </label>
               <input
@@ -236,22 +246,25 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 maxLength={6}
                 value={oldPin}
                 onChange={e => setOldPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="Enter current PIN (e.g. 689090)"
+                placeholder="Enter current PIN"
                 style={{
                   width: '100%',
+                  minWidth: 0,
                   padding: '9px 12px',
                   borderRadius: '10px',
-                  border: '1.5px solid #d1d5db',
-                  fontSize: '0.88rem',
+                  border: '1.5px solid #cbd5e1',
+                  fontSize: '16px',
+                  color: '#0f172a',
+                  background: '#ffffff',
                   outline: 'none',
                   boxSizing: 'border-box'
                 }}
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '10px' }}>
+              <div style={{ minWidth: 0 }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>
                   New 6-Digit PIN
                 </label>
                 <input
@@ -260,21 +273,24 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                   maxLength={6}
                   value={newPin}
                   onChange={e => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="New 6-digit PIN"
+                  placeholder="6 digits"
                   style={{
                     width: '100%',
+                    minWidth: 0,
                     padding: '9px 12px',
                     borderRadius: '10px',
-                    border: '1.5px solid #d1d5db',
-                    fontSize: '0.88rem',
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: '16px',
+                    color: '#0f172a',
+                    background: '#ffffff',
                     outline: 'none',
                     boxSizing: 'border-box'
                   }}
                 />
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>
+              <div style={{ minWidth: 0 }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>
                   Confirm New PIN
                 </label>
                 <input
@@ -283,13 +299,16 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                   maxLength={6}
                   value={confirmPin}
                   onChange={e => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="Re-enter new PIN"
+                  placeholder="Confirm PIN"
                   style={{
                     width: '100%',
+                    minWidth: 0,
                     padding: '9px 12px',
                     borderRadius: '10px',
-                    border: '1.5px solid #d1d5db',
-                    fontSize: '0.88rem',
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: '16px',
+                    color: '#0f172a',
+                    background: '#ffffff',
                     outline: 'none',
                     boxSizing: 'border-box'
                   }}
@@ -302,16 +321,18 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               disabled={isSubmitting || newPin.length !== 6 || confirmPin.length !== 6}
               style={{
                 marginTop: '4px',
-                padding: '10px',
+                minHeight: '44px',
+                padding: '10px 16px',
                 borderRadius: '12px',
                 border: 'none',
                 background: `linear-gradient(135deg, ${accentColor}, #4f46e5)`,
                 color: '#fff',
                 fontWeight: 700,
                 fontSize: '0.84rem',
+                lineHeight: 1,
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 opacity: newPin.length === 6 && confirmPin.length === 6 ? 1 : 0.6,
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
@@ -330,11 +351,11 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
         </div>
 
         {/* SECTION 2: EDIT PROFILE NAME */}
-        <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
-          <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.92rem', fontWeight: 700, color: '#374151', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '1.25rem', marginBottom: '1.1rem' }}>
+          <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <UserCheck size={15} color={accentColor} /> Display Name
           </h4>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <input
               type="text"
               value={customName}
@@ -342,11 +363,15 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               placeholder="e.g. Rajesh or Partner"
               style={{
                 flex: 1,
+                minWidth: 0,
                 padding: '9px 12px',
                 borderRadius: '10px',
-                border: '1.5px solid #d1d5db',
-                fontSize: '0.88rem',
-                outline: 'none'
+                border: '1.5px solid #cbd5e1',
+                fontSize: '16px',
+                color: '#0f172a',
+                background: '#ffffff',
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
             />
             <button
@@ -354,13 +379,20 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               onClick={handleUpdateName}
               disabled={nameSaving || !customName.trim()}
               style={{
-                padding: '9px 16px',
+                minHeight: '42px',
+                padding: '9px 14px',
                 borderRadius: '10px',
-                border: '1px solid #d1d5db',
-                background: '#f9fafb',
-                color: '#374151',
+                border: '1px solid #cbd5e1',
+                background: '#f8fafc',
+                color: '#0f172a',
                 fontWeight: 600,
                 fontSize: '0.82rem',
+                lineHeight: 1,
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer'
               }}
             >
@@ -369,9 +401,9 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
           </div>
         </div>
 
-        {/* SECTION 3: APP INSTALLATION */}
-        {!isInstalled && onInstallClick && (
-          <div>
+        {/* FOOTER ACTIONS: APP INSTALLATION + LOCK & SWITCH */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+          {!isInstalled && onInstallClick && (
             <button
               type="button"
               onClick={() => {
@@ -380,14 +412,16 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               }}
               style={{
                 width: '100%',
-                padding: '11px',
+                minHeight: '44px',
+                padding: '11px 14px',
                 borderRadius: '12px',
                 border: '1.5px solid #ddd6fe',
                 background: '#f5f3ff',
                 color: '#7c3aed',
                 fontWeight: 700,
                 fontSize: '0.84rem',
-                display: 'flex',
+                lineHeight: 1.2,
+                display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
@@ -395,13 +429,11 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 transition: 'all 0.15s ease'
               }}
             >
-              <Download size={16} /> Install App on this Device
+              <Download size={16} style={{ flexShrink: 0 }} />
+              <span>Install App on this Device</span>
             </button>
-          </div>
-        )}
+          )}
 
-        {/* SECTION 4: SWITCH PARTNER / LOCK */}
-        <div>
           <button
             type="button"
             onClick={() => {
@@ -410,21 +442,24 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             }}
             style={{
               width: '100%',
-              padding: '11px',
+              minHeight: '44px',
+              padding: '11px 14px',
               borderRadius: '12px',
-              border: '1.5px solid #fee2e2',
+              border: '1.5px solid #fecaca',
               background: '#fef2f2',
               color: '#dc2626',
               fontWeight: 700,
               fontSize: '0.84rem',
-              display: 'flex',
+              lineHeight: 1.2,
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
               cursor: 'pointer'
             }}
           >
-            <LogOut size={16} /> Lock & Switch to Other Partner
+            <LogOut size={16} style={{ flexShrink: 0 }} />
+            <span>Lock & Switch to Other Partner</span>
           </button>
         </div>
       </div>

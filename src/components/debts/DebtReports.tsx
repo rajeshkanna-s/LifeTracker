@@ -66,11 +66,12 @@ const DebtReports: React.FC<DebtReportsProps> = ({ debts, settings }) => {
           ) : (
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={progressData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" opacity={0.3} />
-                  <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <BarChart data={progressData} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                  <XAxis type="number" tick={{ fontSize: 10, fill: '#475569' }} hide />
+                  <YAxis dataKey="name" type="category" width={84} tick={{ fontSize: 11, fill: '#475569' }} axisLine={false} tickLine={false} />
                   <Tooltip 
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#0f172a', fontSize: '12px' }}
                     formatter={(v: any, name: any) => [`${settings.currencySymbol}${Number(v).toLocaleString()}`, name === 'paid' ? 'Paid' : 'Remaining']}
                   />
                   <Bar dataKey="paid" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />

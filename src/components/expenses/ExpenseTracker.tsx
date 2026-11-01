@@ -175,17 +175,17 @@ const ExpenseTracker: React.FC = () => {
     <div className="space-y-4">
       {/* Module Sub-tabs */}
       <div className="module-subtabs">
-        <button onClick={() => setActiveTab('home')} title="Home" aria-label="Home" className={`module-subtab ${activeTab === 'home' ? 'active-expense' : ''}`}>
+        <button type="button" onClick={() => setActiveTab('home')} title="Home" aria-label="Home" className={`module-subtab ${activeTab === 'home' ? 'active-expense' : ''}`}>
           <Home size={20} /> <span className="label-text">Home</span>
         </button>
-        <button onClick={() => openForm()} title="Add Expense" aria-label="Add Expense" className={`module-subtab ${activeTab === 'add' ? 'active-expense' : ''}`}
-          style={activeTab !== 'add' ? { color: '#a78bfa' } : {}}>
+        <button type="button" onClick={() => openForm()} title="Add Expense" aria-label="Add Expense" className={`module-subtab ${activeTab === 'add' ? 'active-expense' : ''}`}
+          style={activeTab !== 'add' ? { color: '#7c3aed' } : {}}>
           <Plus size={20} /> <span className="label-text">Add</span>
         </button>
-        <button onClick={() => setActiveTab('reports')} title="Reports" aria-label="Reports" className={`module-subtab ${activeTab === 'reports' ? 'active-expense' : ''}`}>
+        <button type="button" onClick={() => setActiveTab('reports')} title="Reports" aria-label="Reports" className={`module-subtab ${activeTab === 'reports' ? 'active-expense' : ''}`}>
           <ChartIcon size={20} /> <span className="label-text">Reports</span>
         </button>
-        <button onClick={() => setActiveTab('settings')} title="Settings" aria-label="Settings" className={`module-subtab ${activeTab === 'settings' ? 'active-expense' : ''}`}>
+        <button type="button" onClick={() => setActiveTab('settings')} title="Settings" aria-label="Settings" className={`module-subtab ${activeTab === 'settings' ? 'active-expense' : ''}`}>
           <SettingsIcon size={20} /> <span className="label-text">Settings</span>
         </button>
       </div>
@@ -222,6 +222,7 @@ const ExpenseTracker: React.FC = () => {
         <ExpenseForm
           initialData={editExpense}
           settings={settings}
+          expenses={expenses}
           onSubmit={handleAddExpense}
           onClose={() => { setShowAddModal(false); setEditExpense(undefined); }}
         />
