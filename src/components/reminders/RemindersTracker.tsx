@@ -66,6 +66,20 @@ export const RemindersTracker: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleOutside);
   }, [repeatDropdownOpen]);
 
+  const normalizeReminder = (r: any): ReminderItem => ({
+    id: r.id,
+    partner_id: r.partner_id,
+    title: r.title,
+    description: r.description || undefined,
+    reminder_date: r.reminder_date,
+    reminder_time: r.reminder_time ? r.reminder_time.slice(0, 5) : '08:00',
+    repeat_type: (r.repeat_type as RepeatType) || 'none',
+    is_completed: Boolean(r.is_completed),
+    notification_sent: Boolean(r.notification_sent),
+    created_at: r.created_at || new Date().toISOString(),
+    updated_at: r.updated_at
+  });
+
   // Listen for global reminder updates (e.g. from app-level background ticker)
   useEffect(() => {
     const handleGlobalUpdate = () => {
@@ -75,7 +89,7 @@ export const RemindersTracker: React.FC = () => {
         try {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) {
-            setReminders(parsed.filter(r => r && r.partner_id === activePartnerId));
+            setReminders(parsed.map(normalizeReminder).filter(r => r && r.partner_id === activePartnerId));
           }
         } catch {}
       }
@@ -95,21 +109,32 @@ export const RemindersTracker: React.FC = () => {
 
       let hasTriggered = false;
       const updated = reminders.map(item => {
+        const rTime = (item.reminder_time || '').slice(0, 5);
         // Trigger if due right now or overdue on today/past date without notification having fired yet
         const isDue = (
           !item.is_completed &&
           !item.notification_sent &&
-          (item.reminder_date < todayStr || (item.reminder_date === todayStr && item.reminder_time <= currentTimeStr))
+          (item.reminder_date < todayStr || (item.reminder_date === todayStr && rTime <= currentTimeStr))
         );
 
         if (isDue) {
           hasTriggered = true;
-          // Trigger audio chime & browser notification (Android status bar via ServiceWorker)
           playReminderChime();
           sendBrowserNotification(
             `⏰ Remainder: ${item.title}`,
-            item.description || `Scheduled for ${item.reminder_time}`
+            item.description || `Scheduled for ${rTime}`
           );
+
+          // Update in Supabase reminders table
+          supabase
+            .from('reminders')
+            .update({
+              notification_sent: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', item.id)
+            .eq('partner_id', activePartnerId)
+            .then();
 
           // Handle Repeat logic
           if (item.repeat_type !== 'none') {
@@ -136,8 +161,8 @@ export const RemindersTracker: React.FC = () => {
       }
     };
 
-    const timer = setInterval(checkSchedule, 8000); // Check every 8 seconds
-    checkSchedule(); // Immediate evaluation
+    const timer = setInterval(checkSchedule, 8000);
+    checkSchedule();
     return () => clearInterval(timer);
   }, [reminders]);
 
@@ -152,17 +177,16 @@ export const RemindersTracker: React.FC = () => {
 
   const loadReminders = async () => {
     setLoading(true);
-    setReminders([]);
     const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
     let loaded: ReminderItem[] = [];
 
-    // 1. Try local cache first for instant render
+    // 1. Try local cache first for instant 0ms render
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          loaded = parsed.filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          loaded = parsed.map(normalizeReminder).filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
           setReminders(loaded);
         }
       }
@@ -170,7 +194,7 @@ export const RemindersTracker: React.FC = () => {
       // ignore
     }
 
-    // 2. Try Supabase dedicated table 'reminders'
+    // 2. Query Supabase dedicated table 'reminders'
     try {
       const { data: tableData, error: tableErr } = await supabase
         .from('reminders')
@@ -179,15 +203,68 @@ export const RemindersTracker: React.FC = () => {
         .order('reminder_date', { ascending: true })
         .order('reminder_time', { ascending: true });
 
-      if (!tableErr && tableData && Array.isArray(tableData)) {
-        const filteredTable = tableData.filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
-        setReminders(filteredTable);
-        localStorage.setItem(storageKey, JSON.stringify(filteredTable));
-        setLoading(false);
-        return;
+      if (!tableErr && tableData) {
+        if (tableData.length > 0) {
+          const normalized = tableData.map(normalizeReminder).filter(r => r.partner_id === activePartnerId);
+          setReminders(normalized);
+          localStorage.setItem(storageKey, JSON.stringify(normalized));
+          setLoading(false);
+          return;
+        } else {
+          // Check if expense_settings has items to migrate to reminders table
+          const { data: setRow } = await supabase
+            .from('expense_settings')
+            .select('settings_json')
+            .eq('partner_id', activePartnerId)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (setRow?.settings_json?.reminders && Array.isArray(setRow.settings_json.reminders) && setRow.settings_json.reminders.length > 0) {
+            const cloudReminders = setRow.settings_json.reminders
+              .map(normalizeReminder)
+              .filter((r: ReminderItem) => r.partner_id === activePartnerId);
+
+            if (cloudReminders.length > 0) {
+              for (const item of cloudReminders) {
+                await supabase.from('reminders').insert({
+                  partner_id: activePartnerId,
+                  title: item.title,
+                  description: item.description || null,
+                  reminder_date: item.reminder_date,
+                  reminder_time: item.reminder_time.length === 5 ? item.reminder_time + ':00' : item.reminder_time,
+                  repeat_type: item.repeat_type || 'none',
+                  is_completed: item.is_completed || false,
+                  notification_sent: item.notification_sent || false,
+                  created_at: item.created_at || new Date().toISOString()
+                });
+              }
+
+              const { data: refetched } = await supabase
+                .from('reminders')
+                .select('*')
+                .eq('partner_id', activePartnerId)
+                .order('reminder_date', { ascending: true });
+
+              if (refetched && refetched.length > 0) {
+                const finalItems = refetched.map(normalizeReminder);
+                setReminders(finalItems);
+                localStorage.setItem(storageKey, JSON.stringify(finalItems));
+                setLoading(false);
+                return;
+              }
+            }
+          }
+
+          // Truly empty
+          setReminders([]);
+          localStorage.setItem(storageKey, JSON.stringify([]));
+          setLoading(false);
+          return;
+        }
       }
-    } catch {
-      // Table might not exist yet, fallback to expense_settings
+    } catch (e) {
+      console.warn('Dedicated reminders table query error, falling back to expense_settings', e);
     }
 
     // 3. Fallback to expense_settings.settings_json.reminders
@@ -201,10 +278,12 @@ export const RemindersTracker: React.FC = () => {
         .single();
 
       if (setRow?.settings_json?.reminders && Array.isArray(setRow.settings_json.reminders)) {
-        const filteredCloud = setRow.settings_json.reminders.filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
+        const filteredCloud = setRow.settings_json.reminders
+          .map(normalizeReminder)
+          .filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
         setReminders(filteredCloud);
         localStorage.setItem(storageKey, JSON.stringify(filteredCloud));
-      } else if (loaded.length === 0) {
+      } else {
         setReminders([]);
         localStorage.setItem(storageKey, JSON.stringify([]));
       }
@@ -215,25 +294,7 @@ export const RemindersTracker: React.FC = () => {
     }
   };
 
-  const saveReminders = async (updated: ReminderItem[]) => {
-    const sanitized = updated.map(r => ({ ...r, partner_id: activePartnerId }));
-    setReminders(sanitized);
-    const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
-    localStorage.setItem(storageKey, JSON.stringify(sanitized));
-
-    // 1. Try Supabase dedicated table 'reminders' if available
-    try {
-      // Check if table is available
-      const { error: testErr } = await supabase.from('reminders').select('id').limit(1);
-      if (!testErr) {
-        // If table exists, we can upsert or sync
-        // To be safe, we also save to expense_settings so data is 100% persisted
-      }
-    } catch {
-      // ignore
-    }
-
-    // 2. Persist to expense_settings.settings_json.reminders
+  const syncToExpenseSettings = async (list: ReminderItem[]) => {
     try {
       const { data: row } = await supabase
         .from('expense_settings')
@@ -244,7 +305,7 @@ export const RemindersTracker: React.FC = () => {
         .single();
 
       if (row) {
-        const newSettings = { ...(row.settings_json || {}), reminders: updated };
+        const newSettings = { ...(row.settings_json || {}), reminders: list };
         await supabase
           .from('expense_settings')
           .update({ settings_json: newSettings, updated_at: new Date().toISOString() })
@@ -252,13 +313,21 @@ export const RemindersTracker: React.FC = () => {
       } else {
         await supabase.from('expense_settings').insert({
           partner_id: activePartnerId,
-          settings_json: { reminders: updated },
+          settings_json: { reminders: list },
           updated_at: new Date().toISOString()
         });
       }
     } catch (e) {
-      console.warn('Failed to sync reminders to Supabase', e);
+      console.warn('Failed to mirror reminders to expense_settings', e);
     }
+  };
+
+  const saveReminders = async (updated: ReminderItem[]) => {
+    const sanitized = updated.map(r => ({ ...r, partner_id: activePartnerId }));
+    setReminders(sanitized);
+    const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
+    localStorage.setItem(storageKey, JSON.stringify(sanitized));
+    syncToExpenseSettings(sanitized);
   };
 
   const handleOpenAdd = () => {
@@ -283,30 +352,53 @@ export const RemindersTracker: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleSaveModal = (e: React.FormEvent) => {
+  const handleSaveModal = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanTitle = title.trim();
     if (!cleanTitle) return;
 
     if (editingReminder) {
-      const updated = reminders.map(r =>
-        r.id === editingReminder.id
-          ? {
-              ...r,
-              title: cleanTitle,
-              description: description.trim() || undefined,
-              reminder_date: dateVal,
-              reminder_time: timeVal,
-              repeat_type: repeatVal,
-              notification_sent: false,
-              updated_at: new Date().toISOString()
-            }
-          : r
-      );
-      saveReminders(updated);
+      const updatedItem: ReminderItem = {
+        ...editingReminder,
+        title: cleanTitle,
+        description: description.trim() || undefined,
+        reminder_date: dateVal,
+        reminder_time: timeVal,
+        repeat_type: repeatVal,
+        notification_sent: false,
+        updated_at: new Date().toISOString(),
+        partner_id: activePartnerId
+      };
+
+      const updatedList = reminders.map(r => r.id === editingReminder.id ? updatedItem : r);
+      setReminders(updatedList);
+      localStorage.setItem(`${STORAGE_KEY_PREFIX}${activePartnerId}`, JSON.stringify(updatedList));
+      setShowModal(false);
+
+      // Direct write to Supabase dedicated 'reminders' table
+      try {
+        await supabase
+          .from('reminders')
+          .update({
+            title: cleanTitle,
+            description: description.trim() || null,
+            reminder_date: dateVal,
+            reminder_time: timeVal.length === 5 ? timeVal + ':00' : timeVal,
+            repeat_type: repeatVal,
+            notification_sent: false,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingReminder.id)
+          .eq('partner_id', activePartnerId);
+      } catch (err) {
+        console.warn('Error updating in reminders table', err);
+      }
+
+      syncToExpenseSettings(updatedList);
     } else {
+      const newUuid = crypto.randomUUID();
       const newItem: ReminderItem = {
-        id: 'rem-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+        id: newUuid,
         partner_id: activePartnerId,
         title: cleanTitle,
         description: description.trim() || undefined,
@@ -317,23 +409,78 @@ export const RemindersTracker: React.FC = () => {
         notification_sent: false,
         created_at: new Date().toISOString()
       };
-      saveReminders([newItem, ...reminders]);
+
+      const updatedList = [newItem, ...reminders];
+      setReminders(updatedList);
+      localStorage.setItem(`${STORAGE_KEY_PREFIX}${activePartnerId}`, JSON.stringify(updatedList));
+      setShowModal(false);
+
+      // Direct write to Supabase dedicated 'reminders' table
+      try {
+        await supabase
+          .from('reminders')
+          .insert({
+            id: newUuid,
+            partner_id: activePartnerId,
+            title: cleanTitle,
+            description: description.trim() || null,
+            reminder_date: dateVal,
+            reminder_time: timeVal.length === 5 ? timeVal + ':00' : timeVal,
+            repeat_type: repeatVal,
+            is_completed: false,
+            notification_sent: false,
+            created_at: new Date().toISOString()
+          });
+      } catch (err) {
+        console.warn('Error inserting into reminders table', err);
+      }
+
+      syncToExpenseSettings(updatedList);
     }
-
-    setShowModal(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const updated = reminders.filter(r => r.id !== id);
-    saveReminders(updated);
+    setReminders(updated);
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}${activePartnerId}`, JSON.stringify(updated));
     if (showModal) setShowModal(false);
+
+    try {
+      await supabase
+        .from('reminders')
+        .delete()
+        .eq('id', id)
+        .eq('partner_id', activePartnerId);
+    } catch (err) {
+      console.warn('Error deleting reminder from table', err);
+    }
+    syncToExpenseSettings(updated);
   };
 
-  const handleToggleComplete = (id: string) => {
+  const handleToggleComplete = async (id: string) => {
+    const target = reminders.find(r => r.id === id);
+    if (!target) return;
+    const nextStatus = !target.is_completed;
+
     const updated = reminders.map(r =>
-      r.id === id ? { ...r, is_completed: !r.is_completed } : r
+      r.id === id ? { ...r, is_completed: nextStatus } : r
     );
-    saveReminders(updated);
+    setReminders(updated);
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}${activePartnerId}`, JSON.stringify(updated));
+
+    try {
+      await supabase
+        .from('reminders')
+        .update({
+          is_completed: nextStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .eq('partner_id', activePartnerId);
+    } catch (err) {
+      console.warn('Error updating status in table', err);
+    }
+    syncToExpenseSettings(updated);
   };
 
   const handleRequestPermission = async () => {

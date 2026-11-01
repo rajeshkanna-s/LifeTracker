@@ -52,18 +52,19 @@ const AppContent: React.FC = () => {
 
         let changed = false;
         const updated = list.map((item: any) => {
+          const rTime = (item.reminder_time || '').slice(0, 5);
           if (
             item &&
             item.partner_id === activePartnerId &&
             !item.is_completed &&
             !item.notification_sent &&
-            (item.reminder_date < todayStr || (item.reminder_date === todayStr && item.reminder_time <= currentTimeStr))
+            (item.reminder_date < todayStr || (item.reminder_date === todayStr && rTime <= currentTimeStr))
           ) {
             changed = true;
             playReminderChime();
             sendBrowserNotification(
               `⏰ Remainder: ${item.title}`,
-              item.description || `Scheduled for ${item.reminder_time}`
+              item.description || `Scheduled for ${rTime}`
             );
 
             if (item.repeat_type && item.repeat_type !== 'none') {
