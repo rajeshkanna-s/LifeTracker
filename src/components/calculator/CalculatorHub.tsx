@@ -9,10 +9,41 @@ import {
   Wallet,
   Clock,
   Receipt,
-  Zap
+  Zap,
+  ExternalLink
 } from 'lucide-react';
 
 type CalcTab = 'basic' | 'emi' | 'loan' | 'gst' | 'interest';
+
+// External calculator links (open in new tab)
+const EXTERNAL_CALC_GROUPS: { title: string; items: { label: string; url: string; emoji: string; bg: string }[] }[] = [
+  {
+    title: 'Investments',
+    items: [
+      { label: 'FD Calculator', url: 'https://zezhatools.com/investments/fd-calculator', emoji: '🏦', bg: '#ecfdf5' },
+      { label: 'RD Calculator', url: 'https://zezhatools.com/investments/rd-calculator', emoji: '💰', bg: '#f0fdfa' },
+      { label: 'SIP Calculator', url: 'https://zezhatools.com/investments/sip-calculator', emoji: '📈', bg: '#eff6ff' },
+      { label: 'Gold & Silver', url: 'https://zezhatools.com/investments/precious-metals-calculator', emoji: '🪙', bg: '#fffbeb' }
+    ]
+  },
+  {
+    title: 'Loans & EMI',
+    items: [
+      { label: 'Loan Calculator', url: 'https://zezhatools.com/loans-emi/loan-calculator', emoji: '🏠', bg: '#fef2f2' },
+      { label: 'Loan Compare', url: 'https://zezhatools.com/loans-emi/loan-compare', emoji: '⚖️', bg: '#f5f3ff' }
+    ]
+  },
+  {
+    title: 'Utilities',
+    items: [
+      { label: 'Currency', url: 'https://zezhatools.com/utilities/currency-calculator', emoji: '💱', bg: '#ecfeff' },
+      { label: 'Unit Converter', url: 'https://zezhatools.com/utilities/unit-converter', emoji: '📏', bg: '#f8fafc' },
+      { label: 'Percentage', url: 'https://zezhatools.com/utilities/percentage-calculator', emoji: '％', bg: '#fdf2f8' },
+      { label: 'Value of %', url: 'https://zezhatools.com/utilities/value-of-percentage', emoji: '🔢', bg: '#eef2ff' },
+      { label: 'Age / DOB', url: 'https://zezhatools.com/utilities/dob-calculator', emoji: '🎂', bg: '#fff7ed' }
+    ]
+  }
+];
 
 // ══════════════════════════════════════════════════════════════
 // CLEAN, ALIGNED CALCULATOR FIELD (Groww / Zerodha Style)
@@ -1186,6 +1217,49 @@ export const CalculatorHub: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* ════════ More Calculators (External Tools) ════════ */}
+      <div className="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 inline-flex items-center justify-center shrink-0">
+              <Zap size={16} />
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-sm font-extrabold text-slate-900 leading-tight">More Calculators</h3>
+              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">Opens in a new tab</p>
+            </div>
+          </div>
+        </div>
+
+        {EXTERNAL_CALC_GROUPS.map(group => (
+          <div key={group.title} className="mb-3 last:mb-0">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">{group.title}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {group.items.map(item => (
+                <a
+                  key={item.url}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-2.5 min-h-[52px] px-3 py-2 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 active:scale-[0.97] transition no-underline min-w-0"
+                >
+                  <span
+                    className="w-8 h-8 rounded-xl inline-flex items-center justify-center shrink-0 text-base leading-none"
+                    style={{ background: item.bg }}
+                  >
+                    {item.emoji}
+                  </span>
+                  <span className="flex-1 min-w-0 text-xs font-bold text-slate-800 leading-tight">
+                    {item.label}
+                  </span>
+                  <ExternalLink size={13} className="text-slate-400 group-hover:text-emerald-600 shrink-0" />
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

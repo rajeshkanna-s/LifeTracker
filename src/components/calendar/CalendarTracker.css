@@ -987,7 +987,7 @@
   gap: 14px;
 }
 
-.cal-modal-body > * {
+.cal-modal-body>* {
   flex-shrink: 0;
 }
 
