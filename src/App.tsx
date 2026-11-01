@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PartnerProvider, usePartner } from './context/PartnerContext';
 import { ThemeProvider } from './context/ThemeContext';
 import PartnerGateway from './components/PartnerGateway';
@@ -25,10 +25,104 @@ import { AppInstallBanner } from './components/AppInstallBanner';
 import { playReminderChime, sendBrowserNotification } from './utils/notificationService';
 import { formatLocalDate } from './utils/expenseUtils';
 
+const VALID_TABS: readonly TabId[] = [
+  'expenses',
+  'accounts',
+  'budgets',
+  'goals',
+  'calendar',
+  'calculator',
+  'warranties',
+  'debt',
+  'jobs',
+  'habits',
+  'fitness',
+  'notes',
+  'routines',
+  'vault',
+  'remainder'
+];
+
+function isValidTab(tab: unknown): tab is TabId {
+  return typeof tab === 'string' && (VALID_TABS as readonly string[]).includes(tab);
+}
+
+function getSavedTab(partnerId?: string): TabId {
+  try {
+    const hash = window.location.hash.replace(/^#/, '').trim();
+    if (isValidTab(hash)) return hash;
+
+    if (partnerId) {
+      const partnerSaved = sessionStorage.getItem(`mylife_active_tab_${partnerId}`) || localStorage.getItem(`mylife_active_tab_${partnerId}`);
+      if (isValidTab(partnerSaved)) return partnerSaved;
+    }
+
+    const globalSaved = sessionStorage.getItem('mylife_active_tab') || localStorage.getItem('mylife_active_tab');
+    if (isValidTab(globalSaved)) return globalSaved;
+  } catch {
+    // ignore
+  }
+  return 'expenses';
+}
+
+function persistActiveTab(tab: TabId, partnerId?: string) {
+  try {
+    sessionStorage.setItem('mylife_active_tab', tab);
+    localStorage.setItem('mylife_active_tab', tab);
+    if (partnerId) {
+      sessionStorage.setItem(`mylife_active_tab_${partnerId}`, tab);
+      localStorage.setItem(`mylife_active_tab_${partnerId}`, tab);
+    }
+    if (window.history && window.history.replaceState) {
+      const targetHash = tab === 'expenses' ? '' : `#${tab}`;
+      const newUrl = `${window.location.pathname}${window.location.search}${targetHash}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+  } catch {
+    // ignore
+  }
+}
+
 const AppContent: React.FC = () => {
   const { isUnlocked, activePartnerId } = usePartner();
-  const [activeTab, setActiveTab] = useState<TabId>('expenses');
-  const [tabHistory, setTabHistory] = useState<TabId[]>(['expenses']);
+  const [activeTab, setActiveTab] = useState<TabId>(() => getSavedTab(activePartnerId));
+  const [tabHistory, setTabHistory] = useState<TabId[]>(() => {
+    const initial = getSavedTab(activePartnerId);
+    return initial === 'expenses' ? ['expenses'] : ['expenses', initial];
+  });
+
+  const prevPartnerIdRef = useRef<string>(activePartnerId);
+
+  // Sync initial tab state to URL & storage on mount so everything is unified
+  useEffect(() => {
+    persistActiveTab(activeTab, activePartnerId);
+  }, []);
+
+  // When switching between partners, switch to the newly active partner's saved tab
+  useEffect(() => {
+    if (prevPartnerIdRef.current !== activePartnerId) {
+      prevPartnerIdRef.current = activePartnerId;
+      const partnerTab = getSavedTab(activePartnerId);
+      setActiveTab(partnerTab);
+      setTabHistory(partnerTab === 'expenses' ? ['expenses'] : ['expenses', partnerTab]);
+      persistActiveTab(partnerTab, activePartnerId);
+    }
+  }, [activePartnerId]);
+
+  // Listen to browser navigation (back/forward button hash changes)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace(/^#/, '').trim();
+      const targetTab = isValidTab(hash) ? hash : 'expenses';
+      if (targetTab !== activeTab) {
+        setActiveTab(targetTab);
+        setTabHistory(prev => [...prev, targetTab]);
+        persistActiveTab(targetTab, activePartnerId);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [activeTab, activePartnerId]);
 
   // Universal background reminder engine: checks due reminders every 12 seconds
   // across all pages and pushes notifications to the mobile top bar and audio chime
@@ -115,14 +209,9 @@ const AppContent: React.FC = () => {
     setShowInstallModal
   } = usePWA();
 
-  // Reset to first page ('expenses') whenever partner is switched or application is unlocked
-  useEffect(() => {
-    setActiveTab('expenses');
-    setTabHistory(['expenses']);
-  }, [activePartnerId, isUnlocked]);
-
   const handleTabChange = (newTab: TabId) => {
     if (newTab === activeTab) return;
+    persistActiveTab(newTab, activePartnerId);
     setTabHistory(prev => [...prev, newTab]);
     setActiveTab(newTab);
   };
@@ -139,9 +228,11 @@ const AppContent: React.FC = () => {
       const prevTab = newHistory[newHistory.length - 1];
       setTabHistory(newHistory);
       setActiveTab(prevTab);
+      persistActiveTab(prevTab, activePartnerId);
     } else if (activeTab !== 'expenses') {
       setActiveTab('expenses');
       setTabHistory(['expenses']);
+      persistActiveTab('expenses', activePartnerId);
     }
   };
 
