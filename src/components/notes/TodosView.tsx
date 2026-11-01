@@ -85,19 +85,20 @@ export const TodosView: React.FC = () => {
     setLoading(true);
     const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
     let localItems: TodoItem[] = [];
+    const raw = localStorage.getItem(storageKey);
+    const hasLocal = raw !== null;
 
     // 1. Try local storage first for 0ms render
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
+    if (hasLocal) {
+      try {
         localItems = JSON.parse(raw);
         setTodos(localItems);
+      } catch (e) {
+        console.warn('Failed to parse local todos', e);
       }
-    } catch (e) {
-      console.warn('Failed to parse local todos', e);
     }
 
-    // 2. Sync from Supabase settings_json.notesTodos
+    // 2. Sync from Supabase settings_json.notesTodos for this activePartnerId
     try {
       setIsSyncing(true);
       const { data } = await supabase
@@ -108,15 +109,12 @@ export const TodosView: React.FC = () => {
         .limit(1)
         .single();
 
-      if (data?.settings_json?.notesTodos && Array.isArray(data.settings_json.notesTodos)) {
+      if (data?.settings_json?.notesTodos !== undefined && Array.isArray(data.settings_json.notesTodos)) {
         const cloudTodos: TodoItem[] = data.settings_json.notesTodos;
-        // Merge or adopt cloud items
-        if (cloudTodos.length > 0 || localItems.length === 0) {
-          setTodos(cloudTodos);
-          localStorage.setItem(storageKey, JSON.stringify(cloudTodos));
-        }
-      } else if (localItems.length === 0) {
-        // Sample starter todos matching reference screenshot if completely fresh
+        setTodos(cloudTodos);
+        localStorage.setItem(storageKey, JSON.stringify(cloudTodos));
+      } else if (!hasLocal) {
+        // First-time seed only if neither local nor cloud exists yet
         const sampleTodos: TodoItem[] = [
           {
             id: 'sample-1',
@@ -143,6 +141,7 @@ export const TodosView: React.FC = () => {
         ];
         setTodos(sampleTodos);
         localStorage.setItem(storageKey, JSON.stringify(sampleTodos));
+        persistTodos(sampleTodos);
       }
     } catch (err) {
       console.warn('Supabase todos sync fallback to localStorage', err);
@@ -175,6 +174,14 @@ export const TodosView: React.FC = () => {
           .from('expense_settings')
           .update({ settings_json: newSettings, updated_at: new Date().toISOString() })
           .eq('id', row.id);
+      } else {
+        await supabase
+          .from('expense_settings')
+          .insert({
+            partner_id: activePartnerId,
+            settings_json: { notesTodos: updated },
+            updated_at: new Date().toISOString()
+          });
       }
     } catch (err) {
       console.warn('Failed to sync todos to Supabase', err);
