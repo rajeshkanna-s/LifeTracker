@@ -26,11 +26,15 @@ const DebtTracker: React.FC = () => {
   const [editDebt, setEditDebt] = useState<Partial<Debt> | undefined>();
 
   useEffect(() => {
+    setDebts([]);
+    setPayments([]);
     fetchData();
   }, [activePartnerId]);
 
   const fetchData = async () => {
     setLoading(true);
+    setDebts([]);
+    setPayments([]);
     // Strict partner isolation
     const { data: dData } = await supabase
       .from('debts')
@@ -38,7 +42,7 @@ const DebtTracker: React.FC = () => {
       .eq('partner_id', activePartnerId)
       .order('created_at', { ascending: false });
 
-    if (dData) setDebts(dData);
+    if (dData) setDebts(dData.filter(d => !d.partner_id || d.partner_id === activePartnerId));
     else setDebts([]);
     
     const { data: pData } = await supabase
@@ -46,7 +50,7 @@ const DebtTracker: React.FC = () => {
       .select('*')
       .eq('partner_id', activePartnerId);
 
-    if (pData) setPayments(pData);
+    if (pData) setPayments(pData.filter(p => !p.partner_id || p.partner_id === activePartnerId));
     else setPayments([]);
 
     const { data: setObj, error } = await supabase

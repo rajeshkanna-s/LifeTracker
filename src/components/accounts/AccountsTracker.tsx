@@ -60,11 +60,13 @@ export const AccountsTracker: React.FC = () => {
   const [transferAmount, setTransferAmount] = useState<string>('');
 
   useEffect(() => {
+    setAccounts([]);
     fetchAccounts();
   }, [activePartnerId]);
 
   const fetchAccounts = async () => {
     setLoading(true);
+    setAccounts([]);
     const { data: setObj } = await supabase
       .from('expense_settings')
       .select('*')
@@ -79,22 +81,27 @@ export const AccountsTracker: React.FC = () => {
       const sJson = setObj.settings_json || {};
       setSettings({ ...defaults, ...sJson });
       if (Array.isArray(sJson.customAccounts)) {
-        setAccounts(sJson.customAccounts);
+        setAccounts(sJson.customAccounts.filter((a: any) => !a.partner_id || a.partner_id === activePartnerId));
       } else if (activePartnerId === 'partner_1') {
-        setAccounts(DEFAULT_ACCOUNTS);
+        setAccounts(DEFAULT_ACCOUNTS.map(a => ({ ...a, partner_id: 'partner_1' })));
       } else {
         setAccounts([]);
       }
     } else {
       setSettings(defaults);
-      setAccounts(DEFAULT_ACCOUNTS);
+      if (activePartnerId === 'partner_1') {
+        setAccounts(DEFAULT_ACCOUNTS.map(a => ({ ...a, partner_id: 'partner_1' })));
+      } else {
+        setAccounts([]);
+      }
     }
     setLoading(false);
   };
 
   const persistAccounts = async (updated: AccountItem[]) => {
-    setAccounts(updated);
-    const newSettings = { ...settings, customAccounts: updated };
+    const sanitized = updated.map(a => ({ ...a, partner_id: activePartnerId }));
+    setAccounts(sanitized);
+    const newSettings = { ...settings, customAccounts: sanitized };
     setSettings(newSettings);
     if (settingsId) {
       await supabase
@@ -121,8 +128,10 @@ export const AccountsTracker: React.FC = () => {
   };
 
   const totalNetWorth = useMemo(() => {
-    return accounts.reduce((acc, a) => acc + (Number(a.balance) || 0), 0);
-  }, [accounts]);
+    return accounts
+      .filter(a => !a.partner_id || a.partner_id === activePartnerId)
+      .reduce((acc, a) => acc + (Number(a.balance) || 0), 0);
+  }, [accounts, activePartnerId]);
 
   const handleOpenAdd = () => {
     setEditingAccount(null);

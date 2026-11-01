@@ -24,6 +24,7 @@ const ExpenseTracker: React.FC = () => {
   const [editExpense, setEditExpense] = useState<Partial<Expense> | undefined>();
 
   useEffect(() => {
+    setExpenses([]);
     fetchData();
     setActiveTab('home');
   }, [activePartnerId]);
@@ -42,6 +43,7 @@ const ExpenseTracker: React.FC = () => {
 
   const fetchData = async () => {
     setLoading(true);
+    setExpenses([]);
     // Strict partner isolation: only load expenses for the current active partner
     const { data: expData } = await supabase
       .from('expenses')
@@ -49,7 +51,7 @@ const ExpenseTracker: React.FC = () => {
       .eq('partner_id', activePartnerId)
       .order('date', { ascending: false });
 
-    if (expData) setExpenses(expData.map(normalizeTransaction));
+    if (expData) setExpenses(expData.filter(e => !e.partner_id || e.partner_id === activePartnerId).map(normalizeTransaction));
     else setExpenses([]);
 
     // Strict partner isolation for settings

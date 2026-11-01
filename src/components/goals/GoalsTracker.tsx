@@ -59,11 +59,13 @@ export const GoalsTracker: React.FC = () => {
   const [status, setStatus] = useState<'active' | 'paused' | 'reached'>('active');
 
   useEffect(() => {
+    setGoals([]);
     fetchGoals();
   }, [activePartnerId]);
 
   const fetchGoals = async () => {
     setLoading(true);
+    setGoals([]);
     const { data: setObj } = await supabase
       .from('expense_settings')
       .select('*')
@@ -78,7 +80,7 @@ export const GoalsTracker: React.FC = () => {
       const sJson = setObj.settings_json || {};
       setSettings({ ...defaults, ...sJson });
       if (Array.isArray(sJson.customGoals)) {
-        setGoals(sJson.customGoals);
+        setGoals(sJson.customGoals.filter((g: any) => !g.partner_id || g.partner_id === activePartnerId));
       } else if (activePartnerId === 'partner_1') {
         setGoals([
           {
@@ -89,7 +91,8 @@ export const GoalsTracker: React.FC = () => {
             deadline: '2026-12-31',
             icon: '🛡️',
             color: '#f59e0b',
-            status: 'active'
+            status: 'active',
+            partner_id: 'partner_1'
           },
           {
             id: 'g-2',
@@ -99,7 +102,8 @@ export const GoalsTracker: React.FC = () => {
             deadline: '2026-11-20',
             icon: '🏖️',
             color: '#10b981',
-            status: 'active'
+            status: 'active',
+            partner_id: 'partner_1'
           }
         ]);
       } else {
@@ -107,13 +111,15 @@ export const GoalsTracker: React.FC = () => {
       }
     } else {
       setSettings(defaults);
+      setGoals([]);
     }
     setLoading(false);
   };
 
   const persistGoals = async (updated: SavingsGoal[]) => {
-    setGoals(updated);
-    const newSettings = { ...settings, customGoals: updated };
+    const sanitized = updated.map(g => ({ ...g, partner_id: activePartnerId }));
+    setGoals(sanitized);
+    const newSettings = { ...settings, customGoals: sanitized };
     setSettings(newSettings);
     if (settingsId) {
       await supabase
@@ -140,13 +146,15 @@ export const GoalsTracker: React.FC = () => {
   };
 
   const filteredGoals = useMemo(() => {
-    return goals.filter(g => {
-      const isReached = g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount);
-      if (goalTab === 'reached') return isReached;
-      if (goalTab === 'paused') return g.status === 'paused';
-      return g.status === 'active' || (!g.status && g.savedAmount < g.targetAmount);
-    });
-  }, [goals, goalTab]);
+    return goals
+      .filter(g => !g.partner_id || g.partner_id === activePartnerId)
+      .filter(g => {
+        const isReached = g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount);
+        if (goalTab === 'reached') return isReached;
+        if (goalTab === 'paused') return g.status === 'paused';
+        return g.status === 'active' || (!g.status && g.savedAmount < g.targetAmount);
+      });
+  }, [goals, goalTab, activePartnerId]);
 
   const toggleReachedGoal = async (g: SavingsGoal) => {
     const isCurrentlyReached = g.status === 'reached' || (!g.status && g.savedAmount >= g.targetAmount);

@@ -29,17 +29,21 @@ const JobTracker: React.FC = () => {
     interview_date: '', interview_time: '', interview_mode: '', offer_amount: '', notes: ''
   });
 
-  useEffect(() => { fetchData(); }, [activePartnerId]);
+  useEffect(() => {
+    setJobs([]);
+    fetchData();
+  }, [activePartnerId]);
 
   const fetchData = async () => {
     setLoading(true);
+    setJobs([]);
     const { data } = await supabase
       .from('job_applications')
       .select('*')
       .eq('partner_id', activePartnerId)
       .order('applied_date', { ascending: false });
 
-    if (data) setJobs(data);
+    if (data) setJobs(data.filter(j => !j.partner_id || j.partner_id === activePartnerId));
     else setJobs([]);
 
     const { data: setObj, error } = await supabase

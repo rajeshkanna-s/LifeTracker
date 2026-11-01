@@ -90,22 +90,22 @@ const AppContent: React.FC = () => {
             isInstalled={isInstalled}
           />
 
-          <main>
-            {activeTab === 'expenses' && <ExpenseTracker />}
-            {activeTab === 'accounts' && <AccountsTracker />}
-            {activeTab === 'budgets' && <BudgetsTracker />}
-            {activeTab === 'goals' && <GoalsTracker />}
-            {activeTab === 'calendar' && <CalendarTracker onNavigateTab={handleTabChange} />}
-            {activeTab === 'calculator' && <CalculatorHub />}
-            {activeTab === 'warranties' && <WarrantiesTracker />}
-            {activeTab === 'debt' && <DebtTracker />}
-            {activeTab === 'jobs' && <JobTracker />}
-            {activeTab === 'habits' && <HabitTracker />}
-            {activeTab === 'fitness' && <FitnessTracker />}
-            {activeTab === 'notes' && <NotesTracker />}
-            {activeTab === 'routines' && <RoutineTracker />}
-            {activeTab === 'vault' && <VaultTracker />}
-            {activeTab === 'remainder' && <RemindersTracker />}
+          <main key={activePartnerId}>
+            {activeTab === 'expenses' && <ExpenseTracker key={`expenses-${activePartnerId}`} />}
+            {activeTab === 'accounts' && <AccountsTracker key={`accounts-${activePartnerId}`} />}
+            {activeTab === 'budgets' && <BudgetsTracker key={`budgets-${activePartnerId}`} />}
+            {activeTab === 'goals' && <GoalsTracker key={`goals-${activePartnerId}`} />}
+            {activeTab === 'calendar' && <CalendarTracker key={`calendar-${activePartnerId}`} onNavigateTab={handleTabChange} />}
+            {activeTab === 'calculator' && <CalculatorHub key={`calculator-${activePartnerId}`} />}
+            {activeTab === 'warranties' && <WarrantiesTracker key={`warranties-${activePartnerId}`} />}
+            {activeTab === 'debt' && <DebtTracker key={`debt-${activePartnerId}`} />}
+            {activeTab === 'jobs' && <JobTracker key={`jobs-${activePartnerId}`} />}
+            {activeTab === 'habits' && <HabitTracker key={`habits-${activePartnerId}`} />}
+            {activeTab === 'fitness' && <FitnessTracker key={`fitness-${activePartnerId}`} />}
+            {activeTab === 'notes' && <NotesTracker key={`notes-${activePartnerId}`} />}
+            {activeTab === 'routines' && <RoutineTracker key={`routines-${activePartnerId}`} />}
+            {activeTab === 'vault' && <VaultTracker key={`vault-${activePartnerId}`} />}
+            {activeTab === 'remainder' && <RemindersTracker key={`remainder-${activePartnerId}`} />}
           </main>
         </>
       )}

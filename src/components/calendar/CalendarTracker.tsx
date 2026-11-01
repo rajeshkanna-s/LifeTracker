@@ -79,11 +79,13 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
   const touchStartYRef = useRef<number | null>(null);
 
   useEffect(() => {
+    setExpenses([]);
     fetchExpenses();
   }, [activePartnerId]);
 
   const fetchExpenses = async () => {
     setLoading(true);
+    setExpenses([]);
 
     const { data: expData } = await supabase
       .from('expenses')
@@ -92,7 +94,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
       .order('date', { ascending: false });
 
     if (expData) {
-      setExpenses(expData.map(normalizeTransaction));
+      setExpenses(expData.filter(e => !e.partner_id || e.partner_id === activePartnerId).map(normalizeTransaction));
     } else {
       setExpenses([]);
     }

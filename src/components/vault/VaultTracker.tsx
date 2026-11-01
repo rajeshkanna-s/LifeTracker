@@ -45,6 +45,7 @@ const VaultTracker: React.FC = () => {
   const [copiedState, setCopiedState] = useState<{ id: string; type: 'username' | 'password' } | null>(null);
 
   useEffect(() => {
+    setCredentials([]);
     fetchCredentials();
     generateDedicatedPassword();
   }, [activePartnerId]);
@@ -52,6 +53,7 @@ const VaultTracker: React.FC = () => {
   const fetchCredentials = async () => {
     try {
       setLoading(true);
+      setCredentials([]);
       setErrorState(null);
       const { data, error } = await supabase
         .from('credentials')
@@ -63,10 +65,13 @@ const VaultTracker: React.FC = () => {
         throw error;
       }
       if (data) {
-        setCredentials(data);
+        setCredentials(data.filter((c: Credential) => !c.partner_id || c.partner_id === activePartnerId));
+      } else {
+        setCredentials([]);
       }
     } catch (err: any) {
       console.error('Error fetching credentials:', err);
+      setCredentials([]);
       if (err.message && (err.message.includes('relation') || err.message.includes('does not exist'))) {
         setErrorState('table_not_found');
       } else {
@@ -212,14 +217,16 @@ const VaultTracker: React.FC = () => {
     setTimeout(() => setGenCopied(false), 2000);
   };
 
-  const filteredCredentials = credentials.filter(c => {
-    const query = searchQuery.toLowerCase();
-    return (
-      c.service_name.toLowerCase().includes(query) ||
-      (c.username && c.username.toLowerCase().includes(query)) ||
-      (c.notes && c.notes.toLowerCase().includes(query))
-    );
-  });
+  const filteredCredentials = credentials
+    .filter(c => !c.partner_id || c.partner_id === activePartnerId)
+    .filter(c => {
+      const query = searchQuery.toLowerCase();
+      return (
+        c.service_name.toLowerCase().includes(query) ||
+        (c.username && c.username.toLowerCase().includes(query)) ||
+        (c.notes && c.notes.toLowerCase().includes(query))
+      );
+    });
 
   // Graceful setup render if table is missing
   if (errorState === 'table_not_found') {

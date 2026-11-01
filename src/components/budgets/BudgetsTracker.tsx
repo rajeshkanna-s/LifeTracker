@@ -49,11 +49,13 @@ export const BudgetsTracker: React.FC = () => {
   const [addSpendNote, setAddSpendNote] = useState<string>('');
 
   useEffect(() => {
+    setBudgets([]);
     fetchData();
   }, [activePartnerId]);
 
   const fetchData = async () => {
     setLoading(true);
+    setBudgets([]);
 
     const { data: setObj } = await supabase
       .from('expense_settings')
@@ -70,33 +72,41 @@ export const BudgetsTracker: React.FC = () => {
       setSettings({ ...defaults, ...sJson });
       if (Array.isArray(sJson.customBudgets) && sJson.customBudgets.length > 0) {
         // Ensure spent is properly initialized on loaded budgets
-        const sanitized = sJson.customBudgets.map((b: BudgetPlan) => {
-          let spentVal = Number(b.spent);
-          if (isNaN(spentVal)) {
-            spentVal = b.name.toLowerCase().includes('gold') ? 10000 : 0;
-          }
-          return {
-            ...b,
-            spent: spentVal
-          };
-        });
+        const sanitized = sJson.customBudgets
+          .filter((b: any) => !b.partner_id || b.partner_id === activePartnerId)
+          .map((b: BudgetPlan) => {
+            let spentVal = Number(b.spent);
+            if (isNaN(spentVal)) {
+              spentVal = b.name.toLowerCase().includes('gold') ? 10000 : 0;
+            }
+            return {
+              ...b,
+              spent: spentVal,
+              partner_id: activePartnerId
+            };
+          });
         setBudgets(sanitized);
       } else if (activePartnerId === 'partner_1') {
-        setBudgets(DEFAULT_BUDGETS);
+        setBudgets(DEFAULT_BUDGETS.map(b => ({ ...b, partner_id: 'partner_1' })));
       } else {
         setBudgets([]);
       }
     } else {
       setSettings(defaults);
-      setBudgets(DEFAULT_BUDGETS);
+      if (activePartnerId === 'partner_1') {
+        setBudgets(DEFAULT_BUDGETS.map(b => ({ ...b, partner_id: 'partner_1' })));
+      } else {
+        setBudgets([]);
+      }
     }
 
     setLoading(false);
   };
 
   const persistBudgets = async (updated: BudgetPlan[]) => {
-    setBudgets(updated);
-    const newSettings = { ...settings, customBudgets: updated };
+    const sanitized = updated.map(b => ({ ...b, partner_id: activePartnerId }));
+    setBudgets(sanitized);
+    const newSettings = { ...settings, customBudgets: sanitized };
     setSettings(newSettings);
     if (settingsId) {
       await supabase
@@ -124,7 +134,9 @@ export const BudgetsTracker: React.FC = () => {
 
   // Compute calculated metrics directly from each individual budget
   const budgetsWithCalculations = useMemo(() => {
-    return budgets.map(b => {
+    return budgets
+      .filter(b => !b.partner_id || b.partner_id === activePartnerId)
+      .map(b => {
       const spent = Math.max(0, Number(b.spent) || 0);
       const remaining = Math.max(0, b.amount - spent);
       const pct = b.amount > 0 ? Math.round((spent / b.amount) * 100) : 0;

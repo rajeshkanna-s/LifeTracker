@@ -52,10 +52,11 @@ export const TodosView: React.FC = () => {
 
   // Initial load from localStorage & Supabase
   useEffect(() => {
-    const isDismissed = localStorage.getItem(SYNC_BANNER_KEY) === 'true';
+    setTodos([]);
+    const isDismissed = localStorage.getItem(`${SYNC_BANNER_KEY}_${activePartnerId}`) === 'true';
     setBannerDismissed(isDismissed);
 
-    const savedAutoSync = localStorage.getItem('xpenser_todos_autosync');
+    const savedAutoSync = localStorage.getItem(`xpenser_todos_autosync_${activePartnerId}`);
     if (savedAutoSync !== null) {
       setAutoSync(savedAutoSync === 'true');
     }
@@ -83,6 +84,7 @@ export const TodosView: React.FC = () => {
 
   const loadTodos = async () => {
     setLoading(true);
+    setTodos([]); // Immediate zero-state on partner change
     const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
     let localItems: TodoItem[] = [];
     const raw = localStorage.getItem(storageKey);
@@ -91,14 +93,17 @@ export const TodosView: React.FC = () => {
     // 1. Try local storage first for 0ms render
     if (hasLocal) {
       try {
-        localItems = JSON.parse(raw);
-        setTodos(localItems);
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          localItems = parsed.filter((t: TodoItem) => t && t.partner_id === activePartnerId);
+          setTodos(localItems);
+        }
       } catch (e) {
         console.warn('Failed to parse local todos', e);
       }
     }
 
-    // 2. Sync from Supabase settings_json.notesTodos for this activePartnerId
+    // 2. Sync from Supabase settings_json.notesTodos strictly for this activePartnerId
     try {
       setIsSyncing(true);
       const { data } = await supabase
@@ -110,38 +115,14 @@ export const TodosView: React.FC = () => {
         .single();
 
       if (data?.settings_json?.notesTodos !== undefined && Array.isArray(data.settings_json.notesTodos)) {
-        const cloudTodos: TodoItem[] = data.settings_json.notesTodos;
+        const cloudTodos: TodoItem[] = data.settings_json.notesTodos.filter(
+          (t: any) => t && t.partner_id === activePartnerId
+        );
         setTodos(cloudTodos);
         localStorage.setItem(storageKey, JSON.stringify(cloudTodos));
       } else if (!hasLocal) {
-        // First-time seed only if neither local nor cloud exists yet
-        const sampleTodos: TodoItem[] = [
-          {
-            id: 'sample-1',
-            text: 'Groceries & Household Supplies',
-            completed: false,
-            created_at: new Date().toISOString(),
-            partner_id: activePartnerId
-          },
-          {
-            id: 'sample-2',
-            text: 'Check monthly electricity & internet bills',
-            completed: false,
-            created_at: new Date(Date.now() - 3600000).toISOString(),
-            partner_id: activePartnerId
-          },
-          {
-            id: 'sample-3',
-            text: 'Review investments & savings goal progress',
-            completed: true,
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-            completed_at: new Date().toISOString(),
-            partner_id: activePartnerId
-          }
-        ];
-        setTodos(sampleTodos);
-        localStorage.setItem(storageKey, JSON.stringify(sampleTodos));
-        persistTodos(sampleTodos);
+        setTodos([]);
+        localStorage.setItem(storageKey, JSON.stringify([]));
       }
     } catch (err) {
       console.warn('Supabase todos sync fallback to localStorage', err);
@@ -152,9 +133,13 @@ export const TodosView: React.FC = () => {
   };
 
   const persistTodos = async (updated: TodoItem[]) => {
-    setTodos(updated);
+    const sanitized = updated
+      .filter(t => t && (!t.partner_id || t.partner_id === activePartnerId))
+      .map(t => ({ ...t, partner_id: activePartnerId }));
+
+    setTodos(sanitized);
     const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
-    localStorage.setItem(storageKey, JSON.stringify(updated));
+    localStorage.setItem(storageKey, JSON.stringify(sanitized));
 
     if (!autoSync) return;
 
@@ -169,17 +154,18 @@ export const TodosView: React.FC = () => {
         .single();
 
       if (row) {
-        const newSettings = { ...(row.settings_json || {}), notesTodos: updated };
+        const newSettings = { ...(row.settings_json || {}), notesTodos: sanitized };
         await supabase
           .from('expense_settings')
           .update({ settings_json: newSettings, updated_at: new Date().toISOString() })
-          .eq('id', row.id);
+          .eq('id', row.id)
+          .eq('partner_id', activePartnerId);
       } else {
         await supabase
           .from('expense_settings')
           .insert({
             partner_id: activePartnerId,
-            settings_json: { notesTodos: updated },
+            settings_json: { notesTodos: sanitized },
             updated_at: new Date().toISOString()
           });
       }
@@ -269,7 +255,7 @@ export const TodosView: React.FC = () => {
   const handleToggleAutoSync = () => {
     const nextVal = !autoSync;
     setAutoSync(nextVal);
-    localStorage.setItem('xpenser_todos_autosync', String(nextVal));
+    localStorage.setItem(`xpenser_todos_autosync_${activePartnerId}`, String(nextVal));
     if (nextVal) {
       persistTodos(todos);
     }
@@ -278,19 +264,20 @@ export const TodosView: React.FC = () => {
 
   const handleDismissBanner = () => {
     setBannerDismissed(true);
-    localStorage.setItem(SYNC_BANNER_KEY, 'true');
+    localStorage.setItem(`${SYNC_BANNER_KEY}_${activePartnerId}`, 'true');
   };
 
   const handleTurnOnSync = () => {
     setAutoSync(true);
-    localStorage.setItem('xpenser_todos_autosync', 'true');
+    localStorage.setItem(`xpenser_todos_autosync_${activePartnerId}`, 'true');
     setBannerDismissed(true);
-    localStorage.setItem(SYNC_BANNER_KEY, 'true');
+    localStorage.setItem(`${SYNC_BANNER_KEY}_${activePartnerId}`, 'true');
     persistTodos(todos);
   };
 
-  const activeTodos = todos.filter(t => !t.completed);
-  const completedTodos = todos.filter(t => t.completed);
+  const activeTodos = todos.filter(t => t.partner_id === activePartnerId && !t.completed);
+  const completedTodos = todos.filter(t => t.partner_id === activePartnerId && t.completed);
+  const totalPartnerTodos = activeTodos.length + completedTodos.length;
 
   return (
     <div className="bg-white min-h-[500px] w-full rounded-2xl p-4 sm:p-6 transition-all">
@@ -301,7 +288,7 @@ export const TodosView: React.FC = () => {
             To-dos
           </h1>
           <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-1.5 flex items-center gap-1.5">
-            <span>{todos.length} to-dos</span>
+            <span>{totalPartnerTodos} to-dos</span>
             {isSyncing && (
               <span className="inline-flex items-center gap-1 text-[11px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-medium">
                 <Cloud size={11} className="animate-pulse" /> Syncing...

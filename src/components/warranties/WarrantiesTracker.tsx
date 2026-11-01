@@ -68,11 +68,13 @@ export const WarrantiesTracker: React.FC = () => {
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
+    setWarranties([]);
     fetchWarranties();
   }, [activePartnerId]);
 
   const fetchWarranties = async () => {
     setLoading(true);
+    setWarranties([]);
     const { data: setObj } = await supabase
       .from('expense_settings')
       .select('*')
@@ -87,22 +89,27 @@ export const WarrantiesTracker: React.FC = () => {
       const sJson = setObj.settings_json || {};
       setSettings({ ...defaults, ...sJson });
       if (Array.isArray(sJson.customWarranties)) {
-        setWarranties(sJson.customWarranties);
+        setWarranties(sJson.customWarranties.filter((w: any) => !w.partner_id || w.partner_id === activePartnerId));
       } else if (activePartnerId === 'partner_1') {
-        setWarranties(DEFAULT_WARRANTIES);
+        setWarranties(DEFAULT_WARRANTIES.map(w => ({ ...w, partner_id: 'partner_1' })));
       } else {
         setWarranties([]);
       }
     } else {
       setSettings(defaults);
-      setWarranties(DEFAULT_WARRANTIES);
+      if (activePartnerId === 'partner_1') {
+        setWarranties(DEFAULT_WARRANTIES.map(w => ({ ...w, partner_id: 'partner_1' })));
+      } else {
+        setWarranties([]);
+      }
     }
     setLoading(false);
   };
 
   const persistWarranties = async (updated: WarrantyItem[]) => {
-    setWarranties(updated);
-    const newSettings = { ...settings, customWarranties: updated };
+    const sanitized = updated.map(w => ({ ...w, partner_id: activePartnerId }));
+    setWarranties(sanitized);
+    const newSettings = { ...settings, customWarranties: sanitized };
     setSettings(newSettings);
     if (settingsId) {
       await supabase
@@ -138,7 +145,9 @@ export const WarrantiesTracker: React.FC = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return warranties.map(w => {
+    return warranties
+      .filter(w => !w.partner_id || w.partner_id === activePartnerId)
+      .map(w => {
       const exp = new Date(w.expiryDate);
       exp.setHours(0, 0, 0, 0);
       const diffTime = exp.getTime() - today.getTime();

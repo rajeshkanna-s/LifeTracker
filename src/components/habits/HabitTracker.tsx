@@ -40,17 +40,23 @@ const HabitTracker: React.FC = () => {
 
   const weekDates = getWeekDates(baseDate);
 
-  useEffect(() => { fetchAll(); }, [baseDate, activePartnerId]);
+  useEffect(() => {
+    setHabits([]);
+    setEntries([]);
+    fetchAll();
+  }, [baseDate, activePartnerId]);
 
   const fetchAll = async () => {
     setLoading(true);
+    setHabits([]);
+    setEntries([]);
     const { data: h } = await supabase
       .from('habits')
       .select('*')
       .eq('partner_id', activePartnerId)
       .order('created_at', { ascending: true });
 
-    if (h) setHabits(h);
+    if (h) setHabits(h.filter(item => !item.partner_id || item.partner_id === activePartnerId));
     else setHabits([]);
 
     const { data: e } = await supabase
@@ -60,7 +66,7 @@ const HabitTracker: React.FC = () => {
       .gte('date', weekDates[0])
       .lte('date', weekDates[6]);
 
-    if (e) setEntries(e);
+    if (e) setEntries(e.filter(item => !item.partner_id || item.partner_id === activePartnerId));
     else setEntries([]);
 
     const { data: setObj, error } = await supabase

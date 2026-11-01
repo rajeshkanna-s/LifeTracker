@@ -44,6 +44,7 @@ export interface SavingsGoal {
   icon?: string;
   note?: string;
   status?: 'active' | 'paused' | 'reached';
+  partner_id?: string;
 }
 
 export interface AccountItem {
@@ -57,6 +58,7 @@ export interface AccountItem {
   accountNumber?: string;
   notes?: string;
   updated_at?: string;
+  partner_id?: string;
 }
 
 export interface BudgetSpendEntry {
@@ -78,6 +80,7 @@ export interface BudgetPlan {
   currency?: string;
   color?: string;
   created_at?: string;
+  partner_id?: string;
 }
 
 export interface WarrantyItem {
@@ -92,6 +95,7 @@ export interface WarrantyItem {
   invoiceNumber?: string;
   notes?: string;
   status?: 'active' | 'expiring' | 'expired';
+  partner_id?: string;
 }
 
 export interface DayNote {
@@ -251,6 +255,7 @@ export interface Credential {
   notes?: string;
   created_at?: string;
   updated_at?: string;
+  partner_id?: string;
 }
 
 // ── App Types ──

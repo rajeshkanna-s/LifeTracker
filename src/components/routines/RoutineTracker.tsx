@@ -23,15 +23,24 @@ const RoutineTracker: React.FC = () => {
   const [formFreq, setFormFreq] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('daily');
 
   useEffect(() => {
+    setRoutines([]);
+    setEntries([]);
     fetchData();
   }, [baseDate, activePartnerId]);
 
   const fetchData = async () => {
     setLoading(true);
+    setRoutines([]);
+    setEntries([]);
     
-    // Fetch routines
-    const { data: rData } = await supabase.from('routines').select('*').eq('partner_id', activePartnerId).order('created_at', { ascending: true });
-    if (rData) setRoutines(rData);
+    // Fetch routines strictly for activePartnerId
+    const { data: rData } = await supabase
+      .from('routines')
+      .select('*')
+      .eq('partner_id', activePartnerId)
+      .order('created_at', { ascending: true });
+    if (rData) setRoutines(rData.filter(r => !r.partner_id || r.partner_id === activePartnerId));
+    else setRoutines([]);
 
     // Calculate month boundaries for entries
     const year = baseDate.getFullYear();
@@ -46,7 +55,8 @@ const RoutineTracker: React.FC = () => {
       .gte('date', startDate)
       .lte('date', endDate);
       
-    if (eData) setEntries(eData);
+    if (eData) setEntries(eData.filter(e => !e.partner_id || e.partner_id === activePartnerId));
+    else setEntries([]);
     setLoading(false);
   };
 

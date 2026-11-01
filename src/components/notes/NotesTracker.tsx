@@ -33,6 +33,7 @@ interface DailyNote {
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
+  partner_id?: string;
 }
 
 const MOODS = [
@@ -55,7 +56,7 @@ const NOTE_COLORS = [
 const NotesTracker: React.FC = () => {
   const { activePartnerId } = usePartner();
   const [mainTab, setMainTab] = useState<'notes' | 'todos'>(() => {
-    return (localStorage.getItem('xpenser_notes_maintab') as 'notes' | 'todos') || 'todos';
+    return (localStorage.getItem(`xpenser_notes_maintab_${activePartnerId}`) as 'notes' | 'todos') || 'todos';
   });
   const [notes, setNotes] = useState<DailyNote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,20 +74,29 @@ const NotesTracker: React.FC = () => {
 
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => { fetchNotes(); }, [activePartnerId]);
+  useEffect(() => {
+    setNotes([]);
+    setSelectedNote(null);
+    fetchNotes();
+  }, [activePartnerId]);
 
   const handleTabChange = (tab: 'notes' | 'todos') => {
     setMainTab(tab);
-    localStorage.setItem('xpenser_notes_maintab', tab);
+    localStorage.setItem(`xpenser_notes_maintab_${activePartnerId}`, tab);
   };
 
   const fetchNotes = async () => {
     setLoading(true);
+    setNotes([]);
     const { data } = await supabase
       .from('daily_notes').select('*').eq('partner_id', activePartnerId)
       .order('is_pinned', { ascending: false })
       .order('updated_at', { ascending: false });
-    if (data) setNotes(data);
+    if (data) {
+      setNotes(data.filter((n: DailyNote) => !n.partner_id || n.partner_id === activePartnerId));
+    } else {
+      setNotes([]);
+    }
     setLoading(false);
   };
 
@@ -213,7 +223,7 @@ const NotesTracker: React.FC = () => {
 
       {/* ── Main View (To-dos or Notes) ── */}
       {mainTab === 'todos' ? (
-        <TodosView />
+        <TodosView key={`todos-${activePartnerId}`} />
       ) : loading ? (
         <div className="bg-white rounded-3xl border border-slate-200 p-16 flex items-center justify-center shadow-xs">
           <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin" />

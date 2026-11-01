@@ -135,6 +135,7 @@ export const RemindersTracker: React.FC = () => {
 
   const loadReminders = async () => {
     setLoading(true);
+    setReminders([]);
     const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
     let loaded: ReminderItem[] = [];
 
@@ -142,8 +143,11 @@ export const RemindersTracker: React.FC = () => {
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) {
-        loaded = JSON.parse(raw);
-        setReminders(loaded);
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          loaded = parsed.filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
+          setReminders(loaded);
+        }
       }
     } catch {
       // ignore
@@ -159,8 +163,9 @@ export const RemindersTracker: React.FC = () => {
         .order('reminder_time', { ascending: true });
 
       if (!tableErr && tableData && Array.isArray(tableData)) {
-        setReminders(tableData);
-        localStorage.setItem(storageKey, JSON.stringify(tableData));
+        const filteredTable = tableData.filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
+        setReminders(filteredTable);
+        localStorage.setItem(storageKey, JSON.stringify(filteredTable));
         setLoading(false);
         return;
       }
@@ -179,25 +184,12 @@ export const RemindersTracker: React.FC = () => {
         .single();
 
       if (setRow?.settings_json?.reminders && Array.isArray(setRow.settings_json.reminders)) {
-        setReminders(setRow.settings_json.reminders);
-        localStorage.setItem(storageKey, JSON.stringify(setRow.settings_json.reminders));
+        const filteredCloud = setRow.settings_json.reminders.filter((r: ReminderItem) => r && r.partner_id === activePartnerId);
+        setReminders(filteredCloud);
+        localStorage.setItem(storageKey, JSON.stringify(filteredCloud));
       } else if (loaded.length === 0) {
-        // Seed initial friendly starter reminder
-        const todayStr = formatLocalDate(new Date());
-        const starter: ReminderItem = {
-          id: 'rem-starter-1',
-          partner_id: activePartnerId,
-          title: 'Welcome to Remainder! Set your first alert',
-          description: 'Custom date, time, and repeating schedule with sound & browser alerts',
-          reminder_date: todayStr,
-          reminder_time: '20:00',
-          repeat_type: 'none',
-          is_completed: false,
-          notification_sent: false,
-          created_at: new Date().toISOString()
-        };
-        setReminders([starter]);
-        localStorage.setItem(storageKey, JSON.stringify([starter]));
+        setReminders([]);
+        localStorage.setItem(storageKey, JSON.stringify([]));
       }
     } catch (e) {
       console.warn('Fallback reminders loaded from local', e);
@@ -207,9 +199,10 @@ export const RemindersTracker: React.FC = () => {
   };
 
   const saveReminders = async (updated: ReminderItem[]) => {
-    setReminders(updated);
+    const sanitized = updated.map(r => ({ ...r, partner_id: activePartnerId }));
+    setReminders(sanitized);
     const storageKey = `${STORAGE_KEY_PREFIX}${activePartnerId}`;
-    localStorage.setItem(storageKey, JSON.stringify(updated));
+    localStorage.setItem(storageKey, JSON.stringify(sanitized));
 
     // 1. Try Supabase dedicated table 'reminders' if available
     try {
@@ -368,7 +361,9 @@ export const RemindersTracker: React.FC = () => {
 
   const todayStr = formatLocalDate(new Date());
 
-  const filteredReminders = reminders.filter(r => {
+  const partnerReminders = reminders.filter(r => !r.partner_id || r.partner_id === activePartnerId);
+
+  const filteredReminders = partnerReminders.filter(r => {
     if (filter === 'completed') return r.is_completed;
     if (r.is_completed) return false;
     if (filter === 'today') return r.reminder_date === todayStr;
@@ -376,9 +371,9 @@ export const RemindersTracker: React.FC = () => {
     return true; // 'all' active
   });
 
-  const todayCount = reminders.filter(r => !r.is_completed && r.reminder_date === todayStr).length;
-  const upcomingCount = reminders.filter(r => !r.is_completed && r.reminder_date > todayStr).length;
-  const completedCount = reminders.filter(r => r.is_completed).length;
+  const todayCount = partnerReminders.filter(r => !r.is_completed && r.reminder_date === todayStr).length;
+  const upcomingCount = partnerReminders.filter(r => !r.is_completed && r.reminder_date > todayStr).length;
+  const completedCount = partnerReminders.filter(r => r.is_completed).length;
 
   const sqlCode = `-- SQL to create dedicated 'reminders' table in Supabase
 CREATE TABLE IF NOT EXISTS public.reminders (

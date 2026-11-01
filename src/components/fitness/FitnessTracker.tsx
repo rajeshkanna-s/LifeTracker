@@ -27,17 +27,21 @@ const FitnessTracker: React.FC = () => {
     mood: '', exercises: '', notes: ''
   });
 
-  useEffect(() => { fetchWorkouts(); }, [activePartnerId]);
+  useEffect(() => {
+    setWorkouts([]);
+    fetchWorkouts();
+  }, [activePartnerId]);
 
   const fetchWorkouts = async () => {
     setLoading(true);
+    setWorkouts([]);
     const { data } = await supabase
       .from('workouts')
       .select('*')
       .eq('partner_id', activePartnerId)
       .order('date', { ascending: false });
 
-    if (data) setWorkouts(data);
+    if (data) setWorkouts(data.filter(w => !w.partner_id || w.partner_id === activePartnerId));
     else setWorkouts([]);
 
     const { data: setObj, error } = await supabase
