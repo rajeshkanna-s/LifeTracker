@@ -9,7 +9,8 @@ import {
   Trash2,
   X,
   Check,
-  ChevronRight
+  ChevronRight,
+  ChevronDown
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { BudgetPlan, Expense, ExpenseSettings } from '../../types';
@@ -34,6 +35,7 @@ export const BudgetsTracker: React.FC = () => {
   // Modal State
   const [showModal, setShowModal] = useState(false);
   const [editingBudget, setEditingBudget] = useState<BudgetPlan | null>(null);
+  const [expandedBudgetId, setExpandedBudgetId] = useState<string | null>(null);
 
   // Form State
   const [name, setName] = useState('');
@@ -134,7 +136,8 @@ export const BudgetsTracker: React.FC = () => {
         ...b,
         spent,
         remaining,
-        pct
+        pct,
+        matchedExpenses: matched
       };
     });
   }, [budgets, expenses, currentMonthPrefix]);
@@ -336,7 +339,35 @@ export const BudgetsTracker: React.FC = () => {
                       `₹${b.remaining.toLocaleString()} left to spend`
                     )}
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedBudgetId(expandedBudgetId === b.id ? null : b.id)}
+                    className="text-[11px] font-bold text-pink-600 dark:text-pink-400 hover:text-pink-700 flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{expandedBudgetId === b.id ? 'Hide' : `View ${b.matchedExpenses.length} expense${b.matchedExpenses.length === 1 ? '' : 's'}`}</span>
+                    <ChevronDown size={12} style={{ transform: expandedBudgetId === b.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                  </button>
                 </div>
+
+                {expandedBudgetId === b.id && (
+                  <div className="mt-2.5 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-100 dark:border-slate-800 text-xs">
+                    {b.matchedExpenses.length === 0 ? (
+                      <div className="text-[11px] text-slate-500 py-1">
+                        No expenses recorded under <span className="font-bold text-slate-700 dark:text-slate-300">"{b.categories?.includes('All') ? 'All' : b.categories?.join(', ')}"</span> in the current month.
+                      </div>
+                    ) : (
+                      b.matchedExpenses.map(exp => (
+                        <div key={exp.id} className="flex items-center justify-between py-1 border-b border-slate-100 dark:border-slate-700/50 last:border-0 text-xs">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-bold text-slate-800 dark:text-slate-200 truncate">{exp.description || exp.category}</p>
+                            <p className="text-[10px] text-slate-400">{exp.date} • {exp.category}</p>
+                          </div>
+                          <span className="font-black text-slate-900 dark:text-slate-100 ml-2">₹{Number(exp.amount).toLocaleString('en-IN')}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           );
