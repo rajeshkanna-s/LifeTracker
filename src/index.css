@@ -233,6 +233,7 @@
   .nav-tab-item.active-habits { background: #10b981; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.45); }
   .nav-tab-item.active-fitness { background: #f97316; box-shadow: 0 2px 10px rgba(249, 115, 22, 0.45); }
   .nav-tab-item.active-notes { background: #d97706; box-shadow: 0 2px 10px rgba(217, 119, 6, 0.45); }
+  .nav-tab-item.active-remainder { background: #f59e0b; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.45); }
   .nav-tab-item.active-routines { background: #0891b2; box-shadow: 0 2px 10px rgba(8, 145, 178, 0.45); }
   .nav-tab-item.active-vault { background: #3b82f6; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.45); }
   .nav-tab-item.active-jobs { background: #6366f1; box-shadow: 0 2px 10px rgba(99, 102, 241, 0.45); }

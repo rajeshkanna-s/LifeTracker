@@ -17,6 +17,7 @@ import FitnessTracker from './components/fitness/FitnessTracker';
 import NotesTracker from './components/notes/NotesTracker';
 import RoutineTracker from './components/routines/RoutineTracker';
 import VaultTracker from './components/vault/VaultTracker';
+import RemindersTracker from './components/reminders/RemindersTracker';
 import type { TabId } from './types';
 import { usePWA } from './utils/usePWA';
 import { InstallModal } from './components/InstallModal';
@@ -104,6 +105,7 @@ const AppContent: React.FC = () => {
             {activeTab === 'notes' && <NotesTracker />}
             {activeTab === 'routines' && <RoutineTracker />}
             {activeTab === 'vault' && <VaultTracker />}
+            {activeTab === 'remainder' && <RemindersTracker />}
           </main>
         </>
       )}

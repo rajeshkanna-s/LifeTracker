@@ -52,6 +52,7 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode; color: string; de
   { id: 'habits', label: 'Habits', icon: <CheckSquare size={18} />, color: '#059669', desc: 'Daily Habits & Streaks' },
   { id: 'fitness', label: 'Fitness', icon: <Dumbbell size={18} />, color: '#ea580c', desc: 'Workouts & Progress' },
   { id: 'notes', label: 'Notes', icon: <StickyNote size={18} />, color: '#d97706', desc: 'Notebook & Quick Notes' },
+  { id: 'remainder', label: 'Remainder', icon: <Bell size={18} />, color: '#f59e0b', desc: 'Date & Time Reminders' },
   { id: 'routines', label: 'Routines', icon: <ListChecks size={18} />, color: '#0891b2', desc: 'Daily Schedules' },
   { id: 'vault', label: 'Vault', icon: <Lock size={18} />, color: '#2563eb', desc: 'Secure Credentials' },
   { id: 'jobs', label: 'Jobs', icon: <Building2 size={18} />, color: '#4f46e5', desc: 'Job Application Tracker' },
@@ -304,7 +305,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 ))}
 
                 <div className="nav-more-group-header" style={{ marginTop: '8px' }}>LIFESTYLE & PRODUCTIVITY</div>
-                {tabs.filter(t => ['calendar', 'habits', 'fitness', 'notes', 'routines', 'vault', 'jobs'].includes(t.id)).map(tab => (
+                {tabs.filter(t => ['calendar', 'habits', 'fitness', 'notes', 'remainder', 'routines', 'vault', 'jobs'].includes(t.id)).map(tab => (
                   <button
                     key={tab.id}
                     type="button"

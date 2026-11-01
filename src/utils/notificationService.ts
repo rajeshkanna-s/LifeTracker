@@ -4,13 +4,48 @@ import type { Debt, DebtSettings, ExpenseSettings, WarrantyItem } from '../types
 
 export interface AppNotification {
   id: string;
-  type: 'emi' | 'insurance' | 'warranty' | 'budget' | 'recurring';
+  type: 'emi' | 'insurance' | 'warranty' | 'budget' | 'recurring' | 'remainder';
   title: string;
   message: string;
   urgency: 'low' | 'medium' | 'high';
   dateStr?: string;
   linkTab?: string;
 }
+
+export const playReminderChime = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+
+    // Pleasant tone 1 (D5)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, now);
+    gain1.gain.setValueAtTime(0.18, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.35);
+
+    // Pleasant tone 2 (A5)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880.0, now + 0.14);
+    gain2.gain.setValueAtTime(0.22, now + 0.14);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.14);
+    osc2.stop(now + 0.65);
+  } catch {
+    // AudioContext may be restricted until user interaction
+  }
+};
 
 export const requestNotificationPermission = async (): Promise<boolean> => {
   if (!('Notification' in window)) return false;
@@ -182,6 +217,33 @@ export const fetchRemindersAndNotifications = async (partnerId: string): Promise
             urgency: rb.dueDay === currentDayNum ? 'high' : 'low',
             linkTab: 'expenses'
           });
+        }
+      }
+    }
+
+    // 6. User Scheduled Reminders
+    if (settingsJson?.reminders && Array.isArray(settingsJson.reminders)) {
+      for (const rem of settingsJson.reminders) {
+        if (!rem.is_completed && rem.reminder_date) {
+          if (rem.reminder_date === todayStr) {
+            notifications.push({
+              id: `rem-${rem.id}`,
+              type: 'remainder',
+              title: `⏰ Remainder Today: ${rem.title}`,
+              message: `Scheduled for ${rem.reminder_time || 'today'}${rem.description ? ` · ${rem.description}` : ''}`,
+              urgency: 'high',
+              linkTab: 'remainder'
+            });
+          } else if (rem.reminder_date < todayStr) {
+            notifications.push({
+              id: `rem-past-${rem.id}`,
+              type: 'remainder',
+              title: `⚠️ Overdue Remainder: ${rem.title}`,
+              message: `Was scheduled for ${rem.reminder_date} at ${rem.reminder_time}`,
+              urgency: 'high',
+              linkTab: 'remainder'
+            });
+          }
         }
       }
     }

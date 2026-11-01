@@ -254,7 +254,23 @@ export interface Credential {
 }
 
 // ── App Types ──
-export type TabId = 'expenses' | 'accounts' | 'budgets' | 'goals' | 'calendar' | 'calculator' | 'warranties' | 'debt' | 'jobs' | 'habits' | 'fitness' | 'notes' | 'routines' | 'vault';
+export type RepeatType = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+export interface ReminderItem {
+  id: string;
+  partner_id: string;
+  title: string;
+  description?: string;
+  reminder_date: string; // YYYY-MM-DD
+  reminder_time: string; // HH:mm
+  repeat_type: RepeatType;
+  is_completed: boolean;
+  notification_sent: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+export type TabId = 'expenses' | 'accounts' | 'budgets' | 'goals' | 'calendar' | 'calculator' | 'warranties' | 'debt' | 'jobs' | 'habits' | 'fitness' | 'notes' | 'routines' | 'vault' | 'remainder';
 
 // ── Multi-Partner Types ──
 export type PartnerId = 'partner_1' | 'partner_2';
