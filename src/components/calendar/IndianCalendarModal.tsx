@@ -14,6 +14,7 @@ import {
   findIndianHoliday,
   type IndianHoliday
 } from '../../data/indianHolidays';
+import './CalendarTracker.css';
 
 interface IndianCalendarModalProps {
   isOpen: boolean;
@@ -30,10 +31,10 @@ const MONTH_NAMES = [
 const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const TricolorBadgeIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-2.5' }) => (
+const TricolorBadgeIcon: React.FC = () => (
   <svg
     viewBox="0 0 24 16"
-    className={`${className} rounded-[2px] shadow-2xs shrink-0 overflow-hidden`}
+    style={{ width: 15, height: 10, borderRadius: 2, overflow: 'hidden', flexShrink: 0 }}
     aria-hidden="true"
   >
     <rect width="24" height="5.33" y="0" fill="#FF9933" />
@@ -50,14 +51,11 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
   initialDate = new Date()
 }) => {
   const [viewYear, setViewYear] = useState<number>(() => initialDate.getFullYear());
-  const [viewMonth, setViewMonth] = useState<number>(() => initialDate.getMonth()); // 0-11
-  const [selectedDateStr, setSelectedDateStr] = useState<string>(() => {
-    return formatLocalDate(initialDate);
-  });
+  const [viewMonth, setViewMonth] = useState<number>(() => initialDate.getMonth());
+  const [selectedDateStr, setSelectedDateStr] = useState<string>(() => formatLocalDate(initialDate));
 
   const todayStr = useMemo(() => formatLocalDate(new Date()), []);
 
-  // Available years: 2020 through 2035
   const availableYears = useMemo(() => {
     const list: number[] = [];
     for (let y = 2020; y <= 2035; y++) {
@@ -66,12 +64,10 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
     return list;
   }, []);
 
-  // Holidays for current view month
   const monthHolidays = useMemo(() => {
     return getIndianHolidaysForMonth(viewYear, viewMonth);
   }, [viewYear, viewMonth]);
 
-  // Holidays dictionary for the whole year for fast lookup in grid
   const yearHolidaysMap = useMemo(() => {
     const all = getIndianHolidaysForYear(viewYear);
     const map = new Map<string, IndianHoliday>();
@@ -81,52 +77,59 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
     return map;
   }, [viewYear]);
 
-  // Calendar matrix calculation for viewYear and viewMonth
   const calendarCells = useMemo(() => {
     const firstDay = new Date(viewYear, viewMonth, 1);
     const lastDay = new Date(viewYear, viewMonth + 1, 0);
     const totalDays = lastDay.getDate();
 
-    // Day of week: 0=Sun, 1=Mon, ..., 6=Sat. Convert so Mon=0, Sun=6
     let startingDayOfWeek = firstDay.getDay() - 1;
     if (startingDayOfWeek === -1) startingDayOfWeek = 6;
 
-    const cells: { dateStr: string; dayNum: number; isCurrentMonth: boolean; holiday?: IndianHoliday }[] = [];
+    const cells: {
+      dateStr: string;
+      dayNum: number;
+      isCurrentMonth: boolean;
+      isWeekend: boolean;
+      holiday?: IndianHoliday;
+    }[] = [];
 
-    // Previous month filler days
     const prevMonthLastDay = new Date(viewYear, viewMonth, 0).getDate();
     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
       const dNum = prevMonthLastDay - i;
       const prevDate = new Date(viewYear, viewMonth - 1, dNum);
       const dStr = formatLocalDate(prevDate);
+      const col = cells.length % 7;
       cells.push({
         dateStr: dStr,
         dayNum: dNum,
         isCurrentMonth: false,
+        isWeekend: col === 5 || col === 6,
         holiday: yearHolidaysMap.get(dStr)
       });
     }
 
-    // Current month days
     for (let d = 1; d <= totalDays; d++) {
       const dStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const col = cells.length % 7;
       cells.push({
         dateStr: dStr,
         dayNum: d,
         isCurrentMonth: true,
+        isWeekend: col === 5 || col === 6,
         holiday: yearHolidaysMap.get(dStr)
       });
     }
 
-    // Next month filler days to complete standard 35 or 42 grid cells
     const remaining = (7 - (cells.length % 7)) % 7;
     for (let d = 1; d <= remaining; d++) {
       const nextDate = new Date(viewYear, viewMonth + 1, d);
       const dStr = formatLocalDate(nextDate);
+      const col = cells.length % 7;
       cells.push({
         dateStr: dStr,
         dayNum: d,
         isCurrentMonth: false,
+        isWeekend: col === 5 || col === 6,
         holiday: yearHolidaysMap.get(dStr)
       });
     }
@@ -180,134 +183,149 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200/80"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* ════════ Header ════════ */}
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 px-4 py-3.5 text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-              <CalendarIcon size={18} className="text-white" />
+    <div className="cal-modal-backdrop" onClick={onClose}>
+      <div className="cal-modal-sheet" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="cal-modal-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 12,
+                background: 'rgba(255,255,255,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              <CalendarIcon size={18} color="#ffffff" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-extrabold text-white leading-tight">Calendar</h3>
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white leading-none">
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 16, fontWeight: 800, color: '#ffffff', lineHeight: 1.2 }}>
+                  Calendar
+                </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    padding: '4px 9px',
+                    borderRadius: 999,
+                    background: 'rgba(255,255,255,0.22)',
+                    color: '#ffffff',
+                    lineHeight: 1
+                  }}
+                >
                   <TricolorBadgeIcon />
                   <span>Holidays</span>
                 </span>
               </div>
-              <p className="text-[11px] text-white/85 font-medium leading-tight mt-0.5">
+              <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.86)', marginTop: 3, fontWeight: 500 }}>
                 2020–2035 Gazetted & National Holidays
-              </p>
+              </div>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition active:scale-90 cursor-pointer"
-          >
+          <button type="button" onClick={onClose} aria-label="Close" className="cal-modal-close">
             <X size={16} />
           </button>
         </div>
 
-        {/* ════════ Body (Scrollable) ════════ */}
-        <div className="p-3.5 sm:p-4 overflow-y-auto flex-1 space-y-3 bg-white">
-          {/* Navigation Bar (Month & Year) */}
-          <div className="flex items-center justify-between gap-2">
-            {/* Month Stepper */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80">
-              <button
-                type="button"
-                onClick={handlePrevMonth}
-                title="Previous Month"
-                className="w-7 h-7 rounded-lg bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition active:scale-90 cursor-pointer"
-              >
-                <ChevronLeft size={14} />
+        {/* Scrollable Body */}
+        <div className="cal-modal-body">
+          {/* Month & Year Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <button type="button" onClick={handlePrevMonth} className="cal-nav-arrow" title="Previous Month">
+                <ChevronLeft size={16} />
               </button>
-              <span className="text-xs font-extrabold text-slate-800 px-3 text-center min-w-[88px]">
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: '#0f172a',
+                  minWidth: 92,
+                  textAlign: 'center'
+                }}
+              >
                 {MONTH_NAMES[viewMonth]}
               </span>
-              <button
-                type="button"
-                onClick={handleNextMonth}
-                title="Next Month"
-                className="w-7 h-7 rounded-lg bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition active:scale-90 cursor-pointer"
-              >
-                <ChevronRight size={14} />
+              <button type="button" onClick={handleNextMonth} className="cal-nav-arrow" title="Next Month">
+                <ChevronRight size={16} />
               </button>
             </div>
 
-            {/* Year Selector & Today */}
-            <div className="flex items-center gap-1.5">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <select
                 value={viewYear}
                 onChange={e => setViewYear(Number(e.target.value))}
-                className="bg-slate-100 border border-slate-200/80 text-xs font-extrabold text-slate-800 px-2.5 py-1.5 rounded-xl outline-none cursor-pointer"
+                className="cal-year-select"
               >
                 {availableYears.map(y => (
-                  <option key={y} value={y}>{y}</option>
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
                 ))}
               </select>
 
-              <button
-                type="button"
-                onClick={handleGoToday}
-                className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-extrabold transition active:scale-95 cursor-pointer"
-              >
+              <button type="button" onClick={handleGoToday} className="cal-today-chip">
                 Today
               </button>
             </div>
           </div>
 
-          {/* Quick Month Bar */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+          {/* Month Quick Pills */}
+          <div className="cal-month-pills">
             {SHORT_MONTHS.map((m, idx) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setViewMonth(idx)}
-                className={`px-2.5 py-1 text-[11px] font-bold rounded-lg shrink-0 transition active:scale-95 cursor-pointer ${
-                  viewMonth === idx
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                className={`cal-month-pill ${viewMonth === idx ? 'active' : ''}`}
               >
                 {m}
               </button>
             ))}
           </div>
 
-          {/* ════════ Calendar Grid ════════ */}
-          <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-2 sm:p-2.5">
-            {/* Weekday Labels */}
-            <div className="grid grid-cols-7 gap-1 text-center mb-1">
+          {/* Centered Calendar Grid */}
+          <div
+            style={{
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: 18,
+              padding: '12px 8px 10px 8px'
+            }}
+          >
+            <div className="cal-weekdays">
               {DAY_LABELS.map((d, i) => (
-                <span
-                  key={d}
-                  className={`text-[10px] sm:text-[11px] font-extrabold uppercase py-1 ${
-                    i === 5 || i === 6 ? 'text-amber-600' : 'text-slate-400'
-                  }`}
-                >
+                <div key={d} className={`cal-weekday ${i === 5 || i === 6 ? 'weekend' : ''}`}>
                   {d}
-                </span>
+                </div>
               ))}
             </div>
 
-            {/* Date Cells */}
-            <div className="grid grid-cols-7 gap-1">
+            <div className="cal-days-grid">
               {calendarCells.map((cell, idx) => {
                 const isSelected = cell.dateStr === selectedDateStr;
                 const isToday = cell.dateStr === todayStr;
                 const hasHoliday = !!cell.holiday;
-                const isNational = cell.holiday?.type === 'National Holiday';
+
+                const cellClasses = [
+                  'cal-day-cell',
+                  !cell.isCurrentMonth ? 'outside' : '',
+                  cell.isWeekend ? 'weekend' : '',
+                  hasHoliday ? 'holiday' : '',
+                  isToday ? 'today' : '',
+                  isSelected ? 'selected' : ''
+                ]
+                  .filter(Boolean)
+                  .join(' ');
 
                 return (
                   <button
@@ -315,58 +333,45 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                     type="button"
                     onClick={() => handleDayClick(cell)}
                     title={cell.holiday ? `${cell.holiday.name} (${cell.holiday.type})` : cell.dateStr}
-                    className={`aspect-square p-1 rounded-xl flex flex-col items-center justify-center transition cursor-pointer select-none relative ${
-                      isSelected
-                        ? 'bg-emerald-600 text-white font-black shadow-sm ring-2 ring-emerald-300'
-                        : isToday
-                        ? 'bg-emerald-50 text-emerald-800 font-extrabold border-2 border-emerald-500 shadow-2xs'
-                        : cell.isCurrentMonth
-                        ? hasHoliday
-                          ? isNational
-                            ? 'bg-orange-50 text-orange-900 font-extrabold border border-orange-300'
-                            : 'bg-emerald-50/80 text-emerald-900 font-bold border border-emerald-300'
-                          : 'bg-white text-slate-800 hover:bg-slate-100 font-semibold border border-slate-200/70 shadow-2xs'
-                        : 'bg-transparent text-slate-300 font-medium border-transparent'
-                    }`}
+                    className={cellClasses}
                   >
-                    <span className="text-xs leading-none">{cell.dayNum}</span>
-
-                    {/* Holiday Indicator Dot */}
-                    {hasHoliday && (
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full mt-1 shrink-0 ${
-                          isSelected
-                            ? 'bg-amber-300'
-                            : isNational
-                            ? 'bg-orange-500'
-                            : 'bg-emerald-600'
-                        }`}
-                      />
-                    )}
+                    <span className="cal-day-num">{cell.dayNum}</span>
+                    <span className="cal-day-dots">
+                      {hasHoliday && <span className="cal-dot holiday" />}
+                    </span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Selected Date Inspector Card */}
+          {/* Selected Date Action Bar */}
           {selectedDateStr && (
-            <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3 flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block leading-tight">Selected Date</span>
-                <p className="text-xs sm:text-sm font-black text-slate-900 mt-0.5 truncate leading-tight">
+            <div className="cal-modal-selected-bar">
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#94a3b8'
+                  }}
+                >
+                  Selected Date
+                </div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a', marginTop: 2 }}>
                   {new Date(selectedDateStr + 'T00:00:00').toLocaleDateString('en-US', {
                     weekday: 'short',
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric'
                   })}
-                </p>
+                </div>
                 {selectedHoliday && (
-                  <p className="text-[11px] font-bold text-orange-600 mt-1 flex items-center gap-1 truncate">
-                    <span>🎉 {selectedHoliday.name}</span>
-                    <span className="text-[10px] text-slate-500">({selectedHoliday.type})</span>
-                  </p>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, color: '#d97706', marginTop: 3 }}>
+                    🎉 {selectedHoliday.name}
+                  </div>
                 )}
               </div>
 
@@ -374,99 +379,143 @@ export const IndianCalendarModal: React.FC<IndianCalendarModalProps> = ({
                 <button
                   type="button"
                   onClick={() => handleApplyDate(selectedDateStr)}
-                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl shrink-0 transition active:scale-95 cursor-pointer shadow-xs flex items-center gap-1.5"
+                  className="cal-add-btn"
                 >
                   <span>Open Day</span>
-                  <ArrowRight size={13} />
+                  <ArrowRight size={14} />
                 </button>
               )}
             </div>
           )}
 
-          {/* Holidays List */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between px-0.5">
-              <h4 className="text-xs font-extrabold text-slate-700 flex items-center gap-1.5">
-                <Flag size={13} className="text-orange-500 shrink-0" />
-                <span>Holidays in {MONTH_NAMES[viewMonth]} {viewYear}</span>
-                <span className="text-[10px] font-extrabold px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded-full leading-none">
-                  {monthHolidays.length}
-                </span>
-              </h4>
+          {/* Holidays List for Current Month */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Flag size={13} color="#f59e0b" />
+              <span style={{ fontSize: 12.5, fontWeight: 800, color: '#334155' }}>
+                Holidays in {MONTH_NAMES[viewMonth]} {viewYear}
+              </span>
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  padding: '2px 8px',
+                  borderRadius: 999,
+                  background: '#fef3c7',
+                  color: '#92400e'
+                }}
+              >
+                {monthHolidays.length}
+              </span>
             </div>
 
             {monthHolidays.length === 0 ? (
-              <div className="text-center py-4 bg-slate-50 rounded-xl border border-slate-200/80 text-slate-400 text-xs font-medium">
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '16px 12px',
+                  borderRadius: 13,
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  fontSize: 12,
+                  color: '#94a3b8',
+                  fontWeight: 600
+                }}
+              >
                 No Gazetted Holidays in {MONTH_NAMES[viewMonth]} {viewYear}
               </div>
             ) : (
-              <div className="space-y-1.5">
-                {monthHolidays.map(h => {
-                  const hDate = new Date(h.date + 'T00:00:00');
-                  const dayName = hDate.toLocaleDateString('en-US', { weekday: 'short' });
-                  const dayNum = hDate.getDate();
-                  const isNational = h.type === 'National Holiday';
+              monthHolidays.map(h => {
+                const hDate = new Date(h.date + 'T00:00:00');
+                const dayName = hDate.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayNum = hDate.getDate();
+                const isNational = h.type === 'National Holiday';
 
-                  return (
-                    <div
-                      key={h.date + h.name}
-                      onClick={() => setSelectedDateStr(h.date)}
-                      className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-between gap-2.5 ${
-                        selectedDateStr === h.date
-                          ? 'bg-emerald-50/70 border-emerald-300 shadow-2xs'
-                          : 'bg-white border-slate-200/80 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div
-                          className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center shrink-0 leading-none ${
-                            isNational
-                              ? 'bg-orange-100 text-orange-900 font-black border border-orange-200'
-                              : 'bg-emerald-100 text-emerald-900 font-extrabold border border-emerald-200'
-                          }`}
-                        >
-                          <span className="text-[13px]">{dayNum}</span>
-                          <span className="text-[8px] uppercase mt-0.5">{dayName}</span>
-                        </div>
-
-                        <div className="min-w-0">
-                          <h5 className="text-xs font-bold text-slate-800 truncate leading-snug">
-                            {h.name}
-                          </h5>
-                          <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                            {h.description}
-                          </p>
-                        </div>
+                return (
+                  <div
+                    key={h.date + h.name}
+                    onClick={() => setSelectedDateStr(h.date)}
+                    className={`cal-holiday-list-item ${selectedDateStr === h.date ? 'selected' : ''}`}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                      <div
+                        style={{
+                          width: 38,
+                          height: 38,
+                          minWidth: 38,
+                          borderRadius: 11,
+                          background: isNational ? '#ffedd5' : '#ecfdf5',
+                          border: `1px solid ${isNational ? '#fed7aa' : '#a7f3d0'}`,
+                          color: isNational ? '#9a3412' : '#065f46',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          lineHeight: 1
+                        }}
+                      >
+                        <span style={{ fontSize: 13, fontWeight: 800 }}>{dayNum}</span>
+                        <span style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', marginTop: 2 }}>
+                          {dayName}
+                        </span>
                       </div>
 
-                      <span
-                        className={`text-[9px] font-extrabold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wide ${
-                          isNational
-                            ? 'bg-orange-100 text-orange-800'
-                            : 'bg-emerald-100 text-emerald-800'
-                        }`}
-                      >
-                        {isNational ? 'National' : 'Gazetted'}
-                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 12.5,
+                            fontWeight: 700,
+                            color: '#0f172a',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {h.name}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: '#64748b',
+                            marginTop: 2,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {h.description}
+                        </div>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
+
+                    <span
+                      style={{
+                        fontSize: 9.5,
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        padding: '4px 8px',
+                        borderRadius: 7,
+                        background: isNational ? '#ffedd5' : '#d1fae5',
+                        color: isNational ? '#9a3412' : '#065f46',
+                        flexShrink: 0,
+                        lineHeight: 1
+                      }}
+                    >
+                      {isNational ? 'National' : 'Gazetted'}
+                    </span>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
 
-        {/* ════════ Footer ════════ */}
-        <div className="px-4 py-3 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between shrink-0">
-          <span className="text-[11px] text-slate-500 font-medium">
+        {/* Footer */}
+        <div className="cal-modal-footer">
+          <span style={{ fontSize: 11.5, color: '#64748b', fontWeight: 500 }}>
             Tap any date to check holidays
           </span>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-1.5 bg-slate-200/80 hover:bg-slate-300/80 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer"
-          >
+          <button type="button" onClick={onClose} className="cal-modal-close-btn">
             Close
           </button>
         </div>

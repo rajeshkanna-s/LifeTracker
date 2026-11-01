@@ -18,6 +18,7 @@ import { usePartner } from '../../context/PartnerContext';
 import ExpenseForm from '../expenses/ExpenseForm';
 import IndianCalendarModal from './IndianCalendarModal';
 import { findIndianHoliday } from '../../data/indianHolidays';
+import './CalendarTracker.css';
 
 interface CalendarTrackerProps {
   onNavigateTab?: (tab: TabId) => void;
@@ -37,29 +38,18 @@ const getCategoryIcon = (exp: Expense): string => {
   return '📦';
 };
 
-/** Compact INR formatter for calendar day cells (e.g. 800 -> "800", 1200 -> "1.2k", 52087 -> "52k", 150000 -> "1.5L") */
-const formatCompactCellAmount = (val: number): string => {
-  const abs = Math.abs(val);
-  if (abs >= 10000000) {
-    return `${(abs / 10000000).toFixed(1).replace(/\.0$/, '')}Cr`;
-  }
-  if (abs >= 100000) {
-    return `${(abs / 100000).toFixed(1).replace(/\.0$/, '')}L`;
-  }
-  if (abs >= 10000) {
-    return `${Math.round(abs / 1000)}k`;
-  }
-  if (abs >= 1000) {
-    return `${(abs / 1000).toFixed(1).replace(/\.0$/, '')}k`;
-  }
-  return `${Math.round(abs)}`;
-};
-
 /** Crisp SVG Indian Tricolor Flag (never renders as broken "IN" letters on Windows) */
-const TricolorFlagIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-2.5' }) => (
+const TricolorFlagIcon: React.FC = () => (
   <svg
     viewBox="0 0 24 16"
-    className={`${className} rounded-[2px] shadow-2xs shrink-0 overflow-hidden border border-black/10`}
+    style={{
+      width: 15,
+      height: 10,
+      borderRadius: 2,
+      overflow: 'hidden',
+      border: '1px solid rgba(15, 23, 42, 0.12)',
+      flexShrink: 0
+    }}
     aria-hidden="true"
   >
     <rect width="24" height="5.33" y="0" fill="#FF9933" />
@@ -72,25 +62,19 @@ const TricolorFlagIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5
 export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
   const { activePartnerId } = usePartner();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [selectedDateStr, setSelectedDateStr] = useState<string>(() => {
-    return formatLocalDate(new Date());
-  });
+  const [selectedDateStr, setSelectedDateStr] = useState<string>(() => formatLocalDate(new Date()));
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [settings, setSettings] = useState<ExpenseSettings>(getDefaultExpenseSettings(activePartnerId));
   const [loading, setLoading] = useState(true);
 
-  // View state: 'grid' (month view) or 'agenda' (timeline list)
   const [viewMode, setViewMode] = useState<'grid' | 'agenda'>('grid');
-  // Type filter: 'all' | 'expense' | 'income'
   const [typeFilter, setTypeFilter] = useState<'all' | 'expense' | 'income'>('all');
 
-  // Modal state for Add/Edit transaction & Holidays
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [showHolidayModal, setShowHolidayModal] = useState(false);
 
-  // Touch swipe tracking for native mobile month navigation
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
 
@@ -131,9 +115,8 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
     setLoading(false);
   };
 
-  // Calendar Month Info
   const year = currentDate.getFullYear();
-  const month = currentDate.getMonth(); // 0-indexed
+  const month = currentDate.getMonth();
   const monthPrefix = `${year}-${(month + 1).toString().padStart(2, '0')}`;
 
   const monthLabelFull = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -141,14 +124,12 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
   const todayStr = useMemo(() => formatLocalDate(new Date()), []);
   const isViewingTodayMonth = todayStr.startsWith(monthPrefix);
 
-  // Filtered transactions by typeFilter
   const filteredExpenses = useMemo(() => {
     if (typeFilter === 'all') return expenses;
     if (typeFilter === 'income') return expenses.filter(e => isIncome(e));
     return expenses.filter(e => !isIncome(e));
   }, [expenses, typeFilter]);
 
-  // Aggregated data map by date string (YYYY-MM-DD)
   const dateDataMap = useMemo(() => {
     const map: Record<
       string,
@@ -175,7 +156,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
     return map;
   }, [filteredExpenses]);
 
-  // Calendar Days Grid (Monday start)
   const calendarDays = useMemo(() => {
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
@@ -191,7 +171,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
       isWeekend: boolean;
     }[] = [];
 
-    // Previous month padding
     const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = startPadding - 1; i >= 0; i--) {
       const dNum = prevMonthLastDay - i;
@@ -205,11 +184,10 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         dayNumber: dNum,
         isCurrentMonth: false,
         isToday: dateStr === todayStr,
-        isWeekend: colIdx === 5 || colIdx === 6,
+        isWeekend: colIdx === 5 || colIdx === 6
       });
     }
 
-    // Current month days
     for (let i = 1; i <= daysInMonth; i++) {
       const mStr = (month + 1).toString().padStart(2, '0');
       const dStr = i.toString().padStart(2, '0');
@@ -220,11 +198,10 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         dayNumber: i,
         isCurrentMonth: true,
         isToday: dateStr === todayStr,
-        isWeekend: colIdx === 5 || colIdx === 6,
+        isWeekend: colIdx === 5 || colIdx === 6
       });
     }
 
-    // Next month padding
     const totalCells = Math.ceil(days.length / 7) * 7;
     const remaining = totalCells - days.length;
     for (let i = 1; i <= remaining; i++) {
@@ -238,18 +215,16 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         dayNumber: i,
         isCurrentMonth: false,
         isToday: dateStr === todayStr,
-        isWeekend: colIdx === 5 || colIdx === 6,
+        isWeekend: colIdx === 5 || colIdx === 6
       });
     }
 
     return days;
   }, [year, month, todayStr]);
 
-  // Month Financial Totals
   const monthStats = useMemo(() => {
     let mIncome = 0;
     let mExpense = 0;
-    const spendingDays = new Set<string>();
     let monthFilteredCount = 0;
 
     for (const exp of expenses) {
@@ -258,7 +233,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         mIncome += Number(exp.amount) || 0;
       } else {
         mExpense += Number(exp.amount) || 0;
-        spendingDays.add(exp.date);
       }
     }
 
@@ -269,11 +243,9 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
     }
 
     const net = mIncome - mExpense;
-    const avgDaily = spendingDays.size > 0 ? Math.round(mExpense / spendingDays.size) : 0;
-    return { mIncome, mExpense, net, avgDaily, monthFilteredCount };
+    return { mIncome, mExpense, net, monthFilteredCount };
   }, [expenses, filteredExpenses, monthPrefix]);
 
-  // Selected Day Items
   const selectedDayExpenses = useMemo(() => {
     return filteredExpenses.filter(e => e.date === selectedDateStr);
   }, [filteredExpenses, selectedDateStr]);
@@ -288,7 +260,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
     return { spent, income, net: income - spent };
   }, [selectedDayExpenses]);
 
-  // Agenda View Grouped Transactions (Current Month)
   const monthAgendaGroups = useMemo(() => {
     const monthList = filteredExpenses.filter(e => e.date && e.date.startsWith(monthPrefix));
 
@@ -311,12 +282,11 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         dateStr: dStr,
         items,
         spent: daySpent,
-        income: dayInc,
+        income: dayInc
       };
     });
   }, [filteredExpenses, monthPrefix]);
 
-  // Navigation helpers
   const handlePrevMonth = () => {
     setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
@@ -341,7 +311,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
     }
   };
 
-  // Touch swipe handlers for mobile month swiping
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length !== 1) return;
     touchStartXRef.current = e.touches[0].clientX;
@@ -355,7 +324,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
     touchStartXRef.current = null;
     touchStartYRef.current = null;
 
-    // Horizontal swipe threshold (55px) and ensure horizontal intent
     if (Math.abs(deltaX) > 55 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
       if (deltaX < 0) {
         handleNextMonth();
@@ -365,7 +333,6 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
     }
   };
 
-  // Add / Edit Transaction Handlers
   const handleOpenAdd = () => {
     setEditingExpense(null);
     setShowFormModal(true);
@@ -409,7 +376,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         ...dbFields,
         tags,
         partner_id: activePartnerId,
-        date: data.date || selectedDateStr,
+        date: data.date || selectedDateStr
       };
 
       const { data: updated } = await supabase
@@ -428,7 +395,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         ...dbFields,
         tags,
         partner_id: activePartnerId,
-        date: data.date || selectedDateStr,
+        date: data.date || selectedDateStr
       };
 
       const { data: newRow } = await supabase.from('expenses').insert(payload).select().single();
@@ -443,7 +410,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
         <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -453,38 +420,80 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
   const selectedDayNum = selectedDateObj.getDate().toString().padStart(2, '0');
   const selectedShortMonth = selectedDateObj.toLocaleDateString('en-US', { month: 'short' });
   const selectedWeekdayFull = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' });
-  const selectedMonthYear = selectedDateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const selectedHoliday = findIndianHoliday(selectedDateStr);
   const isSelectedToday = selectedDateStr === todayStr;
 
+  const renderTransactionRow = (exp: Expense) => {
+    const isInc = isIncome(exp);
+    const icon = getCategoryIcon(exp);
+    const metaParts = [exp.category, exp.platform, exp.payment_method, exp.time].filter(Boolean);
+
+    return (
+      <div key={exp.id} className="cal-tx-row">
+        <div className="cal-tx-left">
+          <div className={`cal-tx-icon ${isInc ? 'income' : ''}`}>{icon}</div>
+          <div className="cal-tx-info">
+            <div className="cal-tx-title-line">
+              <span className="cal-tx-title">{exp.description || exp.category}</span>
+              {isInc && <span className="cal-tx-inc-tag">Income</span>}
+            </div>
+            <div className="cal-tx-sub">{metaParts.join(' • ')}</div>
+          </div>
+        </div>
+
+        <div className="cal-tx-right">
+          <span className={`cal-tx-amount ${isInc ? 'income' : ''}`}>
+            {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
+          </span>
+          <div className="cal-tx-actions">
+            <button
+              type="button"
+              onClick={() => handleOpenEdit(exp)}
+              className="cal-icon-btn"
+              title="Edit transaction"
+              aria-label="Edit transaction"
+            >
+              <Pencil size={13} strokeWidth={2.2} />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDeleteExpense(exp.id)}
+              className="cal-icon-btn delete"
+              title="Delete transaction"
+              aria-label="Delete transaction"
+            >
+              <Trash2 size={13} strokeWidth={2.2} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="space-y-3 max-w-4xl mx-auto pb-32">
-      {/* ════════ Native App Top Control & Cashflow Card ════════ */}
-      <div className="bg-white border border-slate-200/80 rounded-3xl p-3 sm:p-4 shadow-xs space-y-2.5">
-        {/* Row 1: Integrated Month Navigator + Quick Actions */}
-        <div className="flex items-center justify-between gap-1.5">
-          {/* Month Stepper */}
-          <div className="flex items-center gap-1 min-w-0">
+    <div className="cal-shell">
+      {/* ════════ Card 1: Month Navigation + Summary + Filter ════════ */}
+      <div className="cal-card">
+        <div className="cal-top-bar">
+          <div className="cal-month-nav">
             <button
               type="button"
               onClick={handlePrevMonth}
               aria-label="Previous month"
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 flex items-center justify-center active:scale-90 transition cursor-pointer shrink-0"
+              className="cal-nav-arrow"
             >
-              <ChevronLeft size={17} strokeWidth={2.4} />
+              <ChevronLeft size={16} strokeWidth={2.4} />
             </button>
 
             <button
               type="button"
               onClick={handleGoToday}
-              title="Tap to jump to Today"
-              className="px-2 py-1 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left min-w-0"
+              title="Jump to Today"
+              className="cal-month-title-btn"
             >
-              <span className="text-[15px] sm:text-lg font-black text-slate-900 tracking-tight leading-none block truncate sm:hidden">
-                {monthLabelShort}
-              </span>
-              <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none hidden sm:block truncate">
-                {monthLabelFull}
+              <span className="cal-month-title">
+                <span className="cal-month-title-full">{monthLabelFull}</span>
+                <span className="cal-month-title-short">{monthLabelShort}</span>
               </span>
             </button>
 
@@ -492,177 +501,122 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
               type="button"
               onClick={handleNextMonth}
               aria-label="Next month"
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 flex items-center justify-center active:scale-90 transition cursor-pointer shrink-0"
+              className="cal-nav-arrow"
             >
-              <ChevronRight size={17} strokeWidth={2.4} />
+              <ChevronRight size={16} strokeWidth={2.4} />
             </button>
 
             {(!isViewingTodayMonth || !isSelectedToday) && (
-              <button
-                type="button"
-                onClick={handleGoToday}
-                className="ml-0.5 px-2.5 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 text-[11px] font-extrabold transition active:scale-95 cursor-pointer shrink-0"
-              >
+              <button type="button" onClick={handleGoToday} className="cal-today-chip">
                 Today
               </button>
             )}
           </div>
 
-          {/* Right Action Pills: Holidays + View Switcher */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="cal-top-actions">
             <button
               type="button"
               onClick={() => setShowHolidayModal(true)}
               aria-label="Open Holidays Calendar"
               title="2020–2035 Indian Govt Holidays"
-              className="flex items-center gap-1.5 h-8 px-2.5 sm:px-3 bg-amber-50 hover:bg-amber-100/80 text-slate-800 border border-amber-200/90 rounded-xl text-[11px] font-extrabold shadow-2xs active:scale-95 transition cursor-pointer shrink-0"
+              className="cal-holidays-btn"
             >
               <TricolorFlagIcon />
-              <span>Holidays</span>
+              <span className="cal-holidays-label">Holidays</span>
             </button>
 
-            {/* Compact Segmented View Toggle */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/70 h-8">
+            <div className="cal-view-switch">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1 h-7 px-2 sm:px-2.5 text-[11px] font-extrabold rounded-[10px] transition cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-emerald-700 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className={`cal-view-btn ${viewMode === 'grid' ? 'active' : ''}`}
                 title="Calendar Grid"
                 aria-label="Calendar Grid"
               >
-                <LayoutGrid size={13} strokeWidth={2.3} />
-                <span className="hidden sm:inline">Grid</span>
+                <LayoutGrid size={14} strokeWidth={2.2} />
+                <span className="cal-view-label">Grid</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('agenda')}
-                className={`flex items-center gap-1 h-7 px-2 sm:px-2.5 text-[11px] font-extrabold rounded-[10px] transition cursor-pointer ${
-                  viewMode === 'agenda'
-                    ? 'bg-white text-emerald-700 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className={`cal-view-btn ${viewMode === 'agenda' ? 'active' : ''}`}
                 title="Timeline List"
                 aria-label="Timeline List"
               >
-                <List size={14} strokeWidth={2.3} />
-                <span className="hidden sm:inline">List</span>
+                <List size={14} strokeWidth={2.2} />
+                <span className="cal-view-label">List</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Row 2: Compact 4-Column App Cashflow Strip */}
-        <div className="grid grid-cols-4 divide-x divide-slate-200/75 bg-slate-50/90 border border-slate-200/70 rounded-2xl py-2 px-1">
-          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
-            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 truncate">
-              Income
-            </p>
-            <p className="text-[11px] sm:text-sm font-black text-emerald-700 tabular-nums tracking-tight truncate mt-0.5">
+        {/* 3-Column Spacious Cashflow Summary */}
+        <div className="cal-summary-strip">
+          <div className="cal-summary-item">
+            <span className="cal-summary-label">Income</span>
+            <span className="cal-summary-val income">
               +₹{monthStats.mIncome.toLocaleString('en-IN')}
-            </p>
+            </span>
           </div>
 
-          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
-            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-rose-500 truncate">
-              Spent
-            </p>
-            <p className="text-[11px] sm:text-sm font-black text-rose-600 tabular-nums tracking-tight truncate mt-0.5">
+          <div className="cal-summary-item">
+            <span className="cal-summary-label">Expenses</span>
+            <span className="cal-summary-val expense">
               ₹{monthStats.mExpense.toLocaleString('en-IN')}
-            </p>
+            </span>
           </div>
 
-          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
-            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 truncate">
-              Net Flow
-            </p>
-            <p
-              className={`text-[11px] sm:text-sm font-black tabular-nums tracking-tight truncate mt-0.5 ${
-                monthStats.net >= 0 ? 'text-emerald-600' : 'text-rose-600'
-              }`}
-            >
+          <div className="cal-summary-item">
+            <span className="cal-summary-label">Net Balance</span>
+            <span className={`cal-summary-val ${monthStats.net >= 0 ? 'net-pos' : 'net-neg'}`}>
               {monthStats.net >= 0 ? '+' : '-'}₹{Math.abs(monthStats.net).toLocaleString('en-IN')}
-            </p>
-          </div>
-
-          <div className="px-1.5 sm:px-3 text-center sm:text-left min-w-0">
-            <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 truncate">
-              Avg/Day
-            </p>
-            <p className="text-[11px] sm:text-sm font-black text-slate-800 tabular-nums tracking-tight truncate mt-0.5">
-              ₹{monthStats.avgDaily.toLocaleString('en-IN')}
-            </p>
+            </span>
           </div>
         </div>
 
-        {/* Row 3: Sleek Native Segmented Filter */}
-        <div className="flex items-center bg-slate-100/90 p-1 rounded-xl gap-1 border border-slate-200/60">
+        {/* Centered Segmented Filter */}
+        <div className="cal-filter-track">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className={`flex-1 py-1 text-[11px] sm:text-xs font-extrabold rounded-lg transition cursor-pointer text-center ${
-              typeFilter === 'all'
-                ? 'bg-slate-900 text-white shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className={`cal-filter-btn ${typeFilter === 'all' ? 'active-all' : ''}`}
           >
             All
           </button>
           <button
             type="button"
             onClick={() => setTypeFilter('expense')}
-            className={`flex-1 py-1 text-[11px] sm:text-xs font-extrabold rounded-lg transition cursor-pointer text-center ${
-              typeFilter === 'expense'
-                ? 'bg-rose-600 text-white shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className={`cal-filter-btn ${typeFilter === 'expense' ? 'active-expense' : ''}`}
           >
             Expenses
           </button>
           <button
             type="button"
             onClick={() => setTypeFilter('income')}
-            className={`flex-1 py-1 text-[11px] sm:text-xs font-extrabold rounded-lg transition cursor-pointer text-center ${
-              typeFilter === 'income'
-                ? 'bg-emerald-600 text-white shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className={`cal-filter-btn ${typeFilter === 'income' ? 'active-income' : ''}`}
           >
             Income
           </button>
         </div>
       </div>
 
-      {/* ════════ VIEW 1: NATIVE APP MONTH GRID ════════ */}
+      {/* ════════ VIEW 1: MONTH CALENDAR GRID + SELECTED DAY ════════ */}
       {viewMode === 'grid' && (
         <>
           <div
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
-            className="bg-white border border-slate-200/80 rounded-3xl p-2.5 sm:p-4 shadow-xs select-none"
+            className="cal-grid-card"
           >
-            {/* Weekdays Header */}
-            <div className="grid grid-cols-7 gap-1 text-center pb-2 mb-1.5 border-b border-slate-100">
-              {DAYS_HEADER.map((d, idx) => {
-                const isWeekend = idx === 5 || idx === 6;
-                return (
-                  <div
-                    key={d}
-                    className={`text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider ${
-                      isWeekend ? 'text-amber-600' : 'text-slate-400'
-                    }`}
-                  >
-                    {d}
-                  </div>
-                );
-              })}
+            <div className="cal-weekdays">
+              {DAYS_HEADER.map((d, idx) => (
+                <div key={d} className={`cal-weekday ${idx === 5 || idx === 6 ? 'weekend' : ''}`}>
+                  {d}
+                </div>
+              ))}
             </div>
 
-            {/* Interactive Day Tiles with Micro Cashflow Amounts */}
-            <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+            <div className="cal-days-grid">
               {calendarDays.map(cell => {
                 const isSelected = cell.dateStr === selectedDateStr;
                 const data = dateDataMap[cell.dateStr];
@@ -671,332 +625,164 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
                 const hasActivity = hasExpense || hasIncome;
                 const cellHoliday = findIndianHoliday(cell.dateStr);
 
+                const cellClasses = [
+                  'cal-day-cell',
+                  !cell.isCurrentMonth ? 'outside' : '',
+                  cell.isWeekend ? 'weekend' : '',
+                  hasActivity ? 'has-activity' : '',
+                  cellHoliday ? 'holiday' : '',
+                  cell.isToday ? 'today' : '',
+                  isSelected ? 'selected' : ''
+                ]
+                  .filter(Boolean)
+                  .join(' ');
+
                 return (
                   <button
                     key={cell.dateStr}
                     type="button"
                     onClick={() => handleSelectCell(cell.dateStr, cell.isCurrentMonth)}
                     title={cellHoliday ? `${cellHoliday.name} • ${cell.dateStr}` : cell.dateStr}
-                    className={`relative flex flex-col items-center justify-between min-h-[54px] sm:min-h-[66px] py-1.5 px-0.5 rounded-2xl transition-all duration-150 cursor-pointer active:scale-95 ${
-                      !cell.isCurrentMonth
-                        ? 'opacity-30 hover:opacity-55 bg-transparent'
-                        : isSelected
-                        ? 'bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/25 z-10'
-                        : cell.isToday
-                        ? 'bg-emerald-50/90 text-emerald-900 border-2 border-emerald-500 shadow-2xs'
-                        : cellHoliday
-                        ? 'bg-amber-50/70 hover:bg-amber-50 text-slate-900 border border-amber-200/80'
-                        : hasActivity
-                        ? 'bg-slate-50/90 hover:bg-slate-100/80 text-slate-900 border border-slate-200/70'
-                        : 'bg-white hover:bg-slate-50 text-slate-700 border border-transparent'
-                    }`}
+                    className={cellClasses}
                   >
-                    {/* Holiday Corner Dot */}
-                    {cellHoliday && (
-                      <span
-                        className={`absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full ${
-                          isSelected ? 'bg-amber-300' : 'bg-orange-500'
-                        }`}
-                      />
-                    )}
-
-                    {/* Day Number */}
-                    <span
-                      className={`text-xs sm:text-sm leading-none tabular-nums ${
-                        isSelected
-                          ? 'font-black text-white'
-                          : cell.isToday
-                          ? 'font-black text-emerald-700'
-                          : hasActivity || cellHoliday
-                          ? 'font-extrabold text-slate-900'
-                          : cell.isWeekend
-                          ? 'font-bold text-slate-600'
-                          : 'font-semibold text-slate-700'
-                      }`}
-                    >
-                      {cell.dayNumber}
+                    <span className="cal-day-num">{cell.dayNumber}</span>
+                    <span className="cal-day-dots">
+                      {hasIncome && <span className="cal-dot income" />}
+                      {hasExpense && <span className="cal-dot expense" />}
+                      {cellHoliday && <span className="cal-dot holiday" />}
                     </span>
-
-                    {/* Micro Cashflow Preview Inside Tile */}
-                    <div className="flex flex-col items-center justify-end gap-0.5 w-full min-h-[20px] leading-none">
-                      {hasIncome && (
-                        <span
-                          className={`text-[8.5px] sm:text-[10px] font-extrabold tabular-nums tracking-tight leading-none truncate max-w-full px-0.5 ${
-                            isSelected ? 'text-emerald-100' : 'text-emerald-600'
-                          }`}
-                        >
-                          +{formatCompactCellAmount(data.incomeTotal)}
-                        </span>
-                      )}
-                      {hasExpense && (
-                        <span
-                          className={`text-[8.5px] sm:text-[10px] font-extrabold tabular-nums tracking-tight leading-none truncate max-w-full px-0.5 ${
-                            isSelected ? 'text-white' : 'text-rose-600'
-                          }`}
-                        >
-                          -{formatCompactCellAmount(data.expenseTotal)}
-                        </span>
-                      )}
-                      {!hasIncome && !hasExpense && cellHoliday && (
-                        <span
-                          className={`text-[8px] font-bold truncate max-w-[92%] leading-none ${
-                            isSelected ? 'text-amber-200' : 'text-orange-600'
-                          }`}
-                        >
-                          Holiday
-                        </span>
-                      )}
-                    </div>
                   </button>
                 );
               })}
             </div>
 
-            {/* Subtle Legend Footer */}
-            <div className="flex items-center justify-between gap-2 pt-2.5 mt-2 border-t border-slate-100 px-1 text-[10px] font-bold text-slate-400">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  Income
+            <div className="cal-grid-footer">
+              <div className="cal-legend-items">
+                <span className="cal-legend-item">
+                  <span className="cal-dot income" />
+                  <span>Income</span>
                 </span>
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                  Spent
+                <span className="cal-legend-item">
+                  <span className="cal-dot expense" />
+                  <span>Expense</span>
                 </span>
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                  Holiday
+                <span className="cal-legend-item">
+                  <span className="cal-dot holiday" />
+                  <span>Holiday</span>
                 </span>
               </div>
-              <span className="sm:hidden text-[9.5px] text-slate-400 font-semibold">
-                Swipe ↔ month
+              <span className="cal-swipe-hint">
+                {monthStats.monthFilteredCount} {monthStats.monthFilteredCount === 1 ? 'entry' : 'entries'}
               </span>
             </div>
           </div>
 
-          {/* ════════ Native App Selected Day Agenda Sheet ════════ */}
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-3">
-            {/* Day Sheet Header */}
-            <div className="flex items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-3 min-w-0">
-                {/* Calendar Leaf Badge */}
-                <div
-                  className={`w-11 h-11 rounded-2xl flex flex-col items-center justify-center shrink-0 leading-none border ${
-                    isSelectedToday
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
-                      : 'bg-slate-50 text-slate-800 border-slate-200/90'
-                  }`}
-                >
-                  <span
-                    className={`text-[9px] font-extrabold uppercase tracking-wider ${
-                      isSelectedToday ? 'text-emerald-100' : 'text-slate-400'
-                    }`}
-                  >
-                    {selectedShortMonth}
-                  </span>
-                  <span className="text-[15px] font-black tabular-nums mt-0.5">
-                    {selectedDayNum}
-                  </span>
+          {/* Selected Day Agenda Card */}
+          <div className="cal-card">
+            <div className="cal-agenda-header">
+              <div className="cal-agenda-date-wrap">
+                <div className={`cal-date-leaf ${isSelectedToday ? 'today' : ''}`}>
+                  <span className="cal-leaf-month">{selectedShortMonth}</span>
+                  <span className="cal-leaf-day">{selectedDayNum}</span>
                 </div>
 
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <h3 className="text-sm sm:text-base font-black text-slate-900 leading-tight truncate">
-                      {selectedWeekdayFull}
-                    </h3>
-                    <span className="text-xs font-semibold text-slate-400 hidden sm:inline">
-                      • {selectedMonthYear}
+                <div className="cal-agenda-date-info">
+                  <div className="cal-agenda-title-row">
+                    <span className="cal-agenda-weekday">
+                      {selectedWeekdayFull}, {selectedShortMonth} {selectedDateObj.getDate()}
                     </span>
-                    {isSelectedToday && (
-                      <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full leading-none">
-                        Today
-                      </span>
-                    )}
+                    {isSelectedToday && <span className="cal-agenda-today-badge">Today</span>}
                   </div>
 
-                  {/* Daily Summary Chips */}
-                  <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                  <div className="cal-day-pills">
                     {selectedDayTotals.spent > 0 && (
-                      <span className="inline-flex items-center text-[11px] font-extrabold text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-lg tabular-nums leading-none">
+                      <span className="cal-day-pill spent">
                         Spent ₹{selectedDayTotals.spent.toLocaleString('en-IN')}
                       </span>
                     )}
                     {selectedDayTotals.income > 0 && (
-                      <span className="inline-flex items-center text-[11px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg tabular-nums leading-none">
+                      <span className="cal-day-pill income">
                         +₹{selectedDayTotals.income.toLocaleString('en-IN')}
                       </span>
                     )}
                     {selectedDayTotals.spent === 0 && selectedDayTotals.income === 0 && (
-                      <span className="text-[11px] font-semibold text-slate-400">
-                        No transactions logged
-                      </span>
+                      <span className="cal-day-empty-meta">No transactions on this date</span>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Primary Add Button */}
-              <button
-                type="button"
-                onClick={handleOpenAdd}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-2xl shadow-sm shadow-emerald-600/20 active:scale-95 transition cursor-pointer shrink-0"
-              >
-                <Plus size={15} strokeWidth={2.6} />
+              <button type="button" onClick={handleOpenAdd} className="cal-add-btn">
+                <Plus size={15} strokeWidth={2.5} />
                 <span>Add</span>
               </button>
             </div>
 
-            {/* Holiday Banner if applicable */}
             {selectedHoliday && (
-              <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-amber-50/90 border border-amber-200/80">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Sparkles size={14} className="text-amber-600 shrink-0" />
-                  <p className="text-xs font-extrabold text-amber-950 truncate">
-                    {selectedHoliday.name}
-                  </p>
+              <div className="cal-holiday-banner">
+                <div className="cal-holiday-banner-left">
+                  <Sparkles size={15} color="#d97706" />
+                  <span className="cal-holiday-banner-name">{selectedHoliday.name}</span>
                 </div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white text-amber-700 border border-amber-200/70 shrink-0">
+                <span className="cal-holiday-banner-tag">
                   {selectedHoliday.type === 'National Holiday' ? 'National' : 'Gazetted'}
                 </span>
               </div>
             )}
 
-            {/* Selected Day Transactions List */}
             {selectedDayExpenses.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 px-4 bg-slate-50/70 rounded-2xl border border-dashed border-slate-200 text-center">
-                <div className="w-9 h-9 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center text-slate-400 mb-2 shadow-2xs">
-                  <CalendarIcon size={16} />
+              <div className="cal-empty-day">
+                <div className="cal-empty-icon">
+                  <CalendarIcon size={17} />
                 </div>
-                <p className="text-xs font-bold text-slate-600">
+                <p className="cal-empty-text">
                   Nothing recorded for {selectedShortMonth} {selectedDateObj.getDate()}
                 </p>
-                <button
-                  type="button"
-                  onClick={handleOpenAdd}
-                  className="mt-2.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 font-extrabold text-xs active:scale-95 transition cursor-pointer shadow-2xs"
-                >
-                  <Plus size={13} strokeWidth={2.5} />
+                <button type="button" onClick={handleOpenAdd} className="cal-empty-btn">
+                  <Plus size={14} strokeWidth={2.4} />
                   <span>Add Expense or Income</span>
                 </button>
               </div>
             ) : (
-              <div className="space-y-2">
-                {selectedDayExpenses.map(exp => {
-                  const isInc = isIncome(exp);
-                  const icon = getCategoryIcon(exp);
-
-                  return (
-                    <div
-                      key={exp.id}
-                      className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 bg-slate-50/60 hover:bg-slate-50 rounded-2xl transition border border-slate-200/75"
-                    >
-                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                        <div
-                          className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg shrink-0 border select-none ${
-                            isInc
-                              ? 'bg-emerald-50 border-emerald-200/80'
-                              : 'bg-white border-slate-200/80 shadow-2xs'
-                          }`}
-                        >
-                          {icon}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <p className="text-xs sm:text-sm font-extrabold text-slate-900 truncate leading-snug">
-                              {exp.description || exp.category}
-                            </p>
-                            {isInc && (
-                              <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-100/80 text-emerald-800 px-1.5 py-0.5 rounded-md leading-none shrink-0">
-                                Income
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium truncate mt-0.5">
-                            <span>{exp.category}</span>
-                            {exp.platform && <span>• {exp.platform}</span>}
-                            {exp.payment_method && <span>• {exp.payment_method}</span>}
-                            {exp.time && <span>• {exp.time}</span>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span
-                          className={`text-xs sm:text-sm font-black tabular-nums whitespace-nowrap ${
-                            isInc ? 'text-emerald-600' : 'text-slate-900'
-                          }`}
-                        >
-                          {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
-                        </span>
-
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEdit(exp)}
-                            className="w-7 h-7 rounded-xl bg-white hover:bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-600 transition active:scale-90 cursor-pointer shadow-2xs"
-                            title="Edit transaction"
-                            aria-label="Edit transaction"
-                          >
-                            <Pencil size={12} strokeWidth={2.2} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteExpense(exp.id)}
-                            className="w-7 h-7 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/70 flex items-center justify-center text-rose-600 transition active:scale-90 cursor-pointer"
-                            title="Delete transaction"
-                            aria-label="Delete transaction"
-                          >
-                            <Trash2 size={12} strokeWidth={2.2} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="cal-tx-list">
+                {selectedDayExpenses.map(exp => renderTransactionRow(exp))}
               </div>
             )}
           </div>
         </>
       )}
 
-      {/* ════════ VIEW 2: NATIVE TIMELINE LIST ════════ */}
+      {/* ════════ VIEW 2: TIMELINE AGENDA LIST ════════ */}
       {viewMode === 'agenda' && (
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
-            <div className="min-w-0">
-              <h3 className="text-sm sm:text-base font-black text-slate-900 truncate">
-                {monthLabelFull} Timeline
-              </h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                {monthStats.monthFilteredCount} {monthStats.monthFilteredCount === 1 ? 'transaction' : 'transactions'} this month
-              </p>
+        <div className="cal-card">
+          <div className="cal-agenda-header">
+            <div className="cal-agenda-date-info">
+              <span className="cal-agenda-weekday">{monthLabelFull} Timeline</span>
+              <span className="cal-day-empty-meta">
+                {monthStats.monthFilteredCount}{' '}
+                {monthStats.monthFilteredCount === 1 ? 'transaction' : 'transactions'} recorded
+              </span>
             </div>
-            <button
-              type="button"
-              onClick={handleOpenAdd}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-2xl shadow-sm shadow-emerald-600/20 active:scale-95 transition cursor-pointer shrink-0"
-            >
-              <Plus size={15} strokeWidth={2.6} />
+
+            <button type="button" onClick={handleOpenAdd} className="cal-add-btn">
+              <Plus size={15} strokeWidth={2.5} />
               <span>Add</span>
             </button>
           </div>
 
           {monthAgendaGroups.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50/70 rounded-2xl border border-dashed border-slate-200">
-              <p className="text-xs sm:text-sm text-slate-500 font-semibold">
-                No transactions recorded in {monthLabelFull}.
-              </p>
-              <button
-                type="button"
-                onClick={handleOpenAdd}
-                className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold hover:bg-emerald-700 transition cursor-pointer shadow-xs active:scale-95"
-              >
-                <Plus size={14} strokeWidth={2.5} />
+            <div className="cal-empty-day">
+              <div className="cal-empty-icon">
+                <CalendarIcon size={17} />
+              </div>
+              <p className="cal-empty-text">No transactions recorded in {monthLabelFull}</p>
+              <button type="button" onClick={handleOpenAdd} className="cal-empty-btn">
+                <Plus size={14} strokeWidth={2.4} />
                 <span>Add Transaction</span>
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="cal-timeline-groups">
               {monthAgendaGroups.map(group => {
                 const dateObj = new Date(group.dateStr + 'T00:00:00');
                 const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
@@ -1004,107 +790,31 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
                 const isGroupToday = group.dateStr === todayStr;
 
                 return (
-                  <div key={group.dateStr} className="space-y-2">
-                    {/* Sticky-style Day Group Pill Bar */}
-                    <div className="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/75">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs font-black text-slate-900">
+                  <div key={group.dateStr} className="cal-timeline-group">
+                    <div className="cal-timeline-day-bar">
+                      <span className="cal-timeline-day-label">
+                        <span>
                           {dayMonth} • {weekday}
                         </span>
-                        {isGroupToday && (
-                          <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-extrabold leading-none">
-                            Today
-                          </span>
-                        )}
-                      </div>
+                        {isGroupToday && <span className="cal-agenda-today-badge">Today</span>}
+                      </span>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="cal-day-pills">
                         {group.spent > 0 && (
-                          <span className="inline-flex items-center text-[11px] font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 tabular-nums">
+                          <span className="cal-day-pill spent">
                             -₹{group.spent.toLocaleString('en-IN')}
                           </span>
                         )}
                         {group.income > 0 && (
-                          <span className="inline-flex items-center text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 tabular-nums">
+                          <span className="cal-day-pill income">
                             +₹{group.income.toLocaleString('en-IN')}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Day Items */}
-                    <div className="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-white">
-                      {group.items.map(exp => {
-                        const isInc = isIncome(exp);
-                        const icon = getCategoryIcon(exp);
-
-                        return (
-                          <div
-                            key={exp.id}
-                            className="p-2.5 sm:p-3.5 bg-white flex items-center justify-between gap-2.5 hover:bg-slate-50/70 transition-colors"
-                          >
-                            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                              <div
-                                className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg shrink-0 border select-none ${
-                                  isInc
-                                    ? 'bg-emerald-50 border-emerald-200/80'
-                                    : 'bg-slate-50 border-slate-200/80'
-                                }`}
-                              >
-                                {icon}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5 min-w-0">
-                                  <p className="text-xs sm:text-sm font-extrabold text-slate-900 truncate leading-snug">
-                                    {exp.description || exp.category}
-                                  </p>
-                                  {isInc && (
-                                    <span className="inline-flex items-center text-[9px] font-extrabold bg-emerald-100/80 text-emerald-800 px-1.5 py-0.5 rounded-md leading-none shrink-0">
-                                      Income
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium truncate mt-0.5">
-                                  <span>{exp.category}</span>
-                                  {exp.platform && <span>• {exp.platform}</span>}
-                                  {exp.payment_method && <span>• {exp.payment_method}</span>}
-                                  {exp.time && <span>• {exp.time}</span>}
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              <span
-                                className={`text-xs sm:text-sm font-black tabular-nums whitespace-nowrap ${
-                                  isInc ? 'text-emerald-600' : 'text-slate-900'
-                                }`}
-                              >
-                                {isInc ? '+' : '-'}₹{Number(exp.amount).toLocaleString('en-IN')}
-                              </span>
-                              <div className="flex items-center gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenEdit(exp)}
-                                  className="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition active:scale-95 cursor-pointer"
-                                  title="Edit transaction"
-                                  aria-label="Edit transaction"
-                                >
-                                  <Pencil size={12} strokeWidth={2.2} />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteExpense(exp.id)}
-                                  className="w-7 h-7 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 flex items-center justify-center transition active:scale-95 cursor-pointer"
-                                  title="Delete transaction"
-                                  aria-label="Delete transaction"
-                                >
-                                  <Trash2 size={12} strokeWidth={2.2} />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                    <div className="cal-tx-list">
+                      {group.items.map(exp => renderTransactionRow(exp))}
                     </div>
                   </div>
                 );
@@ -1114,7 +824,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         </div>
       )}
 
-      {/* ════════ Add / Edit Transaction Modal ════════ */}
+      {/* Add / Edit Transaction Modal */}
       {showFormModal && (
         <ExpenseForm
           initialData={editingExpense || { date: selectedDateStr }}
@@ -1127,7 +837,7 @@ export const CalendarTracker: React.FC<CalendarTrackerProps> = () => {
         />
       )}
 
-      {/* ════════ Indian Govt Holidays Modal ════════ */}
+      {/* Indian Govt Holidays Modal */}
       <IndianCalendarModal
         isOpen={showHolidayModal}
         onClose={() => setShowHolidayModal(false)}
