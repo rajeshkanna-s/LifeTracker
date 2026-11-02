@@ -22,7 +22,8 @@ import { formatLocalDate } from '../../utils/expenseUtils';
 import {
   playReminderChime,
   requestNotificationPermission,
-  sendBrowserNotification
+  sendBrowserNotification,
+  triggerDueReminders
 } from '../../utils/notificationService';
 import type { ReminderItem, RepeatType } from '../../types';
 
@@ -98,73 +99,10 @@ export const RemindersTracker: React.FC = () => {
     return () => window.removeEventListener('xpenser-reminders-updated', handleGlobalUpdate);
   }, [activePartnerId]);
 
-  // Real-time ticker to trigger notifications at exact date & time
+  // Run trigger check on mount & whenever reminders load
   useEffect(() => {
-    const checkSchedule = () => {
-      const now = new Date();
-      const todayStr = formatLocalDate(now);
-      const currentHours = String(now.getHours()).padStart(2, '0');
-      const currentMinutes = String(now.getMinutes()).padStart(2, '0');
-      const currentTimeStr = `${currentHours}:${currentMinutes}`;
-
-      let hasTriggered = false;
-      const updated = reminders.map(item => {
-        const rTime = (item.reminder_time || '').slice(0, 5);
-        // Trigger if due right now or overdue on today/past date without notification having fired yet
-        const isDue = (
-          !item.is_completed &&
-          !item.notification_sent &&
-          (item.reminder_date < todayStr || (item.reminder_date === todayStr && rTime <= currentTimeStr))
-        );
-
-        if (isDue) {
-          hasTriggered = true;
-          playReminderChime();
-          sendBrowserNotification(
-            `⏰ Remainder: ${item.title}`,
-            item.description || `Scheduled for ${rTime}`
-          );
-
-          // Update in Supabase reminders table
-          supabase
-            .from('reminders')
-            .update({
-              notification_sent: true,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', item.id)
-            .eq('partner_id', activePartnerId)
-            .then();
-
-          // Handle Repeat logic
-          if (item.repeat_type !== 'none') {
-            const nextDate = computeNextRepeatDate(item.reminder_date, item.repeat_type);
-            return {
-              ...item,
-              reminder_date: nextDate,
-              notification_sent: false,
-              updated_at: new Date().toISOString()
-            };
-          }
-
-          return {
-            ...item,
-            notification_sent: true,
-            updated_at: new Date().toISOString()
-          };
-        }
-        return item;
-      });
-
-      if (hasTriggered) {
-        saveReminders(updated);
-      }
-    };
-
-    const timer = setInterval(checkSchedule, 8000);
-    checkSchedule();
-    return () => clearInterval(timer);
-  }, [reminders]);
+    triggerDueReminders(activePartnerId);
+  }, [activePartnerId]);
 
   const computeNextRepeatDate = (currentDateStr: string, repeat: RepeatType): string => {
     const d = new Date(currentDateStr);
@@ -330,12 +268,18 @@ export const RemindersTracker: React.FC = () => {
     syncToExpenseSettings(sanitized);
   };
 
-  const handleOpenAdd = () => {
+  const handleOpenAdd = async () => {
+    if ('Notification' in window && Notification.permission !== 'granted') {
+      await handleRequestPermission();
+    }
     setEditingReminder(null);
     setTitle('');
     setDescription('');
     setDateVal(formatLocalDate(new Date()));
-    setTimeVal('08:00');
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    setTimeVal(`${hh}:${mm}`);
     setRepeatVal('none');
     setRepeatDropdownOpen(false);
     setShowModal(true);
@@ -395,6 +339,7 @@ export const RemindersTracker: React.FC = () => {
       }
 
       syncToExpenseSettings(updatedList);
+      triggerDueReminders(activePartnerId);
     } else {
       const newUuid = crypto.randomUUID();
       const newItem: ReminderItem = {
@@ -436,6 +381,7 @@ export const RemindersTracker: React.FC = () => {
       }
 
       syncToExpenseSettings(updatedList);
+      triggerDueReminders(activePartnerId);
     }
   };
 

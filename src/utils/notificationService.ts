@@ -57,10 +57,19 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
   return false;
 };
 
+export const computeNextRepeatDate = (currentDateStr: string, repeat: string): string => {
+  const d = new Date(currentDateStr);
+  if (repeat === 'daily') d.setDate(d.getDate() + 1);
+  else if (repeat === 'weekly') d.setDate(d.getDate() + 7);
+  else if (repeat === 'monthly') d.setMonth(d.getMonth() + 1);
+  else if (repeat === 'yearly') d.setFullYear(d.getFullYear() + 1);
+  return formatLocalDate(d);
+};
+
 export const sendBrowserNotification = async (
   title: string,
   body: string,
-  icon = '/pwa-192x192.png'
+  iconPath = '/pwa-192x192.png'
 ): Promise<boolean> => {
   try {
     if (!('Notification' in window)) {
@@ -68,48 +77,73 @@ export const sendBrowserNotification = async (
       return false;
     }
 
-    // Ensure permission is granted; if 'default', request it
+    // Ensure permission is granted
     let perm = Notification.permission;
     if (perm !== 'granted') {
-      perm = await Notification.requestPermission();
+      try {
+        perm = await Notification.requestPermission();
+      } catch {
+        // user gesture might be required
+      }
     }
     if (perm !== 'granted') {
       console.warn('Notification permission was not granted:', perm);
       return false;
     }
 
+    const iconUrl = new URL(iconPath, window.location.origin).href;
+    const tag = `xpenser-rem-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+
     // 1. Mobile Android / PWA standard: MUST use ServiceWorkerRegistration.showNotification()
     // In mobile Android Chrome, `new Notification()` throws an Illegal Constructor error.
-    // ServiceWorker showNotification is the ONLY API that triggers Android top bar / status bar notifications!
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.ready;
+        let registration = await navigator.serviceWorker.getRegistration();
+        if (!registration) {
+          registration = await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise<any>(resolve => setTimeout(resolve, 1500))
+          ]);
+        }
+
         if (registration && typeof registration.showNotification === 'function') {
-          await registration.showNotification(title, {
-            body,
-            icon,
-            badge: icon,
-            vibrate: [250, 100, 250, 100, 250],
-            tag: 'xpenser-rem-' + Date.now(),
-            renotify: true,
-            requireInteraction: true,
-            silent: false,
-            data: { url: window.location.href }
-          } as NotificationOptions);
-          return true;
+          // Attempt 1: Rich options with vibration
+          try {
+            await registration.showNotification(title, {
+              body,
+              icon: iconUrl,
+              badge: iconUrl,
+              vibrate: [250, 100, 250, 100, 250],
+              tag,
+              renotify: true,
+              data: { url: window.location.href }
+            } as NotificationOptions);
+            return true;
+          } catch (richErr) {
+            console.warn('Rich showNotification options rejected (e.g. background vibrate policy), trying minimal:', richErr);
+            // Attempt 2: Minimal options without vibrate (always allowed on Android without user gesture)
+            await registration.showNotification(title, {
+              body,
+              icon: iconUrl,
+              badge: iconUrl,
+              tag,
+              renotify: true
+            } as NotificationOptions);
+            return true;
+          }
         }
       } catch (swErr) {
         console.warn('ServiceWorker showNotification failed, trying window.Notification fallback:', swErr);
       }
     }
 
-    // 2. Desktop Browser fallback
+    // 2. Desktop Browser fallback (only runs on desktop where Notification constructor is permitted)
     try {
       new Notification(title, {
         body,
-        icon,
-        badge: icon,
-        vibrate: [250, 100, 250]
+        icon: iconUrl,
+        badge: iconUrl,
+        tag
       } as NotificationOptions);
       return true;
     } catch (desktopErr) {
@@ -121,6 +155,123 @@ export const sendBrowserNotification = async (
     console.warn('sendBrowserNotification caught exception:', err);
     return false;
   }
+};
+
+let isTriggeringReminders = false;
+
+/**
+ * Universal Reminder Trigger Engine
+ * Evaluates all scheduled reminders for the active partner and immediately triggers
+ * mobile top-bar notifications + audio chime for any due items.
+ */
+export const triggerDueReminders = async (partnerId: string): Promise<number> => {
+  if (!partnerId || isTriggeringReminders) return 0;
+  isTriggeringReminders = true;
+  let triggeredCount = 0;
+
+  try {
+    const storageKey = `xpenser_reminders_${partnerId}`;
+    let reminders: any[] = [];
+
+    // 1. Try local cache
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) reminders = parsed;
+      }
+    } catch {}
+
+    // 2. Fallback to Supabase dedicated table if cache empty
+    if (reminders.length === 0) {
+      try {
+        const { data: dbItems } = await supabase
+          .from('reminders')
+          .select('*')
+          .eq('partner_id', partnerId)
+          .order('reminder_date', { ascending: true });
+        if (dbItems && dbItems.length > 0) {
+          reminders = dbItems;
+          localStorage.setItem(storageKey, JSON.stringify(dbItems));
+        }
+      } catch {}
+    }
+
+    if (!reminders || reminders.length === 0) return 0;
+
+    const now = new Date();
+    const todayStr = formatLocalDate(now);
+    const currentHours = String(now.getHours()).padStart(2, '0');
+    const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+    const currentTimeStr = `${currentHours}:${currentMinutes}`;
+
+    let changed = false;
+    const updatedList = [...reminders];
+
+    for (let i = 0; i < updatedList.length; i++) {
+      const item = updatedList[i];
+      if (!item || item.partner_id !== partnerId || item.is_completed || item.notification_sent) {
+        continue;
+      }
+
+      const rTime = (item.reminder_time || '').slice(0, 5);
+      const isDue = (item.reminder_date < todayStr) || (item.reminder_date === todayStr && rTime <= currentTimeStr);
+
+      if (isDue) {
+        triggeredCount++;
+        changed = true;
+
+        playReminderChime();
+        await sendBrowserNotification(
+          `⏰ Remainder: ${item.title}`,
+          item.description || `Scheduled for ${rTime || 'today'}`
+        );
+
+        const repeat = item.repeat_type || 'none';
+        let nextDate = item.reminder_date;
+        let markSent = true;
+
+        if (repeat !== 'none') {
+          nextDate = computeNextRepeatDate(item.reminder_date, repeat);
+          markSent = false;
+        }
+
+        const updatedItem = {
+          ...item,
+          reminder_date: nextDate,
+          notification_sent: markSent,
+          updated_at: new Date().toISOString()
+        };
+        updatedList[i] = updatedItem;
+
+        // Persist update directly to Supabase reminders table
+        try {
+          await supabase
+            .from('reminders')
+            .update({
+              reminder_date: nextDate,
+              notification_sent: markSent,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', item.id)
+            .eq('partner_id', partnerId);
+        } catch (dbErr) {
+          console.warn('Failed to update reminder status in Supabase:', dbErr);
+        }
+      }
+    }
+
+    if (changed) {
+      localStorage.setItem(storageKey, JSON.stringify(updatedList));
+      window.dispatchEvent(new CustomEvent('xpenser-reminders-updated'));
+    }
+  } catch (err) {
+    console.warn('triggerDueReminders error:', err);
+  } finally {
+    isTriggeringReminders = false;
+  }
+
+  return triggeredCount;
 };
 
 export const fetchRemindersAndNotifications = async (partnerId: string): Promise<AppNotification[]> => {
@@ -273,29 +424,56 @@ export const fetchRemindersAndNotifications = async (partnerId: string): Promise
       }
     }
 
-    // 6. User Scheduled Reminders
-    if (settingsJson?.reminders && Array.isArray(settingsJson.reminders)) {
-      for (const rem of settingsJson.reminders) {
-        if (!rem.is_completed && rem.reminder_date) {
-          if (rem.reminder_date === todayStr) {
-            notifications.push({
-              id: `rem-${rem.id}`,
-              type: 'remainder',
-              title: `⏰ Remainder Today: ${rem.title}`,
-              message: `Scheduled for ${rem.reminder_time || 'today'}${rem.description ? ` · ${rem.description}` : ''}`,
-              urgency: 'high',
-              linkTab: 'remainder'
-            });
-          } else if (rem.reminder_date < todayStr) {
-            notifications.push({
-              id: `rem-past-${rem.id}`,
-              type: 'remainder',
-              title: `⚠️ Overdue Remainder: ${rem.title}`,
-              message: `Was scheduled for ${rem.reminder_date} at ${rem.reminder_time}`,
-              urgency: 'high',
-              linkTab: 'remainder'
-            });
-          }
+    // 6. User Scheduled Reminders (check dedicated reminders table, settingsJson, and local cache)
+    let activeReminders: any[] = [];
+    try {
+      const { data: remRows } = await supabase
+        .from('reminders')
+        .select('*')
+        .eq('partner_id', partnerId)
+        .order('reminder_date', { ascending: true });
+      if (remRows && remRows.length > 0) {
+        activeReminders = remRows;
+      }
+    } catch {
+      // ignore
+    }
+
+    if (activeReminders.length === 0 && settingsJson?.reminders && Array.isArray(settingsJson.reminders)) {
+      activeReminders = settingsJson.reminders;
+    }
+
+    if (activeReminders.length === 0) {
+      try {
+        const localRaw = localStorage.getItem(`xpenser_reminders_${partnerId}`);
+        if (localRaw) {
+          const parsed = JSON.parse(localRaw);
+          if (Array.isArray(parsed)) activeReminders = parsed;
+        }
+      } catch {}
+    }
+
+    for (const rem of activeReminders) {
+      if (!rem.is_completed && rem.reminder_date) {
+        const rTime = (rem.reminder_time || '').slice(0, 5);
+        if (rem.reminder_date === todayStr) {
+          notifications.push({
+            id: `rem-${rem.id}`,
+            type: 'remainder',
+            title: `⏰ Remainder Today: ${rem.title}`,
+            message: `Scheduled for ${rTime || 'today'}${rem.description ? ` · ${rem.description}` : ''}`,
+            urgency: 'high',
+            linkTab: 'remainder'
+          });
+        } else if (rem.reminder_date < todayStr) {
+          notifications.push({
+            id: `rem-past-${rem.id}`,
+            type: 'remainder',
+            title: `⚠️ Overdue Remainder: ${rem.title}`,
+            message: `Was scheduled for ${rem.reminder_date} at ${rTime}`,
+            urgency: 'high',
+            linkTab: 'remainder'
+          });
         }
       }
     }

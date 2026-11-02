@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import type { TabId } from '../types';
 import { usePartner } from '../context/PartnerContext';
-import { fetchRemindersAndNotifications, type AppNotification } from '../utils/notificationService';
+import { fetchRemindersAndNotifications, triggerDueReminders, type AppNotification } from '../utils/notificationService';
 import NotificationModal from './NotificationModal';
 import SecurityModal from './SecurityModal';
 
@@ -72,10 +72,19 @@ const Navbar: React.FC<NavbarProps> = ({
 
   useEffect(() => {
     let isMounted = true;
-    fetchRemindersAndNotifications(activePartnerId).then(list => {
-      if (isMounted) setNotifications(list);
-    });
-    return () => { isMounted = false; };
+    const loadAlerts = () => {
+      triggerDueReminders(activePartnerId);
+      fetchRemindersAndNotifications(activePartnerId).then(list => {
+        if (isMounted) setNotifications(list);
+      });
+    };
+
+    loadAlerts();
+    window.addEventListener('xpenser-reminders-updated', loadAlerts);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('xpenser-reminders-updated', loadAlerts);
+    };
   }, [activePartnerId]);
 
   const isP1 = activePartnerId === 'partner_1';
@@ -598,7 +607,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   marginBottom: 0
                 }}
               >
-                My Wallet
+                My Tracky
               </p>
             </div>
           </div>
